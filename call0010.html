@@ -1,0 +1,606 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>Print Preview and Documents -- Category 10</title>
+<meta http-equiv="Content-Type" content="text/html"/>
+<meta name="description" content="Print Preview and Documents -- Category 10"/>
+</head><body>
+<a name="Top"></a>
+
+<p>File Date: 2010-06-08</p>
+
+
+<h1>Print Preview, Documents, and Reports -- Category 10</h1> 
+
+<p> Function calls in this category are made<br/>
+1. When a document or certificate is  executed via the 
+<a href="lcxh.html#unicert">unicert( )</a> or, on 16-bit systems, also the
+<a href="lcxh.html#unicert">printcert( )</a> or 
+<a href="lcxh.html#unicert">certificate( )</a> functions.<br/>
+2. When a Report (Status Index, Quantitative Report, Programmed Report, SYNFARE View, or Standard Report)
+is being Printed or previewed.</p>
+
+<h3>Enabling control in WinPCS:</h3>
+<p>
+1. Calls to the <a href="lcxh.html#unicert">unicert( )</a> 
+function or one of its special cases on 16-bit systems, 
+<a href="lcxh.html#unicert">printcert( )</a> or
+<a href="lcxh.html#unicert">certificate( )</a>.</p>
+
+<p> 2. Some kind of Report or List-view data is to be formatted:</p>
+
+<table border="1" cellspacing="5" cellpadding="2"> <tbody>
+<tr><td>Report</td> <td>Where the reference is</td> 
+    <td>Formatting Files</td><td>Formatting Function</td> </tr>
+<tr><td>SYNFARE List Views</td>  
+    <td>WinPCS.INI section [REPORT]</td> <td>Entry FRAMEFILES=</td> <td>Entry FRAMEFUNCTION=</td></tr>
+<tr><td>Exception reports</td>   
+    <td>WinPCS.INI section [REPORT]</td> <td>Entry FRAMEFILES=</td> <td>Entry FRAMEFUNCTION=</td></tr>
+<tr><td>Status index reports</td>     
+        <td>REFREP table</td> <td>field LCXFILE</td><td>field FORM</td></tr>
+<tr><td>Status index reports</td>     
+        <td><a href="lcxh.html#statusindex">statusindex( )</a> </td> 
+        <td>argument <em>filelist</em></td> <td>argument <em>function</em> </td></tr>
+<tr><td>Standard (Quick-)reports</td> 
+    <td>STDREP table</td> <td>Field FRAMEFILE</td> <td>Field FRAMEFUNCTION</td></tr>
+<tr><td>Quantitative Reports</td> 
+    <td>QREPORT.INI section</td> <td>formfiles=</td> <td>formfunctionW= or formfunctionR=</td></tr>
+<tr><td>Programmed Reports</td> 
+    <td>argument to <a href="lcxh.html#RepCreate">RepCreate( )</a> </td> 
+	<td>argument <em>formfile</em></td> <td>argument <em>formfunction</em> </td></tr>
+</tbody></table>
+
+<p>The status index reports are usually run based on the information in the REFREP table, but the code
+in REFREP.LCX eventually call the <a href="lcxh.html#statusindex">statusindex( )</a> 
+function with the parameters picked up from the fields as shown. </p>
+
+<h3>Disallowed functions:</h3>
+<p>DDE callback and functions are only available inside the DDE callback environment.  
+There is however no restrictions on initiating DDE-operations. Another certificate
+may not be created from within the formatting functions of another.</p>
+
+<h3>LCX files:</h3>
+<p>The files listed in the argument to the functions 
+<a href="lcxh.html#unicert">unicert( )</a>, 
+<a href="lcxh.html#certificate">certificate( )</a>,
+<a href="lcxh.html#printcert">printcert( )</a>, or
+<a href="lcxh.html#statusindex">statusindex( )</a>; or the files
+listed in other INI files and tables as shown in the above table, 
+must provide all the necessary functions. If the functions or files are not found, 
+a system-provided default function will be used instead.</p>
+
+<h3>Special Replacements:</h3>
+<p>There is a movement towards placing the formatting functions into the AUTOCODE
+table. For this to work right, the file-argument should be:</p>
+<pre><b>AUTOCODE repform.lcx</b></pre>
+<p>and the function should be a concatenation of a table-name and a suffix referring to the
+report. This is handled automatically by the system for reports managed in REFREP, but
+will have to be added manually in programmed reports: </p>
+
+<pre>
+// title, paperformat, table, funcp, are defined and set
+Report = RepCreate(title, paperformat, "AUTOCODE repform.lcx", concat(table, "_", funcp), ... )
+RepControl(concat("E:", makeset(table, "", "", funcp, title, "" )), Report); 
+</pre>
+
+<p>The E: extra-information is used by the formatting functions in AUTOCODE and repform.lcx. The 
+specified  pattern will match what REFREP status-index reports have.</p>
+
+<h3>Special functions:</h3>
+<p>The Printing functions, such as 
+<a href="lcxh.html#BoundedText"> BoundedText() </a>, 
+<a href="lcxh.html#Height"> Height() </a>, 
+<a href="lcxh.html#Hline"> Hline() </a>, 
+<a href="lcxh.html#Image"> Image() </a>,  
+<a href="lcxh.html#Line"> Line() </a>,
+<a href="lcxh.html#Origin"> Origin() </a>, 
+<a href="lcxh.html#Text"> Text() </a>, 
+<a href="lcxh.html#Vline"> Vline() </a>, 
+<a href="lcxh.html#Width"> Width() </a> 
+are to be used to emit text onto the paper.</p>
+
+<h2>1. For Certificates, </h2>
+<p>The Callback function is called as</p>
+
+<pre><em>lcxfunction</em><b>(</b><em>optarg, ... </em><b>)</b></pre>
+
+<p>where the optarg are optional arguments passed through from the call to 
+<a href="lcxh.html#certificate">certificate( )</a> or 
+<a href="lcxh.html#printcert">printcert( )</a> this inner function. 
+This called function may call more functions in different files, as long as all files are 
+listed in the first argument to <a href="lcxh.html#certificate">certificate( )</a>.</p>
+
+<p> All X and Y coordinates and dimensions are in 1/10mm units, measured above (Y) and to 
+the right (X) of the Origin point. This is the lower left corner of the page, unless the 
+<a href="lcxh.html#Origin">Origin( )</a> 
+function has been called. Positive values of Y are upwards and positive values of  X are to the right, 
+Where not otherwise noted, the X and Y values are signed, and negative values refer to 
+locations below or to the left of the origin point. 
+Normal LCX functions, except for the ones restricted to be used for DDE transactions 
+only,  may be called in the course of drawing a certificate or form.  Notably, all the 
+database interfacing functions (<a href="#get ">get ( )</a>, <a href="#findexact">findexact( )</a>, 
+<a href="#startconnscan">startconnscan( )</a>, ... ) are available and 
+may be used for generating texts and controlling the presence and absence of  various items.</p>
+
+<h3>Return Value:</h3>
+<p>Ignored. </p>
+
+<a name="repformat"></a>
+<h2>2. Report formatting</h2>
+
+<p>This applies to all the various report formats. In general, SYNFARE and Exception reports use a common,
+generic format, while Status Indexes and Quantitative Reports use specialized formats modified for each
+report in the variety. </p>
+
+<p>The report formatting functions are in all cases called with 12 arguments as follows:</p>
+
+<pre><em>function</em><b>(</b><em>pagenumber</em><b>, </b><em> pagecount</em><b>, </b><em> first</em><b>, </b><em> last</em><b>, </b><em> keylegend</em><b>, </b><em> header</em><b>, </b><em> footer</em><b>, </b><em> arguments</em><b>, 
+</b><em> columns</em><b>, </b><em> rows</em><b>, </b><em> pagelitra</em><b>, </b><em> treeinfo</em><b>)</b> </pre>
+
+<p>The formatting function will be called once in advance, with a negative value for <em>pagenumber</em>.  During
+this call, no actual drawing should take place, instead the function should calculate and 
+return formatting <a href="#pageminus1"> information in a 7-part set, (see below),</a> comprising the report 
+output area boundaries,left, top, right, bottom; the text font and size, and additional 
+formatting flags.  Later calls where <em>pagenumber</em> is zero or positive and where drawing is 
+to occur will have their return values ignored.</p>
+
+<p>When the <em>pagenumber</em> is zero or positive, that means this page is in the process of being formatted. 
+The function should use the drawing functions to draw text and lines on the page.  The report-data formatting
+can be examined via the functions 
+<a href="lcxh.html#ReportFirst">ReportFirst( )</a>, <a href="lcxh.html#ReportLast">ReportLast( )</a> , and
+<a href="lcxh.html#ReportLegend">ReportLegend( )</a> , 
+and the data-set report behind it can be found using 
+<a href="lcxh.html#ReportRef">ReportRef( )</a> and then accessed using
+<a href="lcxh.html#RepInfo">RepInfo( )</a> and <a href="lcxh.html#RepGet">RepGet( )</a>. 
+When the <em>pagenumber</em> argument is zero or positive, the return value from the function is ignored.</p>
+
+<p>The arguments are:</p>
+<p><em>pagenumber</em> - the number of the page being formatted. This is -1 for the first, measurement call. 
+Note that this is a base-0 number, if it is desired to print it out, add 1, or use the <em>pagelitra</em>
+argument instead for this purpose. </p>
+<p><em>pagecount</em> - this is the total number of pages being formatted. This is the initial estimate, but
+any calls to 
+<a href="lcxh.html#Newpage">Newpage( )</a> 
+will  cause this number to increase. The main use of this is to get the total in "Page number X of T" strings.</p>
+<p><em>first</em> - this is the value of the first key-field value appearing on the page.</p>
+<p><em>last</em> - this is the value of the last key-field value appearing on the page.</p>
+<p><em>keylegend</em> - this is the legend string of this key-field.</p>
+<p><em>header</em> - header as defined from STATREES.INI or similar</p>
+<p><em>footer</em> - footer as defined from STATREES.INI or similar</p>
+<p><em>arguments</em> - Additional arguments passed in from the call to
+statusindex argument <em>arguments</em>, or set with 
+<a href="lcxh.html#RepControl">RepControl("E:<em>string</em>", <em>identifier</em>)</a>. 
+Some specific conventions of REFREP.LCX and REPFORM.LCX have
+been made. See below for these.</p>
+<p><em>columns</em> - How many columns of report goes on this page</p>
+<p><em>rows</em> - How many rows of report goes on this page</p>
+<p><em>pagelitra</em> - Printable string for the pagenumber (base 1)</p>
+<p><em>treeinfo</em> - Info on tree-lines in Status Index reports. These are inherited by the Quantitative 
+Reports run from the status index reports. </p>
+
+<p>The function 
+<a href="lcxh.html#ReportRef">ReportRef( )</a> 
+can be used to find the actual report-data handle of the report being printed, and thus
+access the contents of the report directly. </p>
+
+<h3>Example:</h3>
+<p>This is a quite simple example. A lot of work has gone into configuring WinPCS so that formatting functions
+are common to all reports and only column titles and widths have to be specified, including all the code for drawing
+lines and legends around the Report itself. Here, the actual Report is drawn using DrawReport(). </p>
+
+<pre>
+
+fabrep(string pagenumber, string pagecount, string first, string last,
+    string keylegend, string header, string footer)
+{
+    string top, center;
+    string left, right, bottom;
+    string flag1, delta;
+
+    string rep, repdescr, user;
+
+    bottom = 10;
+    delta = 610;
+    top = Height() - delta;
+    left = 180;
+    right = Width() - 30;
+    center = (left + right) / 2;
+
+    /* pagenumber &lt; 0 is measurement page */
+    if(0 &lt; pagenumber)
+    {
+        rep = /* ReportFirst(column, page); */ first;
+        findexact("FABREPRT", "REPORT_NO", rep);
+        user = get("FABREPRT", "USER");
+        repdescr = get("FABREPRT", "DESCRIPTION");
+
+        Vline(left, top, bottom);
+        Vline(right, top, bottom);
+        Hline(left, right, top);
+        Hline(left, right, bottom);
+
+        DrawReport(right, top + delta, left, center, 
+            user, rep, repdescr, pagenumber, pagecount); 
+    }
+
+    flag1 = concat("D:0 SN L:-20,-10 Cd:0 C1:230 C2:300 C3:60 C4:150 C5:150 C6:130 
+C7:360 C8:30 C9:0 C10:0 C11:0");
+
+    return(makeset(left + 20, top, right + 10, bottom, "Arial", 25, flag1));
+
+}
+</pre>
+
+<a name="pageminus1"></a>
+<h2>Return values for pagenumber -1</h2>
+
+<p>As can be seen from the above example, the return values indicate the boundary of the report printing area, 
+the font and size of the text in the report, and a set of flags for the report.  As usual, the sizes and 
+coordinates are in 1/10 mm units, so in the above example, the text is 2.5 mm high and there are margins of
+2 mm on the left side and 1 mmm to the right side, relative to the box drawn around the report-output area. </p>
+
+<p>The flags indicate column sizing and other details in the report. In addtion to the ones shown there are also
+commands for aligning text in the columns differently and for making some columns use a different font. All these
+are detailed below:</p>
+
+<table border="1" cellspacing="5" cellpadding="2"> <tbody>
+<tr><td>Key code</td><td>Description</td><td>Example</td> </tr>
+
+<tr><td>S </td><td>Skip the first column from the report data set. This is usually because the data here is
+all the same and will be referenced on the page.</td><td>S</td> </tr>
+
+<tr><td>R </td><td>Repeat the first column on each horizontal page, this is when the report is so wide that
+the data for some rows will not fit on a single page. This takes precedence over the S flag.</td><td>R</td> </tr>
+
+<tr><td>N </td><td>Do not include the legends from the report. This means we will have to draw our own.
+This is frequently the case, also the U: option for vertical lines is not requested then.
+</td><td>N</td></tr>
+
+<tr><td>L:<em>left</em>,<em>right</em></td><td>Draw horizontal lines, offset from
+the left and right edge of the report data ares. L:-20,-10 means draw the lines 
+extending 2 mm to the left of the report-data area, and stopping short 1 mm to the 
+left of the right edge of the report-data area.  </td><td>L:-20,-10</td> </tr>
+
+<tr><td>K:<em>number</em></td><td>Reserved, not defined </td><td>K:0</td> </tr>
+
+<tr><td>D:<em>column[,column ...]</em></td><td>Start new page when there are changes in the data in one 
+or more of these columns</td><td>D:0</td> </tr>
+
+<tr><td>Cd:<em>width</em></td><td>Set default width of all columns not otherwise specified. 
+Zero width of a column means it will not be displayed.
+</td><td>Cd:0 </td> </tr>
+
+<tr><td>C<em>column</em>:<em>width</em></td><td>Set the width of the indicated column. This overrides the default width set.</td><td>C4:150 sets the width of Column 
+4 to 15 mm.</td> </tr>
+
+<tr><td>Ad:<em>value</em></td><td>Set default alignment of all columns not otherwise specified. 
+Alignment -1 is the default left-justified, alignment 0 is centered, alignement 1 is right-justified.
+</td><td>Ad:-1 </td> </tr>
+
+<tr><td>A<em>column</em>:<em>value</em></td><td>Set the alignment of the indicated column. This 
+overrides the default alignments set.</td><td>A4:0 sets the alignment of Column 
+4 to Centered.</td> </tr>
+
+<tr><td>V:<em>height</em></td><td> Adds some extra vertical spacing between the rows.
+The extra height is in the usual 1/10 mm. 
+</td><td>V:5 adds 0.5 mm between the rows.</td></tr>
+
+<tr><td>W:<em>wrapwidth</em></td><td> wrap text. The default is the 
+WinPCS.INI [PPVIEW] WRAPWIDTH= value. </td><td>W:60</td></tr>
+
+<tr><td>Fd:<em>number</em></td><td>Set default font for all columns not otherwise specified. 
+Font 0 is the default. Fonts 0-9 are all the one specified in the return string unless one or more
+of fonts number 1-9 has been specified in WinPCS.INI 
+</td><td>Fd:1 Fd:7</td></tr>
+
+<tr><td>F<em>column</em>:<em>number</em></td><td>Set the font for the indicated column. This 
+overrides the default fonts set.</td><td>F4:3 sets the font of Column 4 to whatever 
+has been defined as font 3.</td> </tr>
+
+<tr><td>K:<em>functionname</em>(<em>columnnumber</em>, <em>columnnumber</em>, ... )
+</td><td>Have a function look at some of the columns, and make it decide that the colors
+in the report-rows should be different than the standard black-on-white. See the
+section on Alternate Colors
+below.</td> <td>K:colorstatus(3,4) looks at the strings passed it from columns 3 and 4.  </td> </tr>
+
+<tr><td>U:<em>top,bottom</em></td><td> Draw vertical lines for the column boundaries, extending away from the
+top and bottom boundaries by the values shown, much like the L: arguments adjust to the left and the right. 
+Frequently, the formatting function wants to draw these lines itself along with the header fields. 
+</td><td> </td> </tr>
+
+</tbody></table>
+
+<h3>Alternate Colors</h3>
+<p>The alternate color functions take 4 arguments when called, and it should return a 3-part set of numbers.</p>
+
+<p>First argument is the report-reference, second argument is the number of the row being handled,
+the third argument is a set of the strings appearing in the rows listed in the K: command, and the 
+fourth command is the index of the column currently having its text being drawn. 
+
+Although the values are given directly as the strings they appear as, the column index under 
+consideration can be used to determine if only some columns need to be differently colored.
+If the entire row should have the same color, this can be ignored. </p>
+
+<p>The first part of the return value is 0 for use standard black-on-white and 1 for use the colors
+specified in the second part for the text, and the third part for the background. Text and background
+colors are 0-black, 1-brown, 2-red, 3-orange, 4-yellow, 5-green, 6-blue, 7-purple, 8-gray, 9-white, 
+10 and beyond are treated as RGB-quads, that are less convenient in decimal notation. </p>
+
+<p>Example where the entire rows for things that are not started are colored red (2) on white (9):</p>
+<pre>
+colorstatus(string report, string row, string columnset, string column)
+{
+	if("not started" == setitem(columnset, 0))
+	{
+		return(makeset(1, 2, 9));  /* 2=red text 9=white background */ 
+	}
+	return(makeset(0, 0, 9));      /* default, the colors 0 and 9 for black text on white background are ignored here. */
+}
+</pre>
+
+
+
+<h3>Alternate Fonts:</h3>
+<p>There are 10 different alternate fonts, that can be specified in the file 
+WinPCS.INI section [REPORT] entries FONT1= FONT2= etc. up to FONT9=.  Each entry is on the form
+fontname+height+. A common use of this is for making barcodes in some column in the report.</p>
+
+<h2>Conventions made for Status Index Reports</h2>
+<p>The problem of formatting and managing status index reports have gradually found a solution. There are two
+parts to this, one has to do with starting the reports and the other has to do with formatting them. </p>
+
+
+<h3>Starting SI reports: REFREP and REFREP.LCX</h3>
+<p>There is a function <b>DragSI( )</b> defined in the file REFREP.LCX, which is referenced from DDMATRIX. This
+function calls the main function <b>SEL_SI( )</b>. Some of the Views also call <b>SEL_SI( )</b> from a pushbutton. </p>
+
+<p>This function lists the relevant report specifications for the table from REFREP and if there is more than one,
+opens up a selection-list. Further selection-lists may be specified by various values in the SELECTn and RESTRICTn
+fields in the REFREP table.  The code in REFREP.LCX eventually calls the function
+<a href="lcxh.html#statusindex">statusindex( )</a> 
+with relevant parameters, and with the <em>argument</em> set to a multi-part set, suitable for later decoding
+work in the formatting functions: </p>
+
+<p><b>setitem(</b><em>argument</em><b>, 0):</b>Table. - This is the name of the table where the status index
+    was started.</p>
+<p><b>setitem(</b><em>argument</em><b>, 1):</b>Tag. - This is the number of the system or package or tag 
+    where the status index was started. Note that when there is a multiple selection, this only lists the first
+    one of the lot.  </p>
+<p><b>setitem(</b><em>argument</em><b>, 2):</b>Field. - This is the field-name where the tag number is. </p>
+<p><b>setitem(</b><em>argument</em><b>, 3):</b>SI-code. - This is the report code from REFREP, field REP_TYPE</p>
+<p><b>setitem(</b><em>argument</em><b>, 4):</b>Title. - This is the title from ? </p>
+<p><b>setitem(</b><em>argument</em><b>, 5):</b>Limits. - This is a string indicating other selection limits
+    that applies such as one or more disciplines, one or more status codes and so on. </p>
+
+<h3>Example</h3>
+<pre>CERTSYS+DCP-010+SYSTEM_NO+A1+Pre-comm Status Index+ALL DISCIPLINES STATUS=Include ALL</pre>
+
+<a name="autocode"></a>
+<h3>Formatting SI reports: REPFORM.LCX and AUTOCODE</h3>
+<p>In order to make report formats look uniform across the set of reports in projects, there are
+a number of library functions defined in REPFORM.LCX, and a cooperation between these and the functions
+defined and stored in the AUTOCODE table, for each report. The functions in AUTOCODE replace the ones
+formerly in MCFORM.LCX, MCFORM2.LCX and others. </p>
+
+<p>A number of modifications in the system are necessary to be able to use this subsystem:</p>
+<p><b>A.</b> The "Report-editing" button should be added in the section [report] in
+view.ini</p>
+<pre>
+Pdes=PDESIGN 1 (Configure printing format)
+</pre>
+
+<p> The symbol Pdes is defined in REFBMP31.ini as: </p>
+<pre>
+PDES=BT_FORMS       272 75 28 16
+</pre>
+
+<p><b>B.</b> "Quick reports" or "Custom reports" have their
+non-AUTOCODE defaults in WinPCS.INI, but when AUTOCODE is in place, it
+allows modifications and saving layouts for these reports as desired, then
+with names linked to the user as well.</p>
+
+<p><b>C.</b> To get the AUTOCODE subsystem working, the table must be created. 
+Its layout is as follows, in TXS-file format:</p>
+<pre>
+AUTOCODE RSERIAL        0     0     4     R 0    M    0    A
+AUTOCODE LCXFUNCTION    1     4     33    A 1    M    0    R
+AUTOCODE DESCRIPTION    2     37    80    A -1   N    -1   R
+AUTOCODE CONTEXT        3     117   20    A 2    B    0    R
+AUTOCODE CREATED_BY     8     137   20    A 3    B    0    R
+AUTOCODE CREATED_ON     9     157   4     D 4    B    0    R
+AUTOCODE ICON           4     161   20    Z -1   N    -1   R
+AUTOCODE LCXCODE        5     181   3800  Z -1   N    -1   R
+</pre>
+<p>This table is managed for the formatting of the reports, both programmed
+and others, and there should be no need for editing records here directly
+using INSP -- this is possible but can be tedious...</p>
+
+<p>Note also that there should be a record defined in CXDICT for the AUTOCODE 
+table as well. </p>
+<table border="1" cellspacing="5" cellpadding="2"> <tbody>
+<tr><td>Field</td> <td>Value</td> </tr>
+<tr><td>ITEMBASE</td><td>AUTOCODE</td></tr>
+<tr><td>ITEMFLD</td><td>LCXFUNCTION</td></tr>
+<tr><td>ITEMUNIFLD</td><td>RSERIAL</td></tr>
+<tr><td>ITEMDESFLDS</td><td>DESCRIPTION</td></tr>
+<tr><td>ITEMDFCOUNT</td><td>1</td></tr>
+<tr><td>DEFAULTICON</td><td>BMFUNCTION</td></tr>
+<tr><td>ITEMICON</td><td>ICON</td></tr>
+<tr><td>ITEMICONMODE</td><td>C</td></tr>
+<tr><td>ISCORED</td><td>N</td></tr>
+<tr><td>BASEDESCR</td><td>Generated Code</td></tr>
+</tbody></table>
+<p>Other fields in CXDICT that are not listed should remain blank.</p>
+
+<p>In order to save the formats, there should also be two USYM entries, EAUTOCODE 
+and VAUTOCODE, with appropriate permission settings; as not everyone may be 
+allowed to create and change AUTOCODE layouts. This is controlled via the USYM 
+entry EAUTOCODE, in a manner analogous to the way the access to other Entry 
+forms are handled. VAUTOCODE is for the benefit of any View that one may want
+to create for AUTOCODE and link into the menu.</p>
+
+<p><b>D.</b> To make reports work with AUTOCODE instead of the older per-report
+functions in mcform.lcx and suchlike, the formatting file names list,
+field LCXFILE, in REFREP should be changed to:</p>
+<pre>
+AUTOCODE REPFORM.LCX
+</pre>
+<p>for all the SI reports that you want to use the AUTOCODE. In most recent
+systems this is just all of them -- most have been very happy to be able
+to edit and adjust the layouts without having to edit LCX files -- but if
+there is one or more special layouts that is not readily handled by the
+AUTOCODE, you can retain the old layout file and function references for
+these.</p>
+
+<p>The naming convention for the functions for these reports are the
+concatenation of the ITEMBASE and REPTYPE values from REFREP, thus
+CERTAC1_A1 will be the name of the formatting function for the A1 report
+run off CERTAC1.</p>
+
+<p><b>E.</b> For Q-reports, there are a few more things to consider.</p>
+
+<p><b>E1.</b> Since the same standard q-report can be run several different ways off
+the same or different status index reports, there are more elements to the
+function-naming of these. The function begins with the one from the
+SI-report (ITEMBASE _ REPTYPE), then the section in the QREPORT.INI file
+(such as QPLSYS or QASHREP) then a suffix from the definition in STAREP.INI, then a
+W or R for the Wide or Rectangular mode report, as applicable.</p>
+
+<pre>
+$button QTOS=QREPORT1 0 (TO System Discipline) QPLSYS S:1 L:6 G:9,9
+$button CalcX=QREPORT5 1 (SubSystem Discipline) QPLSYS S:2 L:6 G:9,9
+$button CalcS=QREPORT2 1 (Unit/Site Discipline) QPLSYS S:0 L:6 G:9,9
+$button CSSy=QREPORT3 0 (Cat. by Subsystem) QPLCAT S:2 L:8 G:9,9
+$button CTO=QREPORT4 0 (Cat. by TO System) QPLCAT S:1 L:8 G:9,9
+</pre>
+<p>This suffix is whatever follows the word QREPORT in the button
+definitions, this is usually a single letter or digit, but could be
+anything really; the important thing is that all the QREPORT buttons in
+any one SI report layout, that is, any one section of STAREP.INI, have
+different suffixes.  The formatting of the first of these will be
+something like CERTSYS_PL_QPLSYS_1W and CERTSYS_PL_QPLSYS_1R for example.
+The 1 is the digit 1 following the QREPORT word in the definition.</p>
+
+<p><b>E2.</b> The second thing to change is analogous to the change to REFREP -- the
+formatting files list should include AUTOCODE, thus all formfiles= entries
+in the various sections in QREPORT.INI should be changed to read:</p>
+<pre>
+formfile=AUTOCODE repform.lcx
+</pre>
+<p>The formfunction= is not used, it can be left as it is (usually it is
+something like "qreportformat")</p>
+
+<p><b>F.</b> The last kind of reports are the programmed reports. These usually
+begin as RepCreate() calls in various LCX files in the system32 directory,
+and they have to be given some "extra-string" values, so that the
+formatting functions get the necessary supporting information for its
+job.  Like the SI-reports and the Q-reports, the formatting files have to
+be specified as "AUTOCODE repform.lcx" here as well. The function-names
+have to be defined as some suitable concatenation of a table-name and a
+report-code, mimicing the names generated for the status index reports,
+and there has to be an "extra" string set, that contains these elements.</p>
+
+<p>A fairly typical sequence will be:</p>
+<pre>
+
+      funcp = "EMITTABLE";
+
+      Report = RepCreate(title, "P",
+              "AUTOCODE repform.lcx", concat(itembase, "_", funcp),
+          makeset ("CI", "Data Number", 30),
+          makeset ("CI", "Week", 10),
+          makeset ("CI", "Total", 10),
+          makeset ("CI", "Cleared this week", 10),
+          makeset ("CI", "Cleared", 10),
+          makeset ("CI", "Active", 10) );
+
+      RepControl(concat("E:",
+              makeset(itembase, "", "", funcp, title, "" ) ), Report);
+
+</pre>
+<p>The Extra-string is a 6-part set, where the first and fourth elements are
+the two names (here they are in the variables itembase and funcp) being
+used to assemble the formatting function name. The sixth element is the
+title of the report.</p>
+
+<p>Both of these names, by convention, consist of capital letters and digits,
+but they don't have to refer to any real table, even though there usually
+is some main table of interest in these reports, and that will be a good
+candidate for the first part of the name. The idea is to be able to
+distinguish the names of all the various reporting formatting functions.</p>
+
+<p>Now, if you don't want to allow changing the format of some specific
+programmed report, the argument
+makeset("PX", "PDESIGN") given to RepCreate(), preceeding or following the
+various makeset("CI", ...) arguments, will cause the exclusion of the
+PDESIGN pushbutton.  In this case, the formatting files and functions
+should not include AUTOCODE.</p>
+
+
+<h3>Formatting SI reports: REPFORM.LCX, MCFORM.LCX/MCFORM2.LCX</h3>
+<p>This is the older style of configuration. It still works, but is being replaced with the AUTOCODE-based
+configuration detailed above.</p> 
+<p>To make the report formats look uniform across the set of reports in the projects, a number of library
+functions in REPFORM.LCX and MCFORM.LCX are used for as many of the reports as possible. Even other reports,
+such as SYNFARE or standard-reports use some of these functions, via the code in R1PAGE.LCX. (these 
+usually use the function <b>printpage( )</b> in R1PAGE.LCX.  </p>
+
+<p>This layout-function is named <b>DrawMCHeader()</b> but for report printouts, it is wrapped inside another, 
+more complete function called <b>DoRestOfReport()</b>, which also deals with the vertical lines separating the data
+fields.  The idea is that the column widths and titles are specified in these functions, then all the common
+details are done by <b>DoRestOfReport()</b>, hence that name. Now, this function needs to make a few callbacks
+for the names and titles. These functions all have names such as "DecodeXXXN" and "DecodeXXXU". Look at the
+actual MCFORM.LCX and REPFORM.LCX files for details on these.</p>
+
+<h3>Example</h3>
+<pre>
+/* A and B sheet status index format */
+mcsilist(string pagenumber, string pagecount, string first,
+    string last, string keylegend, string unheader, string footer,
+    string extra, string ucol, string urow, string pagelitra)
+{
+    string Ldxset, Rdxset, names1, names2, rr;
+
+    Ldxset = makeset(  0,  140,      300,   180   );   Rdxset = makeset(0,   0,  0,  200,    0,    170,     0,  150,      150,      0,  200  );
+    names1 = makeset("", "Sub-",   " Tag", "Tag",   "Tag",             "", "",  "", "Check", "",  "Item",   "", "Insp.",  "Disc.",  "", "Cleared");
+    names2 = makeset("", "System", " No.", "Type",  "Description",     "", "",  "", "Sheet:, "",  "Status", "", "ID",     "",       "", "Date");
+
+    rr = DoRestofReport(pagenumber,  pagelitra, pagecount, first,
+        last, keylegend, unheader, footer,
+        extra, "DecodeREFREPExtraU", "DecodeREFREPExtraN",
+        Ldxset, Rdxset, "", names1, names2, "");
+
+    return(rr);
+}
+</pre>
+
+<p>This shows how the columns are specified in the two sets Ldxset and Rdxset, where 0 means the column isn't shown
+and the other values are the usual 1/10 mm units.  Ldxset specifies the fields bound to the left margin, Rdxset 
+specifies fields anchored to the right margin. One field in the middle does not have its width specified, this is
+so it can take up the slack when the paper widths change, between A4 and US A (8.5 by 11 inches) for example. 
+Usually such fields are descriptions that don't require or have a particular controlled width, in this case this
+is the description of the tag. </p>
+
+<p>Note that the functions generated and stored in AUTOCODE are very similar to the above example; the difference
+is that the user has an easier job of editing and testing the function via the PDESIGN dialog.</p>
+
+<h3>See Also:</h3>
+<p>
+<a href="evini.html#Introduction"> View and Entry INI files</a><br/>
+<a href="qreportini.html"> QREPORT.INI</a>
+</p>
+
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> </p>
+
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+
+</body>
+</html>

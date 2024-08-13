@@ -1,0 +1,20 @@
+
+FilePut() - NCONNFTP_put() -- NCONNFTP_putKernel()
+
+Return values:
+-WE_MALLOCRFAIL -- failed to allocate buffer space
+-WE_FILE_NOT_FOUND -- failed to open the file to read
+WE_NOSERVER -- failed to connect to the server
+-WE_FILE_NOT_OPEN -- Old connection was no longer valid
+WE_OK == 0 -- OK completed
+
+FileGet()
+
+Return values:
+-WE_MALLOCRFAIL -- failed to allocate buffer space
+WE_NOSERVER -- failed to connect to the server
+-WE_FILE_NOT_FOUND -- Old connection was no longer valid
+-WE_FILE_NOT_OPEN -- failed to open the file for writing
+WE_OK == 0 -- OK completed
+
+

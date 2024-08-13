@@ -1,0 +1,150 @@
+
+<html lang="en">
+<head>
+<title>WinPCS Macro Calls</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name=description content="WinPCS Macro Invocations and Origins">
+</head><body>
+
+<a name="Top"></a>
+<a name="Where.20WinPCS.20Calls.20Macro.20Functions"></a> 
+
+<h1>WinPCS Macro Calls Invocations and Origins</h1>
+<p>File Date: 2018-11-20.</p>
+
+<p>UNDER CONSTRUCTION</p>
+
+<p>The following lists all the locations in WinPCS where LCX functions
+are being called. </p>
+
+<h2>64-bit Server</h2>
+
+
+<table border="1" cellspacing="1" cellpadding="2">
+<tbody>
+<tr><td>Label</td><td>Configuration</td><td>Networking</td><td>Operating system</td><td>Database system</td> <td>Development status</td><td>Note</td> </tr> 
+<tr><td>16-bit</td><td>Monolithic</td><td>File Sharing</td><td>Windows</td><td>Btrieve v.5-7</td> <td>Obsolete</td><td></td> </tr> 
+<tr><td>32-bit</td><td>client</td><td>DCE/RPC</td><td>Windows</td><td></td> <td>Obsolete.</td> <td>All new projects use the TCP interface.  </td></tr> 
+<tr><td>32-bit</td><td>server</td><td>DCE/RPC</td><td>Windows</td><td>Pervasive v.7-</td> <td>Obsolete.</td> <td> The difference between TCP and the DCE/RPC systems is the communication modules, all the rest is identical for both.  </td></tr> 
+<tr><td>32-bit</td><td>server</td><td>TCP</td><td>Windows</td><td>Pervasive v.7-</td> <td>Obsolescent.</td> <td>All new projects use one of the SQL databases.</td></tr>
+<tr><td>32-bit</td><td>client</td><td>TCP</td><td>Windows</td><td> </td> <td>In Production</td> <td>Current Product. Used with all the 32-bit and 64-bit servers.</td> </tr>
+<tr><td>32-bit</td><td>server</td><td>TCP</td><td>Windows</td><td>SQLite</td> <td>In Production</td> <td>Current Product. </td></tr>
+<tr><td>64-bit</td><td>server</td><td>TCP</td><td>Windows</td><td>SQLite</td> <td>In Production</td> <td>Current Product</td></tr>
+<tr><td>64-bit</td><td>server</td><td>TCP</td><td>Linux</td><td>SQLite</td> <td>Upcoming</td> <td> </td></tr> 
+<tr><td>64-bit</td><td>server</td><td>TCP</td><td>Linux</td><td>Postgresql</td> <td>In Development</td> <td></td> </tr>
+<tr><td>64-bit</td><td>server</td><td>TCP</td><td>Windows</td><td>Postgresql</td> <td>In Development</td> <td></td></tr>
+</tbody></table>
+
+<h2>32-bit Server</h2>
+
+<h2>Client</h2>
+
+
+
+
+
+
+
+<p>The following describes all places in WinPCS where macro 
+functions are called. 
+Which function and how the call is enabled is detailed in the following. 
+The interested reader should turn to the appropriate section in the System 
+Manual or this Macro Help File for a complete description of any utility or 
+function mentioned in the following; the descriptions here only concern 
+what is needed to explain the macro LCX calls, whether purpose, bugs, 
+or availability.</p>
+
+<p> The numbers of the categories correspond to the internal identity of 
+the category in the 16-bit systems.   The purpose of this was to control
+availability of functions in various contexts, but this is done by having
+secondary lists of callback functions in the 32-bit systems, enabled when
+relevant only.  However, the division is still rather useful, as it makes
+easier to update this document as changes are made to the WinPCS source 
+code.</p>
+
+<p> Any differences between 16 and 32-bit systems will be noted in the sections
+where they occur. Some of these are server-side functions where there are
+a limited set of options and functionality available.  Other limitations are
+simply that some functions are unavailable or meaningless in certain 
+contexts. Functions not listed as inadvisable or unavailable can be expected
+to work as documented.</p>
+
+<p>The entries titled  "Enabling control in WinPCS" give a short 
+description of how the function call comes into being. It is obvious 
+that this requires the referenced function and file to actually exist. 
+On server-side callbacks, all called functions are expected to be in the
+set of files listed in the server.ini.</p>
+
+<p>Unless otherwise noted, failure in this respect is quiet; references 
+to unknown function or unknown files are not reported, and in general 
+results in a no-operation. In several cases, when a macro function is 
+not deemed necessary, default operations are available to be put in 
+their place. Again, this will be noted as necessary.</p>
+
+<p>The "execution context" refers to the data structure that is created 
+when the macro files are first read.  It contains the code to be 
+executed, any predefined global variables, and any global variables 
+defined by the macro function when they run.  Several independent 
+execution contexts may exist at any time, and there may also be several  
+macro function runs during the lifetime of any one execution environment.  
+In this case, all global variables set up by the macro code in an early 
+call are accessible during later calls.   This is referred to as a 
+re-entered execution context.</p>
+
+<p> When macro functions themselves refer to other LCX files and functions, 
+indirectly or directly, additional execution contexts, independent of 
+the first one, may be created.  Global variables in one execution context 
+do not exist in any other execution context, not even when the two 
+contexts exist simultaneously.  This happens as a matter of routine 
+with Print formatting functions, notably 
+<a href="lcxh.html#unicert">unicert( )</a>
+and the older (and deprecated 16-bit systems only) DDE callback functions
+invoked via a call to <a href="lcxh.html#rundde">rundde( )</a>; 
+and also indirect trough making and breaking connections, 
+<a href="lcxh.html#connect">connect( )</a>, 
+<a href="lcxh.html#disconnect">disconnect( )</a>,
+or <a href="lcxh.html#disconnectall">disconnectall( )</a> 
+calls.  The "callback function" entry shows how 
+the definition of the function should look. The names of the function and 
+its arguments is of course not critical, the names chosen as an example 
+are meant to be descriptive.  What is important is the number of 
+arguments. The functions may be defined  with fewer arguments, but if they 
+are defined with more arguments than shown, error messages will appear. 
+In many cases, the return value from the calling function is also 
+of importance, and this will be noted wherever it applies.</p>
+
+<p> The categories are: <br/>
+<a name="categories"></a>
+<a href="call0000.html"> Generic Function Calls -- Category 0</a><br/>
+<a href="call0001.html"> Get and Set Status -- Category 1</a><br/>
+<a href="call1602.html"> Add status -- Category 2 (16-bit only)</a><br/>
+<a href="call0003.html"> Info Init -- Category 3</a><br/>
+<a href="call1604.html"> Make and Break -- Category 4 (16-bit)</a><br/>
+<a href="call3204.html"> Make and Break -- Category 4 (32-bit)</a><br/>
+<a href="call0005.html"> Drag and Drop actions -- Category 5</a><br/>
+<a href="call1606.html"> Pushbutton Operations -- Category 6 (16-bit)</a><br/>
+<a href="call3206.html"> Menu and Pushbutton Operations -- Category 6 (32-bit)</a><br/>
+<a href="call0007.html"> Control and fields functions -- Category 7</a><br/>
+<a href="call1608.html"> DDE callback -- Category 8 (16-bit only)</a><br/>
+<a href="call1609.html"> Status Index callbacks -- Category 9 (16-bit)</a><br/>
+<a href="call3209.html"> Status Index callbacks -- Category 9 (32-bit)</a><br/>
+<a href="call0010.html"> Print Preview of Documents and Reports -- Category 10</a><br/>
+<a href="call0011.html"> Standard Reports functions -- Category 11</a><br/>
+<a href="call0012.html"> View Report Pre and Post processing -- Category 12</a><br/>
+<a href="call0013.html"> View SI report forall-functions -- Category 13</a><br/>
+<a href="call1614.html"> CXDICT filter functions -- Category 14 (16-bit)</a><br/>
+<a href="call3214.html"> CXDICT filter functions -- Category 14 (32-bit)</a><br/>
+<a href="call0015.html"> Quick Reports Forall-functions -- Category 15</a><br/>
+<a href="call0016.html"> For-all record functions in INSPECT and SYNFARE -- category 16</a><br/>
+<a href="call3217.html"> Print all records functions in Quick Reports -- category 17</a><br/>
+</p>
+
+<p><hr/><a name="Endpoint"></a>
+<p>WinPCS Documentation File (KRL 2009-09-02)</p>
+
+</body>
+</html>
+
+
+
+

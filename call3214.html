@@ -1,0 +1,141 @@
+
+<html lang="en">
+<head>
+<title>CXDICT Filter Functions -- Category 14 (32-bit WinPCS)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name=description content="CXDICT Filter Functions -- Category 14 (32-bit WinPCS)">
+</head><body>
+<a name="Top"></a>
+
+<h1>CXDICT Filter Functions -- Category 14 (32-bit WinPCS)</h1> <p> 
+
+<h3>Enabling controls</h3>
+<p>The functions mentioned here are the ones referred to in the field 
+WFILTER (or FILTER in some older systems) in CXDICT for any 
+table that requires it. The entire code 
+(function definitions, complete with 
+brackets and other punctuation) is expected to be within this field, and the 
+first function here is expected to be used to generate displayable strings 
+for hierarchies. Other functions may be present and called from the first one,
+as necessary.</p>
+
+<p>Common functions can be put into the file <b>filter.lcx</b> in the server
+directory. This name is hardcoded.</p>
+
+<h3>Disallowed functions:</h3>
+<p>This runs on the server, so any function in the 
+<a href="lcxh.html#Functions.20available.20with.20the.2032.2dbit.20Server">
+32s </a> series is allowed. 
+For debugging and testing, use <a href="lcxh.html#trace">trace( )</a> 
+or the function's own output for messaging and see the 
+results on the Hierarchy. </p>
+
+<h3>Recommended functions</h3>
+<p>Since these functions are frequently being called, they should 
+not do much more than simple text-manipulation, using functions such as 
+<a href="lcxh.html#substr">substr( )</a>, 
+<a href="lcxh.html#concat">concat( )</a>, 
+<a href="lcxh.html#julday">julday( )</a>, 
+<a href="lcxh.html#caldat">caldat( )</a>, and 
+<a href="lcxh.html#setitem">setitem( )</a>. Table-reading functions such as 
+<a href="lcxh.html#get">get( )</a> are also useful since
+<a href="lcxh.html#get">get( )</a> is rather inexpensive on the server anyways.</p>
+
+<h3>LCX files:</h3>
+<p>In addition to the code in the WFILTER field, code in functions 
+defined on the server in the file <b>filter.lcx</b> can be called. 
+There are no other files involved, the entire code is found in the 
+CXDICT field, and the filter.lcx file, and no other code is in scope. </p>
+
+<h3>Callback functions:</h3>
+<p><pre><em>text</em><b> = </b><em>thefunction</em><b>(</b><em>itemid</em><b>, </b><em>itemdescription</em><b>)</b></pre></p>
+
+<h3>Arguments:</h3>
+<p>The first argument, <em>itemid</em> is the object's identity, tag-number, 
+system-number or similar.  The second argument, <em>itemdescription</em> 
+is the object's service description, title, or similar.  </p>
+
+<h3>Return Value:</h3>
+<p>The return value should be whatever string it is desired to show 
+in Hierarchies and VCONN lists.  This need not resolve to any kind of 
+unique value, it ends up merely as a descriptive string.</p>
+
+<h3>Diagnostics</h3>
+<p>If the function defined has errors, the returned error message will appear
+in the hierarchy view, indicating in a rather unsightly way, 
+that something is obviously wrong.</p>
+
+<h3>Default</h3>
+<p>When this field of CXDICT is blank, 
+the text being output simply is the familiar concatenation of identity and 
+description (ITEMFLD and ITEMDESFLD), with a tab-character to indicate
+to the hierarcy code which part is which, as if the function were:</p>
+
+<p><pre> 
+show(string id, string descr)
+{
+	return(concat(id, "\x09 ", descr));
+}
+</pre></p>
+
+<h3>Example:</h3>
+<p>This is used on instance tables to show associated check-sheet and tag
+number</p>
+<pre>
+show(string ident) { string des; 
+des = F_InstShow("CONITR2", ident); return(des); } 
+</pre>
+
+<p>and where the function <b>F_InstShow()</b> is defined in the server-side
+file <b>filter.lcx</b> as follows:</p>
+<pre>
+F_InstShow(string table, string inident) 
+{ 
+    string gz, L, R, ser, Lz, Rz, des; 
+
+    findexact(table, "RSERIAL", inident);
+
+    gz = multiget(table, makeset("LEFT", "LEFT_RSERIAL", "RIGHT", "RIGHT_RSERIAL"));
+
+    L = setitem(gz, 0); 
+    ser = setitem(gz, 1); 
+    findexact(L, "RSERIAL", ser);
+    Lz = multiget(L, makeset(StdField(L, "ITEMFLD"), StdField(L, "ITEMDESFLDS"))); 
+
+    R = setitem(gz, 2); 
+    ser = setitem(gz, 3); 
+    findexact(R, "RSERIAL", ser);
+    Rz = multiget(R, makeset(StdField(R, "ITEMFLD"), StdField(R, "ITEMDESFLDS"))); 
+
+    des = concat(inident, "\x09 ", 
+        setitem(Lz, 0), " ", setitem(Rz, 0), " ", 
+        setitem(Lz, 1), " ", setitem(Rz, 1) ); 
+
+    return(des);
+}
+</pre>
+
+<h3>Execution context:</h3>
+<p>Not shared and not re-entered. The function is run on the server. </p>
+
+<h3>Source files:</h3>
+<p>TMGT/sdmass1.c, TMGT/sdmass2.c</p>
+
+<h3>See Also:</h3>
+
+<a href="lcxh.html#substr">substr( )</a>, 
+<a href="lcxh.html#concat">concat( )</a>, 
+<a href="lcxh.html#get">get( )</a>, 
+<a href="lcxh.html#Functions.20available.20with.20the.2032.2dbit.20Server">
+    Functions available with the 32-bit server </a> <br>
+
+
+<!-- -->
+<p><hr><a name="Endpoint"></a>
+<p>WinPCS Documentation File (KRL 2014-08-05)</p>
+
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> </p>
+</body>
+</html>
+
+

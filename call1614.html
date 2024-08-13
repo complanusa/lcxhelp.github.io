@@ -1,0 +1,83 @@
+
+<html lang="en">
+<head>
+<title>CXDICT Filter Functions -- Category 14 (16-bit WinPCS)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name=description content="CXDICT Filter Functions -- Category 14 (16-bit WinPCS)">
+</head><body>
+<a name="Top"></a>
+
+<h1>CXDICT Filter Functions -- Category 14 (16-bit WinPCS)</h1> <p> 
+
+<h3>Enabling controls</h3>
+<p>The functions mentioned here are the ones referred to in the FILTER field 
+in CXDICT for any table that requires it. The entire code 
+(function definitions, complete with 
+brackets and other punctuation) is expected to be in this field, and the 
+first function here is expected to be used to generate displayable strings 
+for hierarchies. Other functions may be present and called from the first one,
+as necessary and as space permits.</p>
+
+<h3>Disallowed functions:</h3>
+<p>The form-drawing functions can only be called within the form-drawing contexts.
+Starting more hierarchies or opening other views is not a good idea either. </p>
+
+<h3>Recommended functions</h3>
+<p>Since these functions are frequently being called, they should 
+not do much more than simple text-manipulation, using functions such as 
+<a href="lcxh.html#substr">substr( )</a>, 
+<a href="lcxh.html#concat">concat( )</a>, 
+<a href="lcxh.html#julday">julday( )</a>, 
+<a href="lcxh.html#caldat">caldat( )</a>, and 
+<a href="lcxh.html#setitem">setitem( )</a>. Table-reading functions such as 
+<a href="lcxh.html#get">get( )</a> are also useful. </p>
+
+<h3>LCX files:</h3>
+<p>There are no files involved, the entire code is found in the 
+CXDICT field, and no other code is in scope. </p>
+
+<h3>Callback functions:</h3>
+<p><pre><em>text</em><b> = </b><em>thefunction</em><b>(</b><em>itemid</em><b>, </b><em>itemdescription</em><b>)</b></pre></p>
+
+<h3>Arguments:</h3>
+<p>The first argument, <em>itemid</em> is the object's identity, tag-number, 
+system-number or similar.  The second argument, <em>itemdescription</em> 
+is the object's service description, title, or similar.  </p>
+
+<h3>Return Value:</h3>
+<p>The return value should be whatever string it is desired to show 
+in Hierarchies and VCONN lists.  This need not resolve to any kind of 
+unique value, it ends up merely as a descriptive string.</p>
+
+<h3>Default</h3>
+<p>When this field of CXDICT is blank, 
+the text being output simply is the familiar concatenation of identity and 
+description (ITEMFLD and ITEMDESFLD), as if the function were:</p>
+
+<p><pre> 
+show(string id, string descr)
+{
+	return(concat(id, " ", descr));
+}
+</pre></p>
+
+<h3>Execution context:</h3>
+<p>Not shared and not re-entered. </p>
+
+<h3>See Also:</h3>
+<p>
+<a href="lcxh.html#substr">substr( )</a>, 
+<a href="lcxh.html#concat">concat( )</a> 
+</p>
+
+
+<!-- -->
+<p><hr><a name="Endpoint"></a>
+<p>WinPCS Documentation File (KRL 2005-10-17)</p>
+
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> </p>
+</body>
+</html>
+
+
+

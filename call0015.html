@@ -1,0 +1,132 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>Quick Reports Forall-functions -- Category 15</title>
+
+<meta http-equiv="Content-Type" content="text/html"/>
+<meta name="description" content="Quick Reports Forall-functions -- Category 15"/>
+
+</head><body>
+<a name="Top"></a>
+
+<h1>Quick Reports Forall-functions -- Category 15</h1>
+
+<h3>Description:</h3>
+<p>The Standard Report Generator allows a function to be run once for all records in the 
+table being reported on. The return value from this function is used to determine 
+whether the record under consideration is to be included in the report, or not. </p>
+
+<h3>Enabling control in WinPCS:</h3>
+<p>The file and function are selected in the Report Generator dialog. When the Report is 
+saved, these names end up in the appropriate record in the STDREP table.</p>
+
+<h3>Disallowed functions:</h3>
+<p>This is on the server, so any of the GUI-based functions such as 
+<a href="lcxh.html#input">input( )</a> or
+<a href="lcxh.html#yesno">yesno( )</a> 
+are unavailable. 
+Use <a href="lcxh.html#trace">trace( )</a> , or equivalently,
+<a href="lcxh.html#message">message( )</a>, for debugging purposes.
+</p>
+
+<h3>Callback Function:</h3>
+<p>The function is called with the following 4 arguments</p>
+
+<pre>
+<em>function</em><b>(</b><em>expass</em><b>,</b> <em>reportident</em><b>,</b> <em>table</em><b>,</b> <em>tag</em><b>);</b>
+</pre>
+
+<p>where:</p>
+
+<table border="0"> <tbody>
+
+<tr valign="top">
+<td><em>expass</em></td>
+<td>This is a value from the pass/fail expression, indicating if that indicated the record would or would not pass. 
+Note that this function can override this action in either direction. This value is 0 for skip and non-zero for use.
+</td>
+</tr>
+
+<tr valign="top">
+<td><em>reportident</em></td>
+<td>
+This is the report-handle of the report under construction. At this point it is on the server, and not visible, 
+but functions such as
+<a href="lcxh.html#RepSearch">RepSearch( )</a> , 
+<a href="lcxh.html#RepGet">RepGet( )</a> , and
+<a href="lcxh.html#RepPut">RepPut( )</a> can be used to see or modify the data being reported.
+</td>
+</tr>
+
+<tr valign="top">
+<td><em>table</em></td>
+<td>
+This is the name of the table being reported from. 
+</td>
+</tr>
+
+<tr valign="top">
+<td><em>tag</em></td>
+<td>
+This is the main identity value of the record under consideration. 
+This is the value of the ITEMFIELD for the <em>table</em>, as defined in CXDICT. 
+</td>
+</tr>
+
+</tbody>
+</table>
+
+<h3>Return Value:</h3>
+<p>This function controls whether the record under consideration should be passed into the report, or not. </p>
+<p>It should return 0 for skipping the record, and 1 for passing the record. </p>
+
+<h3>Execution context:</h3>
+
+<p>This is not shared.  It is re-entered, which means that global variables set in an 
+early call can be read later.  The function is called once per selected record in the Report, as indicated 
+above. There is no defined  current record of the main table.  </p>
+
+<h3>Example:</h3>
+
+<p>This function passes only equipment of type MAST, if the equipment-type is the field indexed at 4:</p>
+
+<pre>
+HEI(string oldpass, string Report, string table, string tagno)
+{
+    string a;
+
+    a = RepGet(-1, 4, Report); 
+
+    if("MAST" == a)
+    {
+        return(1);
+    }
+    else
+    {
+        return(0);
+    }
+}
+</pre>
+
+<h3>See Also:</h3>
+<p>For the for-all record functions in TRANS see <a href="call0007.html"> category 7</a>.</p>
+<p>For the for-all record functions in SI Reports see <a href="call0013.html">category 13</a>.</p>
+<p>For the for-all record functions in INSPECT and SYNFARE see <a href="call0016.html"> category 16</a>.</p>
+<p>For the print all records functions in Quick Reports see <a href="call3217.html">category 17</a>.</p>
+
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> </p>
+
+<hr/>
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+</body>
+</html>
+
+

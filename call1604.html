@@ -1,0 +1,80 @@
+
+<html lang="en">
+<head>
+<title>Make and Break -- Category 4 (16-bit WinPCS)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name=description content="Make and Break -- Category 4 (16-bit WinPCS)">
+</head><body>
+<a name="Top"></a>
+
+<h1>Make and Break -- Category 4 (16-bit WinPCS)</h1> <p> 
+
+<h3>Enabling controls in WinPCS:</h3>
+Function calls in this category are made when an item is connected to or disconnected 
+from another item, and there is a reference to a function in <b>STADLG.INI</b>, in the <b>MAKE=</b>
+or <b>BREAK=</b> entriy respectively,  in the dialog referred to in the </b>[$SINGLE]</b> 
+section where the left side refers to the table of the item being dragged onto the View-Connections of 
+the other.  Unfortunately, Gang Connections perform its work in the opposite direction, 
+and these STADLG-specified functions are therefore not called reliably, and are being deprecated. 
+
+<p>Therefore, the alternative action is that if the make or break functions specified in STADLG.INI 
+is NOOP or absent, the functions specified as <b>makecontrol=</b> and <b>breakcontrol=</b> in 
+the <b>[RCONN]</b> section in <b>WinPCS.INI</b> will be used instead, the
+same as with the 32-bit systems. This is reliable.
+
+<h3>Disallowed functions:</h3>
+DDE callback and document-drawing functions are only available inside the DDE 
+callback and Printing callback environments.  
+
+<h3>Functions that are not recommended:</h3>
+Since make and break operations may occur in a noninteractive context, for example 
+with FORKS, they should not normally  contain calls to functions that require user 
+interaction, such as <a href="lcxh.html#message">message( )</a> or 
+<a href="lcxh.html#input">input( )</a>. These functions are OK for development and 
+trace printing purposes, however.  For the same reason, the DDE-initiating, 
+status index dialog, and certificate functions are not recommended.
+
+<p>Further calls to connect or disconnect the same kind of objects must not be attempted either; 
+since this can cause an infinite recursion and eventually a crash. 
+
+<h3>LCX files:</h3>
+16-bit: Functions are expected to be found in the files referenced in <b>WinPCS.INI</b> in the <b>[RCONN]</b> 
+section in the <b>make=</b> and <b>break=</b> entries. <p>
+
+<h3>Callback functions:</h3>
+<pre><em>code</em><b> = </b><em>makefunction</em><b>(</b><em>RCONN_operation_code</em><b>, </b><em>itemID</em><b>, </b><em>relID</em><b>)
+</b><em>code</em><b> = </b><em>breakfunction</em><b>(</b><em>RCONN_operation_code</em><b>, </b><em>itemID</em><b>, </b><em>relID</em><b>)
+</b></pre>
+
+<h3>Arguments:</h3>
+<em>RCONN_operation_code</em> is the operation code (this is usually the name of the relation table).
+<em>itemID</em>, <em>relID</em> are the identities of the two objects being connected or disconnected.
+
+<h3>Current records:</h3>
+RCONN is positioned on the records where its fields OPERATION and ITEMBASE match the two 
+tables being connected. The two tables (RCONN ITEMBASE and RELBASE) are 
+positioned on their respective records, and the connection table's current record is tthe 
+one to be deleted on break, or the data to be put into the new record on make.
+
+<h3>Return Value:</h3>
+<b>0</b> for OK, the system should proceed to make (Insert) or break (Delete) <br>
+<b>-1</b> for indicating that the callback function did the make or break action and the system should not
+perform the Insert or Delete action again. This may also be used for quiet failures. <br>
+<b>-2</b> for fail with an error message. <br>
+Connections are not changed (made or broken) by the system if the return value is negative.
+
+<h3>Special replacements:</h3>
+<b>NOOP</b><br>
+<b>DISALLOW</b><br>
+
+<h3>Execution context:</h3>
+Not shared and not re-entered. 
+
+<h3>See Also:</h3>
+STADLG.INI documentation<br>
+<a href="call3204.html"> Make and Break -- Category 4 32-bit </a><br>
+
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> </p>
+</body>
+</html>
+

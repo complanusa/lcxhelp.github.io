@@ -1,0 +1,550 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>WEBIO</title>
+<meta http-equiv="Content-Type" content="text/html"/>
+<meta name="description" content="WEBIO"/>
+</head><body>
+<a name="Top"></a>
+
+<p>File Date: 2016-09-01</p>
+<h1>WEBIO</h1>
+
+<p>The WinPCS server can understand certain html requests, amongst
+these are GET on some urls. Most of these map to files in the 
+directory identified via the 
+<a href="serverini.html#options.wwwroot">wwwroot= entry in server.ini</a>
+but there are a number of special urls that have predefined meaning.</p>
+
+<p>These are the following: 
+<a href="#wwwroot">/</a>, 
+<a href="#wwwinfo">/info</a>, 
+<a href="#wwwspeed">/speed</a>, 
+<a href="#wwwwebapi">/webapi/*</a>. Each of these are described below.</p>
+
+<p>Urls that map to web pages in files in subdirectories under the 
+<a href="serverini.html#options.wwwroot">wwwroot</a>
+may be made subject to authentication as well,
+this is controlled via the
+<a href="serverini.html#options.htrestrict">htrestrict</a>
+and 
+<a href="serverini.html#options.htrealm">htrealm</a>
+entries in server.ini</p>
+
+
+<a name="wwwroot"></a> 
+<h3>Special URL /</h3>
+<p>This returns the contents of a file named index.* from the 
+<a href="serverini.html#options.wwwroot">wwwroot</a>
+directory. If there are more than one file named index.* here,
+the prioritized order is: <tt>index.html</tt>, 
+or if this is not present, <tt>index.htm</tt>
+or if this is not present either, any other file named 
+index with any other extension, first in the alphabet. </p>
+
+<p>If there is no index.* file there at all, this becomes equivalent
+to the <a href="#wwwinfo">/info</a> special url. </p>
+
+<a name="wwwinfo"></a> 
+<h3>Special URL /info</h3>
+<p>This returns a standard page with information about the server, 
+and which project it runs and the client that came in asking.</p>
+
+<a name="wwwspeed"></a> 
+<h3>Special URL /speed</h3>
+<p>This returns a page similar to
+<a href="#wwwinfo">/info</a> but also shows the 
+round-trip time on the network. It is similar to the speed-measurement
+tool in the standard WinPCS client.</p>
+
+<a name="wwwwebapi"></a>
+<h2>URLs under /webapi</h2>
+
+<p>The webapi functions are for the benefit of the application
+server, that can ask the WinPCS server for various data items
+and perform various activities.</p>
+
+<p>All the /webapi urls require the user to be 
+authenticated, using basic auth or bearer auth, 
+so that the WinPCS server can know who is the
+effective user, which will be determining the rights
+and capabilities. </p>
+
+<p>The webapi urls are:<br/>
+<a href="#wwwwebapi_authenticate">/webapi/authenticate</a><br/>
+<a href="#emailUserExists">/webapi/emailUserExists</a><br/>
+<a href="#wwwwebapi_sqlexec">/webapi/sqlexec</a><br/>
+<!-- <a href="#fillTreeRoots">fillTreeRoots</a><br/>  -->
+<!-- <a href="#fillTreeBranches">fillTreeBranches</<br/>a>  -->
+<!-- <a href="#buildRightMenu">buildRightMenu</a><br/>  -->
+<!-- <a href="#actionRightMenu">actionRightMenu</a><br/>  -->
+<!-- <a href="#statusIndexReport">statusIndexReport</a><br/>  -->
+
+<hr/>
+<a name="wwwwebapi_authenticate"></a> 
+<h3>/webapi/authenticate</h3>
+<h4>Request format Example:</h4>
+<pre>
+GET /webapi/authenticate
+Authorization: <em>(Basic or Bearer)</em>
+Content-Length: 1
+
+</pre>
+
+<h4>Description:</h4>
+
+<p>As all the /webapi urls require the user to be 
+authenticated, using basic auth or bearer auth, this url just 
+verifies that the user-authentication is valid. It is otherwise
+a no-op.</p>
+
+<!-- 0        1         2         3         4 -->
+<!-- 12345678.012345678.012345678.012345678.012345678.0 -->
+
+<hr/>
+<a name="emailUserExists"></a> 
+<h3>/webapi/emailUserExists</h3>
+<h4>Request format Example:</h4>
+<pre>
+GET /webapi/emailUserExists
+Authorization: <em>(Basic or Bearer)</em>
+Content-Length: <em>length</em>
+
+{"email":"whoever@example.com"}
+</pre>
+
+<h4>Description:</h4>
+
+<p>Given a user's email, the existence or otherwise of this in the 
+WUSER table on the server is verified, and if there is someone with
+that email address defined there, that user's entire record from WUSER
+is returned, in JSON format similar to what is shown in the example below. 
+This contains the name, the encoded passwords and so on 
+as per the current layout of WUSER. </p>
+
+
+<hr/>
+<a name="wwwwebapi_sqlexec"></a>
+<h3>/webapi/sqlexec</h3>
+<h4>Request format Example:</h4>
+<pre>
+GET /webapi/sqlexec
+Authorization: <em>(Basic or Bearer)</em>
+Content-Length: <em>length</em>
+
+{"query":"SELECT itr,description FROM REFITR1"}
+</pre>
+
+<h4>Description:</h4>
+
+<p>This allows the server to take a query as part of the body of the 
+incoming request and process this. The header should contain the 
+authentication string and the length of the contents which is the query,
+as exemplified by:</p>
+
+<p>The server will return the results of this query as a JSON array, 
+something similar to this:</p>
+
+<pre>
+{[{"F00":"Q02A","F01":"Pipe Insulation "},
+{"F00":"E02A","F01":"Electrical Motors (LV/HV)"},
+{"F00":"E36A","F01":"MV Cable Test Record"}]}
+</pre>
+
+<p>There will be more varieties of these /webapi 
+functions in the future.</p>
+
+<!-- Fill roots and branches in hierarchies and act on the
+	clicking on these -->
+
+<!-- 
+<hr/>
+<a name="fillTreeRoots"></a><br/> 
+<h3>/webapi/fillTreeRoots</h3>
+<h4>Request format Example:</h4>
+<pre>
+GET /webapi/fillTreeRoots
+Authorization: <em>(Basic or Bearer)</em>
+Content-Length: <em>length</em>
+
+{"table":"CERTSYS","phasecode":"XYZ"}
+</pre>
+
+<h4>Return value example:</h4>
+<pre>
+{[{"table":"CERTSYS","tag":"10","description":"10 Utility Air","icon":"BMSYSTEM","rserial":"1","linearextra":""}, 
+{"table":"CERTSYS","tag":"11","description":"11 Cranes, winches, elevators","icon":"BMSYSTEM","rserial":"3","linearextra":""}, 
+{"table":"CERTSYS","tag":"31","description":"31 Cargo metering","icon":"BMSYSTEM","rserial":"4","linearextra":""}, 
+{"table":"CERTSYS","tag":"51","description":"51 Sea Water","icon":"BMSYSTEM","rserial":"7","linearextra":""}, 
+{"table":"CERTSYS","tag":"53","description":"53 Fresh Water","icon":"BMSYSTEM","rserial":"10","linearextra":""}, 
+{"table":"CERTSYS","tag":"54","description":"54 Potable Water","icon":"BMSYSTEM","rserial":"11","linearextra":""}]} 
+</pre>
+
+<h4>Description:</h4>
+<p>This returns the initial list of objects that we want to 
+see in the hierarchy on the top level.</p>
+
+<hr/>
+<a name="fillTreeBranches"></a><br/> 
+<h3>/webapi/fillTreeBranches</h3>
+<h4>Request format Example:</h4>
+<pre>
+GET /webapi/fillTreeBranches
+Authorization: <em>(Basic or Bearer)</em>
+Content-Length: <em>length</em>
+
+{"table":"CERTSYS","tag":"54",
+	"ancestors":"CERTSYS+11+","linearextra":" ",
+	"phasecode":"XYZ"}
+
+</pre>
+
+<h4>Return value example:</h4>
+<pre>
+{[{"table":"CERTAC1","tag":"5401","description":"5401 Potable Water Cold","icon":"BMAC1","rserial":"6","linearextra":""}, 
+{"table":"CERTAC1","tag":"5402","description":"5402 Potable Water Hot","icon":"BMAC1","rserial":"21","linearextra":""},
+{"table":"DOCPROJ","tag":"54-LD-1501","description":"54-LD-1501 Potable Water Layout Drawings","icon":"BMDOC","rserial":"317","linearextra":""}]} 
+</pre>
+
+<h4>Description:</h4>
+<p>This returns the connected objects that we want to 
+show in the hierarchy. The example shows the items connected to the 
+system number 54, and is called in response to the user having requested
+the contents of that system to be shown.</p>
+
+<hr/>
+<a name="buildRightMenu"></a><br/> 
+<h3>/webapi/buildRightMenu</h3>
+<h4>Request format Example:</h4>
+<pre>
+GET /webapi/buildRightMenu
+Authorization: <em>(Basic or Bearer)</em>
+Content-Length: <em>length</em>
+
+{"table":"CERTAC1","tag","5401"}
+
+</pre>
+
+<h4>Return value example:</h4>
+<pre>
+{[{"action":"RunReport","menutext":"Run a Report"}, 
+{"action":"ViewItem","menutext":"View details of this subsystem"}]} 
+</pre>
+
+<p>Returns a list of actions that are possible for this object.</p>
+
+<h4>Description:</h4>
+
+<hr/>
+<a name="actionRightMenu"></a><br/> 
+<h3>/webapi/actionRightMenu</h3>
+<h4>Request format Example:</h4>
+<pre>
+GET /webapi/actionRightMenu
+Authorization: <em>(Basic or Bearer)</em>
+Content-Length: <em>length</em>
+
+{"table":"CERTAC1","tag","5401",
+"ancestors":"CERTSYS+11+CERTAC1+6+", (might be json-formatted instead of an lcx set)
+"action":"RunReport"} (may be more details here, data here will be coming from the menu)
+</pre>
+
+<h4>Return value example:</h4>
+<pre>
+(list of options from refrep)
+
+
+{[{"table":"CERTAC1","tag":"5401","description":"5401 Potable Water","icon":"BMAC1","rserial":"6","linearextra":""}, 
+{"table":"CERTAC1","tag":"5402","description":"5401 Potable Water","icon":"BMAC1","rserial":"21","linearextra":""},
+{"table":"DOCPROJ","tag":"54-LD-1501","description":"54-LD-1501 Potable Water Layout Drawings","icon":"BMDOC","rserial":"317","linearextra":""}]} 
+</pre>
+
+
+<h4>Description:</h4>
+
+<hr/>
+<a name="statusIndexReport"></a><br/> 
+<h3>/webapi/statusIndexReport</h3>
+<h4>Request format Example:</h4>
+<pre>
+GET /webapi/statusIndexReport
+Authorization: <em>(Basic or Bearer)</em>
+Content-Length: <em>length</em>
+
+{"query":"SELECT itr,description FROM REFITR1"}
+</pre>
+
+<h4>Return value example:</h4>
+<pre>
+(data as formatted from a starep.ini section for this report)
+</pre>
+
+<h4>Description:</h4>
+
+-->
+
+
+<h1>URLs referring to LCX files</h1> 
+<p>If an URL refers to an LCX file, the file is expected to contain
+code that is to be run, and there will have to be a reference to 
+a function in the file and some operational parameters to be 
+passed to the code. </p>
+
+<p>The function will run server-side, so it can use all of 
+the defined functions that are available on the server. </p>
+
+<p>The function itself will be called as per: </p>
+
+<pre>
+lcxfunction(projectnumber)
+</pre>
+
+<p>and the passed-in parameters from the URL string will appear as global 
+variables available to the function. </p>
+
+<p>The following examples show the URLs and how they get handled:</p> 
+
+<pre>
+http://server/abcd.lcx
+</pre>
+
+<p>This calls a function in <tt>abcd.lcx</tt> named <tt>main()</tt>
+as <tt><b>main(</b><em>projectnumber</em><b>)</b></tt> </p>
+
+<pre>
+http://server/abcd.lcx?f=something
+</pre>
+
+<p>This calls a function in <tt>abcd.lcx</tt> named <tt>something()</tt> 
+as <tt><b>something(</b><em>projectnumber</em><b>)</b></tt> </p>
+
+<pre>
+http://server/abcd.lcx?f=something&foo=xyz&bar=abcd
+</pre>
+
+<p>As above, this calls the function in <tt>abcd.lcx</tt> named <tt>something()</tt> 
+as <tt><b>something(</b><em>projectnumber</em><b>)</b></tt>.
+Global variables named <tt><b>foo</b></tt> and <tt><b>bar</b></tt> with the values shown will be defined
+and can be read by the function.  </p>
+
+<p>The page shown is basically whatever html string that 
+is returned by the function.  One common approach is to have the
+function write text into a file with html in it, then 
+we want to return the contents of this file, using the meta-function 
+<b>$filecontents(<em>path</em>)</b>, with a return-value syntax looking like: </p>
+
+<pre>
+	string path, filename;
+
+	filename = "something.html";
+
+	// code for creating and writing the contents to the file would go here 
+
+	path = ExpandPath("9:\htdocs\Items\", filename); 
+
+	return(concat("$filecontents(", path, ")")); 
+</pre>
+
+<p>The returned string coming from this LCX function would look like:</p>
+<pre>
+	$filecontents(C:\winpcs\project\htdocs\Items\something.html)
+</pre>
+<p>and the server then knows that what the client wanted was the contents of this file, not merely its name.</p>
+
+<p>Note that since the initial http request is for the LCX file, then any relative paths in <tt>href=</tt> and 
+similar entries in the html file will refer to the directory where this LCX file is located, and not necessarily
+where the file itself gets written, should this be somewhere else. For maximal compatibility, these locations
+should be the same; in other words, the file should be written in the same directory as the LCX file is located. </p>
+
+<h3>Examples</h3>
+
+<p>The following can be an URL, whether direct like this or called via
+some javascript or otherwise, as shown in these examples:</p>
+
+<pre>
+&lt;a href="wmoreinfo.lcx?f=ShowInfo&grandrepref=REPITR4&level=CERTAC1&rootthis=150"&gt;View subsystem 150&lt;/a&gt;
+
+&lt;a href="http://example.com:5166/wmoreinfo.lcx?f=ShowInfo&grandrepref=REPITR4&level=CERTAC1&rootthis=150"&gt;View subsystem 150&lt;/a&gt;
+
+http://example.com:5166/wmoreinfo.lcx?f=ShowInfo&grandrepref=REPITR4&level=CERTAC1&rootthis=150
+</pre>
+
+<p>The handling LCX function for this is as follows. It refers to another
+function, <tt>TableRunKern()</tt> which writes a page of information to a file,
+and returns the name of the file. The return value of this function tells the
+system to put back the contents of that file.</p>
+
+<pre>
+string level;
+string grandrepref;
+string rootthis;
+
+ShowInfo()
+{
+    string outfile, htext;
+    string path;
+
+    outfile = TableRunKern(grandrepref, level, rootthis);
+
+	/* wmoreinfo.lcx is in htdocs, and the outfile is a simple filename referring to a file also in htdocs. */
+
+    path = ExpandPath(concat("9:\htdocs\", outfile));
+
+    /* Return value from this function will be the contents of this file! */
+
+    /* Tell the server to put out the contents of the file, instead of a string.  */
+    return(concat("$filecontents(", path, ")"));
+}
+</pre>
+
+
+
+<h1>Calls via xmlHttp</h1>
+<p>See the example under
+<a href="lcxh.html#RepToJSON">RepToJSON( )</a> 
+where there is a function ListItems() in a file tablelist.lcx, which
+is then called from the following chunk of javascript:</p>
+
+<pre>
+    var xmlHttp = null;
+
+    xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", "tablelist.lcx?f=ListItems&amp;Table=CERTSITE", false);
+    xmlHttp.send(null);
+
+    var jsonstuff = xmlHttp.responseText;
+
+</pre>
+<p>The returned JSON code that the LCX function returned is then processed further. </p>
+
+<p>This is another chunk of Javascript showing how strings from the javascript code
+in the web page can be sent to a server-side debugger-output channel. </p>
+
+<pre>
+
+/* Emit some tracing message on the WinPCS server debug channel. */
+function DebugOut(Here, Text)
+{
+    var DbgHttp = null;
+    var theurl = null;
+    var encodedtext;
+
+    encodedtext = encodeURIComponent(Text);
+
+    theurl = 'khier.lcx?f=DebugEmit&amp;Here='+Here+'&amp;Text='+encodedtext;
+
+    DbgHttp = new XMLHttpRequest();
+    DbgHttp.open("GET", theurl, false);
+    DbgHttp.send(null);
+}
+
+</pre>
+
+<p>The relevant function in the referenced khier.lcx file is as follows.
+Global variables Text and Here reflect the strings passed after the 
+&amp;Here= and &amp;Text= in the inbound URL. The text has been encoded to
+remove problems with http special characters, and the LCX function
+<a href="lcxh.html#URLDecode">URLDecode( )</a> 
+changes this back to plain text for subsequent output.
+</p>
+
+<pre>
+
+/* Emit stuff on the debugger called from the browser html code */
+
+string Text;
+string Here;
+
+DebugEmit()
+{
+    trace(Here, URLDecode(Text));
+    return("");
+}
+
+</pre>
+
+<h1>In-line LCX functions</h1>
+
+<p>It is possible to embed LCX functions inside the html on a webpage. 
+The syntax is:</p>
+
+<pre>
+&lt;?lcx 
+anyname(string projno) 
+{ 
+	/* any reasonably useful LCX code */
+	return("This &lt;b&gt;chunk of html&lt;/b&gt; will appear."); 
+}
+?&gt;
+</pre>
+
+<p>What will happen is that when this code section is found, the function
+will be run, and the code-section <?lcx ... ?> will be replaced with the
+output from the function. </p>
+
+<p>This function has a placeholder name, and can call any of the server-side system-defined
+functions as well as any of the functions present in the set of LCX files loaded
+on the server. </p>
+
+<!-- Proposed additionals: 
+echo(items...) puts out the concatenation of the items onto the data to go onto the page 
+at that point. As opposed to gathering all and returning it at the end in the code, instead we
+gather the lot during the function call and emit them out at the end as if it were the 
+return value.
+
+Session globals, so variables that are set in one function can appear in another function,
+but not like the server-globals that will appear the same for all users. 
+Maybe best done via the client's cookies or some such state-info there. 
+
+See (rfc2109), (rfc2965), rfc6265
+
+Part of the reply to the client, to set a cookie. The cookie has a name and a value, that can
+be whatever we like (within reasonable limits). 
+
+Set-Cookie: name=value [; expires=date] [; domain=domain] [; path=path] [; secure]
+
+Session cookie has no expiration, it goes away when the browser closes. 
+Set-Cookie: name=value 
+
+Expiration dates are in the printable unix date format and NOT the rfc3339 or iso8601, unfortunately: 
+	wkd, dd Mmm yyyy hh:mm:ss GMT
+
+[; expires=date] [; domain=domain] [; path=path] [; secure]
+
+Client will come back with the string 
+Cookie: name=value 
+in the header. Presumably the rest of the info is there as well.
+
+Cookies state can be stored server-side such as name being client-session identifier 
+and they expire there a certain time after last use or when being actively deallocated.
+
+Cookies management, cookies being state info sitting in the client's browser.
+The server-side code here is basically stateless. 
+
+setcookie(stateinfo);
+stateinfo = readcookie();  ?
+
+Alternates:
+	JSON Web Tokens, JWTs 
+
+<p>TBD: add echo() for finer-grain output into the page.  </p>
+
+-->
+
+
+
+<hr/>
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+</body>
+</html>
+
+

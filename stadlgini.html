@@ -1,0 +1,47 @@
+
+<html lang="en">
+<head>
+<title>Stadlg.INI file reference</title>
+
+</head><body>
+
+<h1>Stadlg.ini file reference</h1>
+<p>File Date: 2020-12-10</p>
+
+<p>Sections, [$category]
+[dialogname]
+dialog=count WR items
+states=
+state1=
+state2=
+state3=
+...
+unconn=state SKIP
+get=OnGetFunction
+set=OnSetFunction
+cdatset=OnSetCdatFunction
+
+Alternate, dialog elements on several lines: 
+
+dialog=count WR Ccount:n Cprefix:Prefix
+Prefix1=info:EchoInfofunction
+Prefix2=edit(varname):E_Completedate
+Prefix3=big(varname):E_Completedate
+Prefix4=select(varname):PD_left+PD_pb+PD_action
+
+As defined in call0003.html:
+
+<pre><b>select(</b><em>varname</em><b>):</b><em>labelfunc</em><b>+</b><em>PBtext</em><b>+</b><em>PBaction</em></pre>
+<pre><b>edithelped(</b><em>varname</em><b>):</b><em>labelfunc</em><b>+</b><em>PBtext</em><b>+</b><em>PBaction</em></pre>
+<pre><b>edit(</b><em>varname</em><b>):</b><em>labelfunc</em></pre>
+<pre><b>big(</b><em>varname</em><b>):</b><em>labelfunc</em></pre>
+<pre><b>info(</b><em>varname</em><b>):</b><em>infotxt</em></pre>
+<pre><b>command(</b><em>varname</em><b>):</b><em>settxt</em><b>+</b><em>Action</em> </pre>
+
+
+
+</body>
+</html>
+
+
+

@@ -1,0 +1,51 @@
+
+<html lang="en">
+<head>
+<title>DDE Callback -- Category 8 (16-bit WinPCS)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name=description content="DDE Callback -- Category 8 (16-bit WinPCS)">
+</head><body>
+<a name="Top"></a>
+
+<h1>DDE Callback -- Category 8 (16-bit WinPCS)</h1> <p> 
+
+<h3>Description:</h3>
+Function calls in this category are made when an item is selected for automatic DDE 
+either in the Report View or via the rundde( )  LCX function.
+
+<h3>Enabling control in WinPCS:</h3>
+Call to <a href="lcxh.html#rundde">rundde( )</a>, or if the Report View is used, a 
+matching report name needs to be found in WinPCS.INI, section [DDEAPPS].
+
+<h3>Default behavior</h3>
+Report Views: If the callback function is not defined for the the report, no special action 
+takes place.
+<a href="lcxh.html#rundde">rundde( )</a> 
+functions: An error message indicating that the file or function was absent is issued.
+
+<h3>Disallowed functions:</h3>
+Document-drawing functions are only available inside the Printing callback 
+environments.  There is however no restriction per se on initiating printing operations.
+
+<h3>LCX files:</h3>
+Files referred to in the entry in WINPCS.INI [DDEAPPS] or in the rundde( ) call.
+
+<h3>Callback functions:</h3>
+<li>For the 
+<a href="lcxh.html#rundde">rundde( )</a> 
+callback function:
+rcode = DDEfunction(argument, server, exepath, topic)<br>
+
+<li>For the Report calls:
+ignored = DDEfunction(filename, server, exepath, topic)<br>
+
+<h3>Execution context:</h3>
+Not shared or reentered. The execution context of the rundde( ) LCX call or LCX call that 
+opened a Status Index is not used; instead, a separate execution context is used for the 
+callback. 
+
+<!-- -->
+
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> </p>
+</body>
+</html>

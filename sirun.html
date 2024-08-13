@@ -1,0 +1,329 @@
+
+<html lang="en">
+<head>
+<title>Information on the SIRUN subsystem</title>
+
+<meta http-equiv="Content-Type" content="text/html">
+<meta name=description content="Information on SIRUN">
+
+</head><body>
+
+<h1>Information on the SIRUN subsystem</h1>
+
+<p> File Date: July 29 2003
+
+<a name="Introduction"></a>
+<h2>Introduction</h2>
+
+<p>The SIRUN subsystem is made for continually running SI reports or other jobs
+without much intervention, so that a slow network doesnt get bogged down in reporting. 
+
+<p>To this end, the program SIRUN.EXE is used. It is a Windows GUI program, and should be set up
+on the machine where the data files are.  SIRUN uses a file in the system directory,
+<a href="#SIRUNinifile">SIRUN.INI</a> 
+which among other things contains the list of activities SIRUN is to perform. This
+file is read on startup, and displayed on the window in a list there.   
+
+<p>To run, the menu selection
+<b>Commands/Go</b> is used, this will open a big odometer window showing what is happening.  To stop the
+looping, the STOP button on this odometer window is used, this will allow the current run to be 
+completed and then the looping will stop. 
+
+
+<h2>The SIRUN.INI file</h2>
+
+<p>This file contains a section [SIRUN] with the list of things to be done, as shown on the window.  
+Each action is specified as a line on section file in the format:
+
+<p><em>priority macrofile macrofunction table parameter </em>
+
+<p>In addition, the program stops when it encounters lines beginning with <b>;</b> 
+which can be used as trailing comment lines, useful for explaining details in the file.  
+An example of such a section is shown here:
+
+<pre>
+[SIRUN]
+1 0:\sirun.lcx DoSIrun CERTHC1 A11
+1 0:\sirun.lcx DoSIrun CERTHC1 P1
+3 0:\sirun.lcx DoSIrun CERTHC1 B11
+; priority macrofile macrofunction table refrepkey
+; DoSIrun(string table, string refrepkey, string itemid)
+; macrofile macrofunction table refrepkey itemid
+</pre>
+
+The <em>priority</em> field indicates how frequently any job is to be done in comparison to the others.  
+When looping, a set of counters are maintained, one per job. This is initially set to the priority-number, 
+and then decremented once for each job. When the counter reaches 0, the job is performed and the counter
+becomes reset to the priority number again. Thus, the lower the number is, the more frequently that job is 
+done compared to others with higher numbers.  In the above, B11 will be done only 1/3 as often as A11 and P1.
+
+<p>The <em>macrofile</em> and <em>macrofunction</em> represents the work to be done for that job. This function will be
+called once per record in the specified <em>table</em> Once the table is exhausted, that job is finished
+and the next job will be performed. 
+
+<p>The last items on the line are parameters to be passed to the macrofunction. These are not used directly by
+SIRUN but are simply passed on into the macrofunction for it to work with.  In the example above, these are
+keys into the REFREP table. 
+
+<h2>Calling the macrofunction</h2>
+
+<p>The rest of WinPCS code is interacted with through the specified macrofunction expected to be in the named file.  
+The location of the file would typically be the system directory, and we may specify the numbered drives for this.
+(see the discussion of these under <a href="lcxh.html#ExpandPath">ExpandPath( )</a> )
+
+<p>The function will be called as: 
+<pre><em>function</em><b>(</b><em>table</em><b>, </b><em>parameter</em><b>, </b><em>itemid</em><b>)</b></pre>
+
+<p>The argument <em>table</em> is the table as initially specified, the <em>parameter</em> is the 
+trailing parameter as given in the 
+<a href="#SIRUNinifile">SIRUN.INI</a> 
+[SIRUN] section, and the <em>itemid</em> is the value of the 
+main field in the current worked-on record in this table.   This is the field specified as ITEMFLD in
+the CXDICT record for this table. 
+
+<p>Most of the usual system functions as listed in the 
+<a href="lcxh.html#Functions.20available.20in.20the.2016.2dbit.20system"> Macro Help</a> file for 
+16-bit clients are available. The exceptions are the functions opening or dealing with MDI child windows,
+notably 
+
+<a href="lcxh.html#runentry">runentry( )</a> ,
+<a href="lcxh.html#Entrydialog">Entrydialog ( )</a> ,
+<a href="lcxh.html#runview">runview( )</a> ,
+<a href="lcxh.html#Viewdialog">Viewdialog( )</a> ,
+<a href="lcxh.html#CreateReport">CreateReport( )</a> ,
+
+<!-- <a href="lcxh.html#varSI">varSI( )</a> , -->
+
+<p>The <a href="lcxh.html#message">message( )</a> 
+function, all the other functions that open a dialog window, including the 
+<a href="lcxh.html#CounterHere">Odometer</a>, are all available.  However, while useful
+for debugging, apart from the 
+<a href="lcxh.html#CounterHere">Odometer</a>
+ones, these are not suitable for unattended operation, since they stop and wait for user interaction. 
+
+<p>Notably, the quiet and CSV-file generating variants of the 
+<a href="lcxh.html#varSI">varSI( )</a> function are quite useful.  More on this anon. 
+
+<h2>Configuration</h2>
+
+The 
+<a href="#SIRUNinifile">SIRUN.INI</a> 
+file is expected to be in the System directory, and any files it refers to should
+also be present. For the SIRUN.EXE program, this is usually located with the other
+common EXE and DLL files, in the directory PROG or similar. The shortcut
+should have the system directory as the working directory, same as the usual WINPCS.EXE has.
+
+<p><b>NB!</b> If you also want to run WinPCS on the same machine, with SIRUN in the background,
+make sure that the properties for the SIRUN shortcut has the "run in separate 
+memory space" checkbox turned on. 
+
+If this is not turned on, then expect both SIRUN and WinPCS to become unstable and crash-prone as 
+they will be fighting for some common resources in the DLLs and the system, as well as 
+not agreeing on whether certain DLLs are present or not.  This will cause trouble. 
+
+<p>This "run in separate memory space" option should work on all most recent version of Windows, 
+I have it here on windows 2000.  (Another version of the startup WinPCS.EXE has been made which does not
+use dynamical loading. This causes no crashes, but WinPCS remains less than perfect
+responsive during SI loading phases of the SIRUN jobs. This version also is mising the -D option, and
+does produce a long painful slew of errormessages, so it has not been publicised.)
+
+<p>If not aimed correctly, it will not start, and instead display a message about some DLL missing, 
+most likely CWULIB or ANCHOR. 
+
+<p>The macro files referred to should of course also be present, if not, they will be skipped, and 
+only the ones present will be run.
+
+<h2>Example: Running SI reports unattended</h2>
+The contents of the above SIRUN.INI file shows how A-sheet, punchlists, and B-sheet indexes may
+be produced unattended. All other configuration info is in the SIRUN.LCX file, as part of
+the function <a href="#DoSIrun">DoSIrun( )</a> there. 
+
+<p>The parameter argument is used as the REFREP key, then the proper SI-report reference is found there,
+and this is used for finding the proper SI-report code. The output file name is placed in a directory
+under REPORTS, as per the statement:
+
+<pre> 
+    outfile = concat("9:\REPORTS\CANNED\", 
+            table, "\", itemID, refrepkey, ".CSV");
+</pre>
+
+This convention is defined in this LCX file only, and there is nothing hard-coded anywhere else. 
+It is possible to integrate this into the PATHS section in WinPCS.INI, but nothing has been done
+along these lines at the moment.  
+
+This is just one of
+several possible naming conventions. The filename must be less than 8 characters, remember this is
+the old 16-bit environment. In the system here, where system numbers are 3-digits, the filenames will
+be in the style <b>400A11.CSV</b>, <b>400P1.CSV</b>, and <b>400B1.CSV</b>, in a subdirectory CERTHC1. 
+
+<p>This is extensible, so other jobs running SI reports on different levels (CERTMILE, CERTSITE)
+would not be that difficult. 
+
+<p>To actually run the SI report, the function varSI( ) with the new C parameter is used, and this
+means that instead of opening an filling a Report View, we instead want the data to go into a CSV
+file specified as one of the later arguments.  Later, there is another function, 
+<a href="lcxh.html#cannedindex">cannedindex( )</a>, which can be called from within WinPCS to read and 
+display this CSV file as a Report. 
+
+<p>Since these files are standard CSV-files it should not be difficult to be able to open Excel 
+on them either, for further processing. 
+
+<p>The <a href="#varSI">varSI( )</a> function accepts the numbered-drive path for its output file, it is
+not necessary (but neither is it harmful) to use <a href="#ExpandPath">ExpandPath( )</a> on this path. 
+
+
+<h2>Running the canned index reports in WinPCS</h2>
+In order to select and run these reports in WinPCS, a new LCX system function,
+<a href="lcxh.html#cannedindex">cannedindex( )</a> , is created.
+
+This takes a subset of the arguments specified for the standard 
+<a href="lcxh.html#varSI ">varSI ( )</a> function, 
+and reads the data-file, which is expected to have been created using the
+previous call to <a href="lcxh.html#varSI">varSI("C", ... )</a>.  
+The linkage inside WinPCS is via DDMATRIX,
+where a new target, such as WinPCS:REPORT, must be used for running a function 
+that does the actual selection, REFREP lookups, and then calls this 
+<a href="lcxh.html#cannedindex">cannedindex( )</a> 
+function. 
+
+The function that does all this is in the file SIRUN.LCX as well, the
+function is called <a href="#StoredReport">StoredReport( )</a>.
+
+<a name="SIRUNinifile"></a>
+<h2>The entire example SIRUN.INI file</h2>
+<pre>
+
+[SIRUN]
+1 0:\sirun.lcx DoSIrun CERTHC1 A11
+1 0:\sirun.lcx DoSIrun CERTHC1 P1
+1 0:\sirun.lcx DoSIrun CERTHC1 B11
+; priority macrofile macrofunction table refrepkey
+; DoSIrun(string table, string refrepkey, string itemid)
+; macrofile macrofunction table refrepkey itemid
+; Report selections from SIRUN.LCX
+[CERTHC1]
+A11=A-sheet status index
+B11=B-sheet status index
+P1=Punch List
+
+</pre>
+
+The section CERTHC1 is used in the 
+<a href="#StoredReport">StoredReport( )</a> 
+to allow selection of the relevant reports for that instance. 
+
+
+<a name="DoSIrun"></a>
+<h2>The example DoSIrun function from SIRUN.LCX</h2>
+<pre>
+DoSIrun(string table, string refrepkey, string itemID)
+{
+    string stat, siname, refrep2;
+    string lcxfile, formfunc, lscape, arg11;
+    string outfile;
+
+    outfile = concat("9:\REPORTS\CANNED\", 
+            table, "\", itemID, refrepkey, ".CSV");
+
+    // message(__HERE__, "File ", outfile);
+
+    refrep2 = makeset(table, refrepkey);
+    stat = findexact("REFREP", "REPORT1", refrep2);
+    if(setitem(stat,0)!=0) 
+        { return(concat("Failed on REFREP ", stat, 
+            " REPORT to match ", refrep2)); }
+
+    siname= get("REFREP", "STATREES");
+    if(notext(siname)) { return("Failed on get statrees"); } 
+
+    arg11 = makeset(table, itemID, 
+        StdField(table, "ITEMFIELD"), refrepkey);
+
+    /* Fillers ... */
+    lcxfile = get("REFREP", "LCXFILE");
+    formfunc = get("REFREP", "FORM");
+    lscape = get("REFREP", "ORIENTATION");
+    if(lscape=="L") { lscape = 1; }
+
+    /* if("400" == itemID || "401" == itemID ) */
+
+    {
+        varSI("C", siname, table, makeset(table, itemID),
+            "Report Name",      // prompt
+            "0",                // postprocode
+            "1",                // restriction 
+            lcxfile,  formfunc, // Format file, function
+            lscape,             // Landscape flag
+            arg11,              // Argument for the function 
+            1,                  // Item is ident, not Rserial
+            outfile);           // CSV-file output option
+    }
+
+    return(0);
+}
+</pre>
+
+
+<a name="StoredReport"></a>
+<h2>The example StoredReport function from SIRUN.LCX</h2>
+<pre>
+
+/* Drag-Drop action */
+StoredReport(string ubase, string ufield, string utobase, string utofield,
+	string udata0, string udata1, string data2, string uwherefrom)
+{
+	string table, bs, item;
+	string initdir, tmask, repfile;
+	string rrkey, refrep2, siname;
+	string Forient, Ffunction, Ffiles, Fparam;
+
+	table = setitem(data2, 0);
+	bs = findexact(table, setitem(data2, 1), setitem( data2, 2));
+	if(setitem(bs, 0) != 0) { return(-1); } 
+	item = get(table, StdField(table, "ITEMFLD"));
+
+	/* List selections outa SIRUN.INI for the table, and 
+		figure out the file-names from this. */
+
+	rrkey = selectinistring("Select", "Select one report", 
+			"0:\sirun.ini", table);
+	if(notext(rrkey)) { return(-1); }
+
+	repfile = concat("9:\REPORTS\CANNED\", table, "\", item, rrkey, ".CSV");
+
+	// message(__HERE__, "Selected file ", repfile, " ", rrkey);
+
+	/* Look this up in REFREP preparing a Stored Report given
+		SI code, file, formatting file, function, and parameter */
+
+	refrep2 = makeset(table, rrkey);
+ 	bs = findexact("REFREP", "REPORT1", refrep2);
+	if(setitem(bs, 0)!=0) 
+		{ return(concat("Failed on REFREP ", bs, 
+			" REPORT to match ", refrep2)); }
+
+	siname = get("REFREP", "STATREES");
+	if(notext(siname)) { return("Failed on get statrees"); } 
+
+	Ffiles = get("REFREP", "LCXFILE");
+	Ffunction = get("REFREP", "FORM");
+	Forient = get("REFREP", "ORIENTATION");
+	Fparam = makeset(table, item, StdField(table, "ITEMFIELD"), rrkey);
+
+	// message(__HERE__, "Format file ", Ffiles, " ", Ffunction);
+
+	cannedindex(siname, table, repfile, Ffiles, Ffunction, Forient, Fparam);
+
+	return(0);
+}
+
+</pre>
+
+
+
+
+</body>
+</html>
+
+
+

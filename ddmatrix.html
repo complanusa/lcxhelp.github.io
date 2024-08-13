@@ -1,0 +1,371 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>DDMATRIX Reference</title>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<meta name="description" content="DDMATRIX Reference"/>
+
+</head><body>
+
+<h1>DDMATRIX Reference</h1>
+
+<h2>Introduction</h2>
+<p>The table DDMATRIX handles all the drag-drop actions
+and the right-click menus in the Hierarchies.</p>
+
+<p>Each record in DDMATRIX defines an action function for dragging
+from somewhere in WinPCS (or outside WinPCS), the "origin", to 
+somewhere else inside WinPCS, the "destination".  
+<a href="call0005.html">
+There are more details on the LCX side of things here. </a></p>
+
+<h2>Standard tables</h2>
+<p>Each record in DDMATRIX identifies a possible object to grab and drag, and a
+possible target for this object, where it is dropped, and the action to be done
+when this happens. The action is formulated as an LCX function defined in the record.</p>
+
+<p>Each origin and target is defined by specifying a table and a fieldname. In most cases, 
+the field is the ITEMFIELD as defined in CXDICT for that table. The objects picked up
+can come from DDSERV fields in Views, VCONN lists, and Hierarchies. The target areas are
+DDSERV fields, VCONN lists, Hierarchies, and WinPCS Strip Icons. In addition, objects
+can be dropped into Gang Connection Selection boxes, but these are part of the Gang Connection,
+and nothing to do with DDMATRIX.</p>
+
+<p>The fields in DDMATRIX are as follows:</p>
+
+<table border="1" cellspacing="5" cellpadding="2"> <tbody>
+
+<tr><td>Fieldname</td><td>Standard Description</td>
+	<td>File Source</td>
+	<td>Strip Drop Targets</td>
+	<td>DCLICK Targets</td>
+	<td>Strip Click Actions</td>
+</tr>
+
+<tr><td>RSERIAL</td><td>The usual Record Number</td> </tr>
+
+<tr><td>ORIGIN</td><td>This identifies the table where the dragged 
+object comes from.
+ It can be a real table, or the mangled name for 
+the variant hierarchies, or the name of the pseudo-table DDFILE for 
+files picked up in Explorer windows. See below for more on 
+DDFILE. This can also be <b>WinPCS</b> for STRIP icon clicks. 
+</td>
+<td><b>DDFILE</b></td> <td></td> <td></td> <td><b>WinPCS</b></td>
+</tr>
+
+<tr><td>ORIGIN_FIELD</td><td>This is the standard fieldname of the 
+origin table, usually the same name as in CXDICT field ITEMFIELD for 
+this table, or the starting fieldname for the variant hierarchies. 
+When ORIGIN is <b>DDFILE</b>, this field should be 
+whatever is defined in CXDICT as the ITEMFIELD for the "table"
+DDFILE. Usually this is the string <b>FIELDNAME</b>. When ORIGIN is
+<b>WinPCS</b> this should be the name of one of the icons on the 
+STRIP.</td>
+<td><b>FIELDNAME</b></td> <td></td> <td></td> <td>Strip icon name</td>
+</tr>
+
+<tr><td>ORIGIN_BASE</td><td>This is an overlaid copy
+of ORIGIN 
+on non-SQL systems. SQL systems don't use this field
+even if it is present. 
+Can be left blank on insertions or updates. </td>
+<td><b>DDFILE</b></td> <td></td> <td></td> <td><b>WinPCS</b></td>
+</tr>
+
+<tr><td>DESTIN</td><td>This is the table name for the target side, the 
+place or object the dragged object is dropped on. This is often <b>WinPCS</b>,
+which indicates one of the icons at the bottom of the screen, or it is some
+real data table, such as ENGTELE, ENGEQUIP, CERTAC1 etc. For double-clicks in 
+hierarchies and clicks on the Strip icons, it indicates that a clicking action
+is to be handled. </td>
+<td></td> <td><b>WinPCS</b></td> <td><b>DCLICK</b></td> <td><b>CLICK</b></td>
+</tr>
+
+<tr><td>DESTIN_FIELD</td><td>This is the ITEMFIELD for the DESTIN
+table, the name of the Strip Icon if DESTIN is <b>WinPCS</b>. 
+It can also be some indicator of what is expected to happen when some
+object in the hierarchy or Strip is clicked on.  
+Tags tend to have TAG_NO, systems have SYSTEM_NO, there are also
+CABLE_NO, TEST_NO, DOC_NO, and LOOP_NO. Use whatever is the standard 
+as found in CXDICT.  </td>
+<td></td> <td>Strip icon name</td> <td>one of 
+<b>STATUS</b>,<br/><b>OSTATUS</b>,<br/><b>LCXCALL</b>,<br/><b>SERVERLCX</b> </td> 
+<td><b>LCXCALL</b></td>
+</tr>
+
+<tr><td>DESTIN_BASE</td><td>This is an overlaid copy
+of DESTIN on non-SQL systems. SQL systems don't use this field
+even if it is present.  Can be left blank on insertions or updates.  </td>
+<td></td> <td><b>WinPCS</b></td> <td><b>DCLICK</b></td> <td><b>CLICK</b></td>
+</tr>
+
+<tr><td>MAGIC</td><td>In 16-bit systems, this used to be a way of identifying different targets.
+This is not used for anything on the 32-bit systems.</td></tr>
+
+<tr><td>WFILE</td><td>This is the usual LCX file where the
+action function is to be found. Non-SQL systems may have this field named FILE</td></tr>
+
+<tr><td>WFUNCTION</td><td>This is the name of the
+action function. Since each table has their own record in DDMATRIX, 
+various action functions can be used for various tables. Some may want 
+documents attached, some may want them inserted or replaced as 
+references. The return value is used to indicate how hierarchies are to be re-drawn.
+See <a href="call0005.html"> Drag and Drop Actions </a> for details. Non-SQL systems may 
+have this field named FUNCTION</td>
+</tr>
+
+<tr><td>CURSOR</td><td>This used to define the cursor that WinPCS would use for marking
+a possible drop. This is not used anymore.  </td></tr>
+
+<tr><td>MENU_TXT</td><td>This is menu texts on right-clicks
+in hierarchies. These are only used for some <b>WinPCS</b> destinations.  See note below.
+</td>
+<td>N/A</td> <td>Menu Entry</td> <td>N/A</td> <td>N/A</td>
+</tr>
+
+<tr><td>SD_COMBO</td><td>This is an overlaid field over ORIGIN, part of a 
+4-segment key used for enforcing uniqueness on non-SQL systems. SQL systems
+don't need or use this field.</td>
+</tr>
+<tr><td>SD_COMBO1</td><td>This is an overlaid field over ORIGIN_FIELD, part of a 
+4-segment key used for enforcing uniqueness on non-SQL systems. SQL systems
+don't need or use this field.</td>
+</tr>
+<tr><td>SD_COMBO2</td><td>This is an overlaid field over DESTIN, part of a 
+4-segment key used for enforcing uniqueness on non-SQL systems. SQL systems
+don't need or use this field.</td>
+</tr>
+<tr><td>SD_COMBO3</td><td>This is an overlaid field over DESTIN_FIELD, part of a 
+4-segment key used for enforcing uniqueness on non-SQL systems. SQL systems
+don't need or use this field.</td>
+</tr>
+
+</tbody> </table>
+
+<h2>WinPCS Special Hierarchy Sources</h2>
+<p>The variant hierarchies as started using the 
+<a href="lcxh.html#VarHierarchy">VarHierarchy( )</a> function produces objects defined with
+a mangled table name and the name of the field given as <i>distfield</i> for the function. 
+More details on the mangling is in the documentation for the 
+<a href="lcxh.html#VarHierarchy">VarHierarchy( )</a> function. </p>
+
+<h2>WinPCS Destinations</h2>
+<p>The possible drop-targets or destinations on the "Strip" are referenced using the table 
+name "WinPCS" for DESTIN instead of a real data table. The DESTIN_FIELD 
+is the name of the icon on the strip, as specified in 
+<a href="winpcsini.html">WinPCS.INI</a> section
+<a href="winpcsini.html#section.20Strip">[STRIP]</a>
+and in REFBMP31.INI file (REFBMP.INI file on 16-bit systems). </p>
+
+<p>The setting in winpcs.ini, section <a href="#section.20WinPCS">[WinPCS]</a>
+entry <a href="#rightmenu"><b>RIGHTMENU=</b></a> controls if and how these 
+menu entries are shown. If RIGHTMENU=DDMATRIX and the field MENU_TXT in DDMATRIX 
+is blank, that menu entry will not be displayed.  The drag-drop action itself still works however.</p>
+
+<p>If RIGHTMENU= is not set to DDMATRIX, the text from the Strip will be used here, 
+independent of what is in DDMATRIX field MENU_TXT. </p>
+
+<!--- <p>These Strip entries are also what produces the entries in the right-click menu in
+the hierarchies. The entries in this menu can come from the description strings on 
+the <a href="winpcsini.html#section.20Strip">[STRIP]</a> section or from 
+<a href="winpcsini.html">WinPCS.INI</a>
+section <a href="#section.20WinPCS">[WinPCS]</a>
+entry <a href="#rightmenu"><b>RIGHTMENU=</b></a>. Generally, the actions are generic
+here, such as opening a View, opening an Entry, run a Report, perform printing, and so on.</p>
+-->
+
+<a name="stripclicks"></a>
+<h2>Strip Clicks (<b>WinPCS</b> origin, <b>CLICK:LCXCALL</b> destination)</h2>
+<p>When the user left-clicks on the symbols in the WinPCS Strip, there can be records
+defined for doing something for these as well. Although not drag-drop related as such, the
+DDMATRIX is a natural place to locate these actions as well, as they may be related to
+others, and there is already the established convention of referring to the STRIP symbols
+with the table name WinPCS and the field-name or object name of the icon. </p>
+
+<p>To enable these actions, the origin table-name is set to <b>WinPCS </b> and the origin
+field is set to the name of the strip symbol. The destination table is set to CLICK and 
+the destination field is set to LCXCALL,
+similar to what we see with the double-click actions from the hierarchies. 
+Unlike these, the only supported combination is CLICK and LCXCALL (no DCLICK or STATUS
+variations here.  </p>
+
+<p>The WFILE and WFUNCTION identifies the LCX file and the function to be run when the click
+is made. This function follows the same standard as other DDMATRIX functions, which are rather
+different from the pushbutton functions seen in Reports or Views.</p>
+
+<a name="doubleclicks"></a>
+
+<h2><b>DCLICK</b> destinations: WinPCS Double-Click actions (32-bit only)</h2>
+<p>This is a way to define what happens on double-clicking on some tag
+or object in a VCONN or hierarchy.  The default in VCONN lists and 
+hierarchies where there is a S: setting is to open the status dialog, 
+but another action that may be desired is to run some LCX function. </p>
+
+<p>Old status dialogs handled this by stealing the OnGet function
+and using that for the LCX action, but when these are run on the 
+server the old actions won't be possible. Instead, the LCXCALL 
+mode is now provided to do this explicitly.</p>
+
+<p>To specify these actions, the field DESTIN is set to contain the 
+string "DCLICK", and the following values of DESTIN_FIELD will 
+have meaning as shown: </p>
+
+<table border="1" cellspacing="5" cellpadding="2"> <tbody>
+<tr><td>DESTIN_FIELD</td><td>Meaning</td></tr>
+<tr><td>STATUS</td><td>Run the optimized status dialog</td></tr>
+<tr><td>OSTATUS</td><td>Run the original model of status dialog</td></tr>
+<tr><td>LCXCALL</td><td>Run the LCX function indicated in FUNCTION and
+found in FILE on the client</td></tr>
+<tr><td>SERVERLCX</td><td>Run the LCX function indicated in FUNCTION on 
+the server. As server-side functions are all in the same code space,
+the field FILE is not referenced and can be leftblank.</td></tr>
+</tbody> </table>
+
+<p>See the <a href="call0001.html">Get and Set Status functions</a> page
+for more details on the get and set functions.</p>
+
+<p>The LCXCALL function has the standard DDMATRIX arguments and return
+value, see <a href="call0005.html">Drag and Drop actions</a>. </p>
+
+<h3>See also:</h3>
+<p> 
+<a href="lcxh.html#statusdialog">statusdialog( )</a> <br/>
+<a href="lcxh.html#CreateAuto">CreateAuto( )</a> <br/>
+</p>
+
+<h2>File Manager and Explorer sources (32-bit only)</h2>
+<p>The objects dragged and dropped into WinPCS may come from the Explorer
+windows outside of WinPCS. The possible targets are the Strip, the Hierarchies, and
+the VCONN lists but unlike dragged objects from within WinPCS, there is no
+standard make-connection action in VCONN. The actions are handled via DDMATRIX
+for all these targets.</p>
+
+<p>The file-system objects are handled as coming from the pseudo-table
+DDFILE, and uses CXDICT to figure out the ITEMFIELD from this table, just
+like all other real tables.  The relevant record in CXDICT therefore has
+the following values:</p>
+
+<table border="1" cellspacing="5" cellpadding="2"> <tbody>
+<tr><td>CXDICT field</td><td>Value</td><td>Comment</td></tr>
+<tr><td>ITEMBASE</td><td>DDFILE</td><td>This is the name defined in the code</td></tr>
+<tr><td>ITEMFIELD</td><td>FILENAME</td><td>Any name here will do, as long
+as it appears the same in DDMATRIX</td></tr>
+
+<tr><td>ITEMUNIFIELD</td><td>RSERIAL</td><td>This is a don't care value, 
+though tradition suggests using RSERIAL</td></tr>
+
+<tr><td>ITEMDESFLDS</td><td>FILENAME</td><td>Description field should be 
+the same as the ITEMFIELD, it makes StdField() calls meaningful. </td></tr>
+<tr><td>ITEMDFCOUNT</td><td>1</td><td>There is 1 description field as usual</td></tr>
+<tr><td>ITEMICON</td><td>BMFILE</td><td>Fixed icon name</td></tr>
+<tr><td>ITEMICONMODE</td><td>C</td><td>C means ITEMICON is a value, not a fieldname.</td></tr>
+<tr><td>ISCORED</td><td>N</td><td>There is nothing to put in CORE. We don't want to to even try.</td></tr>
+
+<tr><td>BASEDESCR</td><td>Dropped Files Pseudo-table</td><td>Describes what this is, 
+suitable for 
+<a href="lcxh.html#StdField">StdField( )</a> 
+calls elsewhere.</td></tr>
+</tbody> </table>
+
+<p>There is then one record in DDMATRIX with the above table and its ITEMFIELD
+as the source, and the dropped-on table and its ITEMFIELD defined as 
+the target. A DDMATRIX entry for drops on ENGTELE is typically 
+something like:</p>
+
+<table border="1" cellspacing="5" cellpadding="2"> <tbody>
+<tr><td>DDMATRIX field</td><td>Value</td><td>Comment</td></tr>
+<tr><td>ORIGIN</td><td>DDFILE</td><td>The pseudo-table for 
+Windows-origin files</td></tr>
+<tr><td>ORIGIN_FIELD</td><td>FILENAME</td><td>This is the same name 
+as in CXDICT field ITEMFIELD. As noted above, any name will do as 
+long as it is the same. </td></tr>
+<tr><td>ORIGIN_BASE</td><td>DDFILE</td><td>This is an overlaid copy
+of ORIGIN. Can be left blank on insertions or updates.  </td></tr>
+
+<tr><td>DESTIN</td><td>ENGTELE</td><td>This is the example for Telecom Tags.
+Any other table that wants to handle documents dropped on it should have
+a record like this in DDMATRIX with its name here.  The Strip Targets will have the
+tablename <b>WinPCS</b> here.
+</td></tr>
+
+<tr><td>DESTIN</td><td>TAG_NO</td><td>This is the ITEMFIELD for the DESTIN
+table. Tags tend to have TAG_NO, systems have SYSTEM_NO, there are also
+CABLE_NO and LOOP_NO. Use whatever is the standard as found in CXDICT.
+The Strip targets will have the field-name from the Strip icon, as detailed
+for Strip targets above.
+</td></tr>
+
+<tr><td>MAGIC</td><td>331</td><td>This is just some number.</td></tr>
+<tr><td>FILE</td><td>autodoc.lcx</td><td>This is the usual file where the
+action function is to be found.</td></tr>
+<tr><td>FUNCTION</td><td>OnDroppedFile</td><td>This is the name of the
+action function. Since each table has their own record in DDMATRIX, 
+various action functions can be used for various tables. Some may want 
+documents attached, some may want them inserted or replaced as 
+references.</td></tr>
+<tr><td>CURSOR</td><td>VOIDDROP</td><td>This is irrelevant, Windows uses
+its own cursors, which are somewhat different from the ones WinPCS uses.  </td></tr>
+
+<tr><td>MENU_TXT</td><td>(blank)</td><td>This is menu texts on right-clicks
+in hierarchies. Irrelevant, since these files do not come from 
+hierarchies at all.  </td></tr>
+
+</tbody> </table>
+
+<p>An example action function, OnDroppedFile(), is shown here. It has the
+usual arguments, but doesn't do anything except display them.</p>
+
+<pre>
+/* autodoc.lcx -- capture drops for document files from Explorer windows
+	dropped onto hierarchies and VCONN lists. */ 
+
+/*D*/ OnDroppedFile(string uF_group, string base, string uF_icon, string item,
+	string uT_group, string uT_type, string uT_icon, string uT_name,
+	string uorigin, string uhierinfo)
+{
+
+	message(__HERE__, "\x0a uF_group = ", uF_group,
+		"\x0a base = ", base,
+		"\x0a uF_icon = ", uF_icon,
+		"\x0a item = ", item,
+		"\x0a uT_group = ", uT_group,
+		"\x0a uT_type = ", uT_type,
+		"\x0a uT_icon = ", uT_icon,
+		"\x0a uT_name = ", uT_name,
+		"\x0a uorigin = ", uorigin,
+		"\x0a uhierinfo = ", uhierinfo);
+
+	return(0);
+}
+</pre>
+
+<p>The possible return values from these functions are:</p>
+<ul>
+<li>0 = Don't refresh the hierarchy. </li>
+<li>1 = Refresh the appearance of the item. Typical case is when changing status of preservation items or check-sheets. </li>
+<li>2 = Close and re-open the item. Typical use of this is creation of punch-items.</li>
+<li>3 = Close and re-open the parent of the item. Typical case is changing status of punch-items 
+that may affect the appearance of the parent and sibling objects.</li>
+<li>4 = Close and re-open the entire hierarchy. Typical case is when 
+preservation schedule has to change. </li> 
+</ul>
+
+<hr/>
+<p>File Date: 2011-10-26</p>
+
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+
+</body>
+</html>
+
+
+

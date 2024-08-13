@@ -1,0 +1,227 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>
+WinPCSMobile files
+</title>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<meta name="description" content="WinPCS Macro Language Help File"/>
+</head>
+<body>
+
+<h1>
+WinPCSMobile files
+</h1>
+
+<p>All files to do with tablets are in the mobile subdirectory, 
+and many of these are the same as the ones in the main WinPCS system 
+(other subdirectories than mobile), but some are in different locations. </p>
+
+<p>These directories are the ones in the WinPCS-system having a mobile 
+function, using WinPCSMobile and pdfcert. Systems using a remote WinPCS
+and htmlcert will be slightly different, as will systems using WinPCSMobile
+and htmlcert. </p>
+
+<table><tbody>
+<tr><td>data/</td>         <td> Data files </td></tr>
+<tr><td>forms/</td>        <td> Forms, has several subdirectories </td></tr>
+<tr><td>ini/</td>          <td> View ini files</td></tr>
+<tr><td>prog_client/</td>  <td> Client executables </td></tr>
+<tr><td>server/</td>       <td> Server files </td></tr>
+<tr><td>system32/</td>     <td> Client configuration </td></tr>
+<tr><td>mobile/</td>       <td> Files and directories for the Mobile additions.</td></tr>
+</tbody></table>
+
+<p>There might be other directories for things such as backup-data, scanned documents,
+log-files, cdat schemas, and so on, but the interesting part of the tree here is 
+what is in the mobile directory. </p>
+
+<p>The following files and directories have to do with the mobile. Some executables and DLLs are specific
+to that, and there are some ini files that are repeated across several of the directories.
+Some of these directories have further subdirectories within.</p>
+
+<table><tbody>
+<tr><td><a href="#mclient">mobile/client</a></td>             <td> WinPCSMobile Client program </td></tr>
+<tr><td><a href="#mdata">mobile/data</a></td>               <td> Data files </td></tr>
+<tr><td><a href="#mforms">mobile/forms</a></td>              <td> Forms, various subdirectories </td></tr>
+<tr><td><a href="#mlogs">mobile/logs</a></td>                <td> Log-files </td></tr>
+<tr><td><a href="#mmlib">mobile/mobilelib</a></td>          <td> Supporting program files </td></tr>
+<tr><td><a href="#mpcert">mobile/pdfcert</a></td>            <td> PDFCert files </td></tr>
+<tr><td><a href="#mserver">mobile/server</a></td>             <td> off-line server </td></tr>
+<tr><td><a href="#msym32">mobile/system32</a></td>           <td> WinPCS-client files</td></tr>
+<tr><td><a href="#mupder">mobile/updater</a></td>            <td> Updater code and config</td></tr>
+<tr><td><a href="#mmini">mobile/mobile.ini</a></td>         <td> Main Configuration file </td></tr>
+<tr><td><a href="#muuini">mobile/updater/updater.ini</a></td><td> Updater configuration file.</td></tr>
+</tbody></table>
+
+
+
+<a name="mupder"></a>
+<h2>The Updater</h2>
+
+<p>The Updater subsystem consists of a service, <b>updatersvc.exe</b> and a command-line executable, 
+<b>updatercmd.exe</b>, to run on the tablet, that both refer to the main WinPCS server, and looks 
+for specified files there, in order to make sure these are the same on the tablet.  When the updater 
+programs sees that a file on the server is different from the one on the tablet, or the one on 
+the tablet doesn't exist, it pulls a copy of it across.</p>
+
+<p>The <b>updatersvc.exe</b>, the service, is limited and hardcoded to only update the <b>mobile.ini</b> file and the
+files in the <b>mobile/updater</b> directory. It makes calls to run the <b>updatercmd.exe</b> program, which uses the
+information in the <b>updater.ini</b> file to make sure that all files of interest are updated. </p>
+
+<p><b>updatersvc.exe</b> has command-line similar to the usual WinPCS server that allows us to install it
+as a service as well as remove it:</p>
+
+<table><tbody>
+<tr><td>updatersvc -install  </td><td>Install the updater-service as a service</td></tr>
+<tr><td>updatersvc -instart  </td><td>Install the updater-service as a service, then start it</td></tr>
+<tr><td>updatersvc -start    </td><td>Start the updater-service </td></tr>
+<tr><td>updatersvc -remove   </td><td>Stop and remove the updater-service from the list of servers</td></tr>
+<tr><td>updatersvc -help     </td><td>Show the possible arguments.</td></tr>
+<tr><td>updatersvc ?         </td><td>Show the possible arguments.</td></tr>
+<tr><td>updatersvc           </td><td>Run the updaterservice program on the command-line.</td></tr>
+</tbody></table>
+
+<p>Both of the updater programs use a couple of the WinPCS DLLs, 
+(<b>cwulib.dll</b> and <b>zlib1.dll</b>) and also expects there to be a sibling system32 directory with files
+<b>client.ini</b>, <b>winpcs.ini</b> and <b>anchorc.dll</b> in it. </p>
+
+<p>With all files present on the server, the minimal set of files needed on the tablet for the <b>updatersvc.exe</b>
+to work are the following:</p>
+
+<table><tbody>
+<tr><td>mobile/mobile.ini</td><td>Configuration file</td></tr>
+<tr><td>mobile/updater/cwulib.dll</td><td>Standard WinPCS DLL</td></tr>
+<tr><td>mobile/updater/updatersvc.exe</td><td>Updater service executable</td></tr>
+<tr><td>mobile/updater/zlib1.dll</td><td>Standard WinPCS DLL</td></tr>
+<tr><td>mobile/system32/anchorc.dll</td><td>Standard WinPCS component identifying the project</td></tr>
+<tr><td>mobile/system32/winpcs.ini</td><td>Standard WinPCS file</td></tr>
+<tr><td>mobile/system32/client.ini</td><td>Standard WinPCS file</td></tr>
+</tbody></table>
+
+<p>The main winpcs server is identified through the index into the server-numbers defined in the <b>winpcs.ini</b> file, 
+in order to access the main WinPCS server. This index is identified in the file 
+<b>mobile.ini</b>,  section <b>[updater]</b> entry <b>main_winpcs_server_number = </b></p>
+
+<p>The executable files listed comprise the set of supporting DLLs and INI files for the <b>updatersvc.exe</b> 
+and <b>updatercmd.exe</b>.  Apart from the two updater-executable files themselves, 
+these INI and DLL files are the same ones as are found elsewhere in the main WinPCS system. As will be 
+evident, there is a bit of mixing and matching of existing files, but with one exception, which is 
+the <b>server.ini</b> file, if these files of the same name already exist in the main WinPCS system, 
+the same files re-appear in various locations in the mobile subfolders.</p>
+
+<a name="muuini"></a>
+<h3>updatercmd.exe and updater.ini</h3>
+
+<p><b>updatercmd.exe</b> is also using a command-line, and it allows the following options:</p>
+
+<table><tbody>
+<tr><td>updatercmd -t tlast tnow </td><td>As invoked from the updatersvc, at times last was t1, now is t2 Install the updater-service as a service</td></tr>
+<tr><td>updatercmd -f            </td><td>Force, do a job even if it isn't scheduled.</td></tr>
+<tr><td>updatercmd -a            </td><td>Do all jobs now, not just the ones scheduled. </td></tr>
+<tr><td>updatercmd -j jobname    </td><td>Do the named job (as defined as a section in the updater.ini file) </td></tr>
+</tbody> </table>
+
+
+<p>The <b>updater.ini</b>
+tells which files and directories that are supposed to be updated as needed, defined as a number of named jobs. 
+See the file for more details. 
+[info to be added later] </p>
+
+<a name="mmini"></a>
+<h2>Main configuration file mobile.ini </h2>
+
+<p>The <b>mobile.ini</b> file is used by the updaters and also the main programs such as WinPCSMobile (previously called Grace)
+and pdfcert. It contains several sections defining values for these other programs to use, and serves
+as the common go-to area for the other programs to tell where things are. 
+(As opposed to the old hardcoded behavior, where things had to be just so, or all bets were off....)  </p>
+
+
+<a name="mclient"></a>
+<h2>mobile/client/</h2>
+
+<p>This contains the executables and configuration files for the WinPCSMObile.exe (formerly known as Grace). There are client.ini, cpdv.ini, and tabifc.ini here which would be identical to the ones in the main system32 directory. The files are: client.ini, clvif.dll, cpdcli.dll, cpdsvr.dll, cpdv.ini, formifc.dll, GraceCadView.dll, GraceManaged.dll, GraceNative.dll, pdf.dll, System.Data.SQlite.dll, tabifc.ini, WinPCSMobile.exe. There is also a subdirectory named GL with a resources dll in it. </p>
+
+<a name="msym32"></a>
+<h2>mobile/system32/*.dll</h2>
+
+<p>Further supporting WinPCS DLLs are in the mobile/system32 directory, which is rather different from the main system32 -- the mobile/system32 contains the anchorc.dll, the winpcs.ini and client.ini files, cpdvio.lcx and cpdv.ini and all the client-side DLLs usually living in prog_client. Notice that all of the other ini or lcx files normally found in system32 are absent here. </p>
+
+<a name="mpcert"></a>
+<h2>mobile/pdfcert/</h2>
+
+<p>This directory contains the pdfcert executable and supporting DLLs:
+anchorc.dll, bitpack.dll, cpdcli.dll, cpdsvr.dll, cwulib.dll, formifc.dll, pdf.dll, zlib1.dll, pdfcert.exe, cpdv.ini, winpcs.ini</p>
+
+<a name="mmlib"></a>
+<h2>mobile/mobilelib/</h2>
+
+<p>This directory contains the following further supporting files for PDFCert to communicate with WinPCSMobile/Grace: cpdcli.dll, cpdsvr.dll, cpdv.ini, formifc.dll, pdf.dll </p>
+
+<p>We may note that several of the same INI and DLL files are located in multiple places -- there might be various reasons for that; as long as they are all the same ones everywhere we should be oke. </p>
+
+<a name="mlogs"></a>
+<h2>mobile/logs/</h2>
+
+<p>This directory is filled with log-files from the updater and other programs showing what they have been doing.</p>
+
+
+<a name="mforms"></a>
+<h2>mobile/forms/</h2>
+
+<p>This contains all the forms files, for A-sheets, B-sheets and so on -- should be identical to the main forms directory and subdirectory. </p>
+
+<a name="mdata"></a>
+<h2>mobile/data/</h2>
+
+<p>This should be left empty (or may even be absent) on the main server, since the updater program knows to pull data files from the real data directory and put them into mobile/data on the tablet</p>
+
+<a name="mserver"></a>
+<h2>mobile/server/</h2>
+
+<p>This is the local WinPCS server directory. With the exception of the server.ini file, everything else in this directory is 
+the same as in the main server's server directory; that means all the ini, lcx, dll, and exe files. </p>
+
+
+<p>Differences in the two server.ini files: </p>
+<table><tbody>
+
+<tr><td>Main server                                           </td><td>Mobile server</td></tr>
+<tr><td>periodic=on                                           </td><td>periodic=off</td></tr>
+<tr><td>Path number 1 undefined                               </td><td>Path number 1 defined as ..:  1=..</td></tr>
+<tr><td>Section [periodic] may have startup functions         </td><td>Section [periodic] should have no startup. </td></tr>
+<tr><td>Section [offline] entries                             </td><td>Section [offline] entries</td></tr>
+<tr><td>offline=No                                            </td><td>offline=Yes</td></tr>
+<tr><td>remotechangefile=9:\changes.txt                       </td><td>remotechangefile=9:\changes\changes.txt</td></tr>
+</tbody></table>
+
+<p>There are optional entries documentfunction= and flattenfunction= that can be defined, but documentation on these
+has to be made later. We leave them absent or just noted as comments for now. </p>
+
+<p>An additional possible difference, which is also optional, is that the two servers run 
+on different ports, so their endpoint= entries are different.  This is not required in a 
+real system, but if demoing on a single machine where both servers will run, they have to use 
+different ports. Any real-life situation has the servers running on separate machines and thus they can listen on the same ports. </p>
+
+<p>Note that the WinPCSMobile actually does start and stop the associated WinPCS server itself as it finds necessary. WinPCSMobile also contains the necessary tabifc component, which replaces the stand-alone tabifc.exe program that may have to be used with regular WinPCS clients. </p>
+
+<p>Also note, there is only a tiny subset of the files in system32 and no INI directory at all, and the winpcs.exe program is also absent -- we do not run a regular WinPCS client here. </p>
+
+
+<p>File Date: 2015-04-23</p>
+
+<hr/>
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+</body>
+</html>
+
+

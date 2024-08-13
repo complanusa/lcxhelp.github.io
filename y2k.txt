@@ -1,0 +1,140 @@
+
+WinPCS and the year 2000
+
+How WinPCS handles dates internally.
+
+	WinPCS stores dates as 4 bytes in the tables. Two bytes are used 
+	for the full year, for a range from 1-32767; one for the month 1-12
+	and one for the date 1-31.
+
+	Year number 0 is not used. The value N/A is encoded as January 14, 0,
+	and may only be entered by typing or importing the string N/A.
+
+	Other Year 0 dates show as blank. No other year, day, or month 
+	number is given any special significance, except that as Year 0
+	does not exist, null dates show in the year 65535, which is 
+	interpreted as year 1 BC. Any end-of-file conditions and the like
+	are reported by the operating system, or Btrieve, and do not depend 
+	on any particular data values found.
+
+	On input, if the date conversion function sees a blank
+	string for the year, the date field is set to blank.
+	If the year input is one or two digits, 0-9, 00-99, the year
+	is expected to fall between 1990 and 2089. If the year input is
+	three digits or more, even with leading zeros, the year is taken
+	at face value. Year 000 translates into year 65535 (really year -1,
+	or 1 BC) in these cases.
+
+	If any number less than 100 for the year, including zero, 
+	that is, from 0 to 99 inclusive; is found, the resulting year is
+	placed in the range 1990-2089. Any year numbers greater than 100
+	are taken as that year. The choice of the range 1990-2089 was made
+	based on the scope of use of WinPCS by our customers.
+
+	To summarize:
+		Input year		Taken as, and stored as:
+		N/A				No date (converts to January 15 Year 65535)
+		(blank)			No date (converts to January 2 Year 65535)
+		Any non-numeric No date (converts to January 2 Year 65535)
+		0				Year 2000
+		00				Year 2000
+		000				Year 65535 (really year 1 BC)
+		1-9				Year 2001-2009
+		01-09			Year 2001-2009
+		001-009			Year 1-9
+		10-89			Year 2010-2089
+		90-99			Year 1990-1999
+		010-089			Year 10-89
+		090-099			Year 90-99
+		100-32767		Year 100-32767
+
+	The full year is always provided on output, no abbreviations are done, 
+	even when system settings within the Windows Operating System prescribes
+	2-digit year numbers.
+
+	Users must beware of mis-typing years, for example, typing in "998" will
+	result in the year 998, not 1998.
+
+How WinPCS calculates shifts of days and weeks
+
+	Day calculations are done using Julian Day numbers, which currently, and
+	for the foreseeable future have values in the vicinity of 2.4 million,
+	for example, 
+
+		11 August 1998 is Julian Day number 2451037
+		1 January 2000 is Julian Day number 2451545
+		29 February 2000 is Julian Day number 2451604
+		31 December 2099 is Julian Day number 2488069
+
+	The date conversion functions from date to J.Day number and the reverse
+	base themselves on the Gregorian Calendar for all dates later than 
+	15 October 1582; in which years divisible by 4, unless they are 
+	century years not divisible by 400, are leap years. 
+
+	This particular day-numbering scheme was invented in 1583 by Joseph 
+	Justus Scaliger, and is used today directly by astronomers.  The 
+	conversion algorithms used in WinPCS have `astronomical scope` in 
+	the sense that they work properly over thousands of years. For WinPCS'
+	purposes, this enormous range is not really needed, but it does put 
+	to rest any concerns about any special dates thay may cause systems to 
+	malfunction. Using the linear day-numbering also simplifies all sorts
+	of day and period calculations. 
+
+	No expectations are made about the numbers of days between any two dates,
+	whenever this is of interest, the system calculates the Julian Day numbers
+	of the two dates in question and finds the difference between them.
+
+	Tests have been run, and `suspicious` dates like the 29th February 
+	2000 are produced and detected correctly.
+
+	WinPCS also uses a system of week numbers, which are six-digit strings
+	with the first four being the year, and the last two are the number of
+	that week in the year. The Julian Day numbering lies behind this as well,
+	since Julian day numbers are divisble by 7 once a week, on Mondays.
+
+	Each week in WinPCS is reckoned from Monday to Sunday.  Functions
+	exist to properly add and subtract these. These function calculates the
+	Julian Day number of the Monday in the weeks of interest and uses
+	them to find offsets or differences.
+
+	With hindsight, it might have been preferable to put the Julian day
+	numbers into the databases as well, and store them there as plain 
+	32-bit integers.
+
+	One issue is necessary to be aware of: WinPCS formats the date as
+	specified in Windows (INI or registry) and this may be different
+	between systems. Text data in reports containing dates do not sort
+	properly unless in the order year-month-day, which works fine in 
+	the U.S. but hardly anywhere else.
+
+	Finally, the system that WinPCS runs on, must provide WinPCS with the
+	proper date so that WinPCS activities have correct input. But
+	given correct input, there is no design decisions causing shortcomings 
+	in WinPCS that should preclude it from handling dates properly in 
+	the future. 
+
+	WinPCS macro functions:
+		date()
+		julday()
+		caldat()
+		DateFromWeek()
+		WeekShift()
+		WeekDelta()
+		WeekFromDate()
+	
+	WinPCS (CWULIB) Internal DLL functions:
+		BT_datatoa()
+		BT_wkn()
+		BT_weeksum()
+		BT_weekdiff()
+		BT_strtodate()
+		caldat()
+		julday()
+		JulMonday()
+
+	References: 
+		David Ewing Duncan: The Calendar, Fourth Estate, London 1998
+		Numerical Recipes in C
+
+
+

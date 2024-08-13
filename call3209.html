@@ -1,0 +1,82 @@
+
+<html lang="en">
+<head>
+<title>Status Index Callback -- Category 9 (32-bit WinPCS)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name=description content="Status Index Callback -- Category 9 (32-bit WinPCS)">
+</head><body>
+<a name="Top"></a>
+
+<h1>Status Index Callback -- Category 9 (32-bit WinPCS)</h1> <p> 
+
+<h3>Enabling control in WinPCS:</h3>
+Function calls in this category are made when an operation function is defined in 
+STATREES.INI or STAREP.INI for a field in a SI report.  The function is called once per record where the 
+tree is complete, i.e. when a leaf record exists.  Calls are not made on records where 
+the leaves are missing.
+
+<h3>Disallowed functions:</h3>
+Since these functions run on the server while the report is being assembled, only the 
+<a href="lcxh.html#Functions.20available.20with.20the.2032.2dbit.20Server"> 
+functions defined on the server </a> may be used. 
+
+<p>This excludes all functions requiring user interaction. To print messages for debugging, 
+use trace() or print(), or put out the messages as part of the function's return value.. 
+
+<h3>LCX files:</h3>
+Server-side functions are expected to be found in the files referenced in 
+<b>SERVER.INI</b> section <b>[LCX]</b> entry <b>FILES=</b> there.  
+
+<h3>Callback function:</h3>
+<p>(Ref: sirep/xsrun.c(1025))</p>
+<pre><em>value_to_appear_in_field</em><b> = </b><em>function</em><b>(</b><em>value_found_in_field</em><b>, </b><em>treeline</em><b>, </b><em>rootitem</em><b>, </b><em>dataset</em><b>, </b><em>columnindex</em><b>)</b></pre>
+
+<p>The <em>value_found_in_field</em> is the inbound value coming from the field specified in the report. 
+This is often the RSERIAL or #ITEMFLD of some object of interest when the output of the function is 
+something related to this, but not merely the name. Typical examples are functions that list and count
+related objects such as punchitems or checksheets.</p>
+
+<p>The <em>treeline</em> is a set containing all the tables in the tree-line being used at the moment. 
+The last name in this set is the leaf, and the second to last name in this set is the penultimate level, 
+corresponding to <b>#LEAF</b> and <b>#PENULT</b>.  </p>
+
+<p>The <em>rootitem</em> is the name of the object that the report is started on.</p>
+
+<p>The next argument, <em>dataset</em>,  is a reference to the status index report. This is used with the 
+<a href="lcxh.html#SIRepGet">SIRepGet( )</a> and <a href="lcxh.html#SIRepPut">SIRepPut( )</a> 
+functions to look at and change earlier values in the same record.  This value can also be used as the report-identifier argument in functions such as
+<a href="lcxh.html#RepInfo">RepInfo( )</a> 
+to obtain parameter or legend string values. </p>
+
+<p>The last argument, <em>columnindex</em> refers to the positional index of the field in the report.</p>
+
+<p>The value of the incoming <em>value_found_in_field</em> argument and the function's return value need 
+not have any  logical connection whatever, the report will reflect whatever data the function returns. 
+This can be exploited for debugging purposes.</p>
+
+<p>The functions <a href="lcxh.html#SIRepGet">SIRepGet( )</a> and <a href="lcxh.html#SIRepPut">SIRepPut( )</a> 
+can be used to examine the data in other fields in this record.  Note that only fields in the same record
+and to the left of the field being assembled can be accessed this way. It may be better to use 
+the before- and after-functions rather than on-field functions for editing entire records.  Reading fields 
+in columns numbered <em>columnindex</em> or higher will return blanks, and values written to such other 
+fields will be overwritten later when this field is populated. </p>
+
+<h3>Execution context:</h3>
+<p>This is reentered, so global variables set up on one early field may be reused in another field.
+Frequently the value to appear in one field is the result of some complex action which 
+produces values to go into several other fields, and by storing these in global variables
+a lot of processing time is saved. </p>
+
+<p>This is also shared with "Category 12 -- View report before/after functions" and thus
+this Before-function may set up reference globals for the field-functions to use. </p>
+
+<h3>See Also:</h3>
+STATREES.INI and STAREP.INI documentation <br>
+
+<a href="lcxh.html#Functions.20available.20with.20the.2032.2dbit.20Server">
+    Functions available with the 32-bit server </a> <br>
+
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> </p>
+</body>
+</html>
+

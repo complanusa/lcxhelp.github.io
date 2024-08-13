@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<title>WUSER (USER) and USYM tables Reference</title>
+</head>
+<body>
+
+<hr/>
+<h1>The WUSER (USER) and USYM tables</h1>
+
+<p>The WUSER (USER) table lists the defined users that can log-in into 
+WinPCS. 
+This table is named WUSER in SQL -based systems, 
+since USER is a reserved keyword there. 
+</p>
+
+<p>Permissions are stored in the field named MATRIX in this table,
+where each position after the first one is a letter indicating
+one of three possible levels of access, basically:</p>
+
+<ul>
+<li>A - All rights - the user has full read/write access to this element</li>
+<li>R - Read-only - the user can see, but not change the element</li>
+<li>H - Hidden - the user cannot even see the element.</li>
+</ul>
+
+<p>There are a number of exceptions to the above, mostly that A and R means
+the same thing, that something is visible and available, and H 
+means it is invisible or unavailable.  The default state 
+when no USYM record is
+defined is also different between various kinds of elements;
+Status and connection controls default to A but the menu entries 
+of Views, Entry, and LCX files default to H.  </p>
+
+<p>The definitions of what these elements are is in the USYM table.  
+The table has a field VIEWSEQ that indexes into the MATRIX string
+for the currently logged-in user, and indicates what their permission
+settings are. </p>
+
+<p>Some of these definitions are unique in nature while the rest 
+are generalized to apply to many different objects such as 
+tables or files, indicated by a string <b>xxx</b> in the following. </p>
+
+<p>The unique settings are identified in the USYM table, field KEYNAME with a short
+string of two or three letters, and have special meaning within
+WinPCS. They are used to allow and disallow large parts of the menu
+tree and some powerful and dangerous tools that can be made available 
+there for the users that need them, and removed for the users who do
+not need them.  </p>
+
+<h4>SLK </h4>
+<p> Show Links in hierarchies (hier/ftree.c) A or R means show the links,
+	H means do not show the links. </p>
+
+<h4>Exxx </h4>
+<p> Edit data in table xxx (nconn/cdisp1.c)
+	Default is H; set to A to enable. R makes for a Read-only	
+	Entry screen, a not very useful construct.</p>
+
+<p>A special case of these E series settings is:</p>
+
+<h4>EAUTOCODE </h4>
+<p> Control the saving of records (report formats) in the 
+	AUTOCODE table.  This follows the general pattern but is, 
+	like AUTOCODE itself, hardcoded. (vrep/pdes1.c)</p>
+<p>Note that if there is no EAUTOCODE defined in USYM the default
+will be H (as for all the E series entries) and no-one can save 
+report-formats; it will appear that the AUTOCODE table is 
+somehow broken, while it is just being marked as off-limits.  </p>
+
+<h4>Vxxx </h4>
+<p> View data in table xxx 
+	(nconn/cdisp1.c nconn/wild.c vconn/vconnwp.c vconn/special.c)
+	Default is H; set to R or A to enable.  Although Views
+	are basically read-only, the A setting allows additional,
+	possibly modifying, actions 
+	(<a href="call3206.html#Cat6132"> LCXCALLA pushbuttons </a>), and also
+	allows associated VCONN lists to allow changing connections
+	instead of just looking at them.</p>
+
+<h4>Sxxx </h4>
+<p> Set status on data in table xxx 
+	(nconn/inspect.c rconn-lx/make_isam.c)
+	Default is A; set this to R or H to disable or hide status-settings</p>
+
+<h4>Cxxx </h4>
+<p> Make connections affection connection-table ("conbase") xxx/ 
+	nconn/make.c rconn-lx/make_isam.c
+	Default is A; set to R or H to disable changing connections.</p>
+
+<h4>Dxxx </h4>
+<p> Disconnect control ? </p>
+
+<h4>Lxxx </h4>
+<p> control menu-entries for running various functions in LCX files.
+	Default there is H. LCX-functions called elsewhere in the system, 
+	are available to everyone, and any permission-controls are via
+<a href="lcxh.html#pcs_permission">pcs_permission( )</a> 
+function-calls. </p>
+
+<h4>GC </h4>
+<p> Gang Connections (vconn/vconnwp.c vconn/special.c, vrep/vrepwp.c)
+	Set to A to enable running Gang Connections from reports.
+	Set to H or R to disable running Gang Connections.</p>
+
+<h4>TO </h4>
+<p> Controls System/Toolbox
+	When set to H, these menu entries are disabled. When set to
+	A or R, these menu entries are enabled.</p>
+
+	<p>This setting also affects 
+	the presence or absence of the menu-entries System/Server 
+	and System/Run depending on a setting in winpcs.ini:</p>
+
+	<p>Controls System/Server menu entry, which appears only if 
+	winpcs.ini [MENU] SERVER=PRESENT and TO has A</p>
+
+	<p>Controls System/Run menu entry along with the UE and SR settings,
+	and values in WinPCS.INI section [MENU]:</p>
+
+	<p>RUNMENU=PRESENT, TO is A and UE is A </p>
+	<p>RUNMENU=SRCONTROLD, SR is not H</p>
+
+<h4>UE </h4>
+<p> Controls the System/Define Users. This is grayed-out when the
+	UE is set to H, and available otherwise.  </p>
+
+	<p>This setting also affects the 
+	presence or absence of the System/Run menu entry depending on
+	a setting in winpcs.ini and the TO setting, as detailed above.</p>
+
+<h4>RM </h4>
+<p> Controls the System/Run Macro menu entry. 
+	This is grayed-out when RM is set to H, and available otherwise.</p>
+
+<h4>SI </h4>
+<p> Controls the System/Standard Import menu entry. 
+	This is grayed-out when SI is set to H, and available otherwise.
+	This menu entry is only present when winpcs.ini section [MENU]
+	entry STDIMP=PRESENT. </p>
+
+<h4>SR </h4>
+<p> Controls System/Standard Reports.
+	This menu entry is only present when winpcs.ini section [MENU]
+	entry STDREP=PRESENT. 
+	If so, the menu entry is grayed-out when SI is set to H, 
+	and available otherwise.</p>
+
+	<p>If winpcs.ini section [MENU] entry RUNMENU=SRCONTROLD,
+	this setting controls the System/Run submenu tree, when set
+	to H this submenu tree is grayed out.</p>
+
+<h4>ED </h4>
+<p> Controls the entire sub-menu tree System/Edit INI files.
+	H means it is not available, R or A means it will be available.
+	(winpcs31/rconfig.c)</p>
+
+<h4>TR </h4>
+<p> Controls the System/Trans menu entry
+	This is grayed-out when TR is set to H, and available otherwise.</p>
+
+<h4>IN </h4>
+<p> Controls the System/Inspect menu entry
+	This is grayed-out when IN is set to H, and available otherwise.</p>
+
+<h4>SF </h4>
+<p> Controls the System/Synfare menu entry; set H to disable, A and R to enable.
+	This is grayed-out when SF is set to H, and available otherwise.</p>
+
+<h4>SW </h4>
+<p> Controls the System/Web menu tree. This is present when
+	winpcs.ini section [MENU] entry SYSTEM_WEB=PRESENT,
+	and the SW setting is A or R.  If the setting is H this menu tree
+	will be completely absent, not even grayed-out.</p>
+
+<!-- 
+
+Suggested simplifications:
+	TO to only control the Toolbox, following pattern of IN TR or SF
+	UE to only control the Define Users, following pattern of IN 
+	SR to only control the System/Run tree, same as how SW controls System/Web
+
+	ESTDREP settings to control the System/Standard Reports:  
+		H is invisible/disabled, R means run reports but no changes
+		A means do everything you want.
+	
+	New entry SS to control System/Server
+	New entry SH to control System/Hierarchies
+
+	None of the Lxxx 
+
+-->
+
+<!--
+
+<h3>Configuration-determined settings</h3>
+<p>Dxxxx </p>
+-->
+
+<h3>See Also</h3>
+<p>
+<a href="lcxh.html#pcs_permission">pcs_permission( )</a> <br/>
+</p>
+
+<!-- _____________________________ -->
+<hr/><a name="Endpoint"></a>
+
+<p> File Date: 2014-09-29</p>
+
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+</body>
+</html>
+
+
+
+

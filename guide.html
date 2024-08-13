@@ -1,0 +1,346 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>Guide to WinPCS documentation</title>
+
+</head><body>
+
+<h1>Guide to WinPCS documentation</h1>
+
+<p>The documentation for the "32-bit WinPCS" as it has become known,
+is for a large part in the various HTML files here.  Much of this
+is the equivalent of the old "16-bit WinPCS" System Manual.  The 
+number of bits in the program files is really only the smallest
+difference. The more accurate descriptions would be the
+"Client-Server" version and the "Monolithic" version. </p>
+
+<h2>About the monolithic, "16-bit" WinPCS</h2>
+<p>The "16-bit WinPCS" is the old, well-known, monolithic version. 
+It used the Btrieve Database engine and the server for file-serving, 
+and had all its executable files in one place, replicated directly 
+or via the file server, on all the workstations. The system consisted of
+4 major parts: 
+<br/>1. Data, usually in the DATA directory. 
+<br/>2. Executable files ("the DLLs") in a PROG directory 
+<br/>3. Configuration files, typically in the SYSTEM and INI directories
+<br/>4. Proforma documents for check-sheets and certificates, in subdirectories under FORMS, and in SYSTEM. </p>
+
+<p>The configuration files were text files, either in INI format or 
+LCX-files containing macrofunctions. Some of the files, 
+such as the ones for Standard Imports were hybrids. A few data tables also
+contained configuration information.</p>
+
+<h2>About the Client-Server, "32-bit" WinPCS</h2>
+<p>The realities of projects where there usually would be several sites
+geographically separated, but with Internet connectivity; dictated that
+WinPCS needed to be able to run at decent speed not just on high-bandwidth
+LANs, but also where the network had less bandwidth available. Some yards
+alone were big enough that the monilitic version ran slow and was 
+unpleasant to use. And forget about any of the projects where the sites
+were far apart geographically. For some time, remote desktop solutions, 
+such as Windows Terminal Server or Citrix would do, but the time came
+in 2004 when the first real client-server installation was deployed. 
+This happened at the HHI yard in Ulsan, South Korea. </p>
+
+<p>The prime design criterion of this newer version was that the network
+load and bandwidth requirements were to be at a minimum. This made it 
+natural to split some of the jobs between the server side and the client
+side. Jobs like status index reports, that required lots of lookups in tables
+were relegated to the server, and they would only emit the found records that
+are to make it into the report view.  Similarly, once the report is run, the
+summary reports are done on the client, since this is a matter from the report
+view only and does not involve the server.  Similar considerations have been
+done with other standard activities, such as filling in bookmark fields in 
+Word forms, or making calls to the "make" or "break" functions for connections.</p>
+
+<p>To this end, a lot of reference and static data from the server gets cached 
+in the client during use, so there is no further need for hitting on the server
+for this. Such caching includes STADLG.INI, check-sheet tables such as REFITR1,
+excerpts as needed from REFREP, discipline codes, and other things like that. </p>
+
+<p>As to the main components, the client-server system consists of 5 parts:
+<br/>1. Server executables, in the PROG_SERVER or sometimes the SERVER directory
+<br/>2. Server configuration files, in the SERVER directory
+<br/>3. Data, in the DATA directory, considered to belong to the server.
+<br/>4. Client executables, in the PROG_CLIENT directory
+<br/>5. Client configuration files, in the SYSTEM32 and INI directories.
+<br/>6. Proformas for check-sheets and certificates, usually in various 
+subdirectories under FORMS and in SYSTEM32.</p>
+
+<p>A comparison to the 16-bit system shows a lot of similarities.  What used to be one
+program is now split into two, and some parts, such as data and a number of configuration
+files have gone to the server side, the other parts have gone to the client parts. Of the
+above, Nos. 1--3 are server, and 4--6 are client. </p>
+
+<h2>Some highlights of current configurations</h2>
+<p>Though the reader may be familiar with the 16-bit system, and the key configuration files
+such as STATREES.INI, their new location and in some cases, slightly modified contents require
+explanation. </p>
+
+<h2>Side-by-side comparison of features in the monolithic "16-bit" and client-server "32-bit" systems</h2>
+
+<p>The majority of the features and functions of the 16-bit systems have been ported, and
+a few new ones have been added. In some cases, less useful things were postponed, and may yet
+be re-instated. Others have been discarded. The following table lists the two sets of subsystems,
+tables, functions etc. side by side, and indicates the differences.</p>
+
+<table border="1" cellspacing="5" cellpadding="2">
+<tbody>
+
+<tr>
+<td>Client-Server 32-bit</td><td>Monolithic 16-bit</td> <td>Differences</td></tr>
+
+<tr><td>RCONN (table)</td><td>RCONN (table)</td><td>Concept and purpose of the table is the same. 
+	The layout is slightly different. See
+	<a href="call3204.html">32-bit Make and Break functions</a>, and 
+	<a href="call1604.html">16-bit Make and Break functions</a>.
+	</td></tr>
+
+<tr><td><a href="cxdict.html">CXDICT (table)</a></td><td><a href="cxdict.html">CXDICT (table)</a></td>
+<td>Concept and purpose of the table is the same. 
+	The table is even more important in the 32-bit systems. Missing entries will cause error notices 
+	to appear. These are not fatal, merely annoying since their errors really should be fixed.
+	CXDICT is cached on the server, and can be re-cached through the [Reload CXDICT] command
+	from the Server dialog in the client.  CXDICT also have parts being used cached on the client, 
+	so in general, expect to have to re-start the client for changes to take effect. 
+</td> </tr>
+
+<tr><td> <a href="ddmatrix.html"> DDMATRIX (table)</a></td><td>DDMATRIX (table)</td><td>
+The concept of this is the same as before. Note that the function signatures have changed quite 
+a lot, to a more regular form, that is well-documented and stable (the 16-bit ones were not). 
+The callback functions run on the client, and are similar in scope and implementation to the 
+16-bit ones. See <a href="call0005.html"> Drag and Drop actions -- Category 5</a>.
+</td> </tr>
+
+<tr><td> 
+<a href="serverini.html">SERVER.INI</a> (server) <br/>
+<a href="winpcsini.html">WINPCS.INI</a> (client) 
+</td> <td> WINPCS.INI </td> <td> 
+The main and miscellaneous configuration files are defined for each of the programs.
+See the links for the details on the contents of the files.
+</td> </tr>
+
+<tr><td> <a href="serverini.html">SERVER.INI</a> (server) <br/> CLIENT.INI (client) </td> <td> BTRS.INI </td> <td> 
+Client-side paths were defined in BTRS.INI on the 16-bit systems and are in CLIENT.INI on the 32-bit clients.
+There is a similar section defined in SERVER.INI for the server. The idea of numbered paths remains useful and
+used.
+</td> </tr>
+
+<tr><td> REFBMP31.INI <br/> *.BMP (client) </td> <td> REFBMP.INI / REFBMP.DLL </td> <td> 
+Bitmaps are not stored in a DLL in the 32-bit system, but as "boards" in several BMP files found
+in the SYSTEM32 directory. The server doesn't care about bitmaps at all. Bitmaps are cached as needed
+on the client. They can be edited using MS-Paint or any other bitmap-aware program. The entries in 
+REFBMP.INI have the same meaning: the name of a icon as used in WinPCS, then the board name or BMP file
+name minus the .BMP extension, then the starting coordinates then the width and finally the height.
+</td> </tr>
+
+<tr><td> STADLG.INI (server) </td> <td> STADLG.INI </td> <td> Same purpose and concept. The 32-bit systems
+	have the same get= and set= functions, but no add= functions. See 
+<a href="call0001.html">Get and Set status</a> and 
+<a href="call0003.html">Info Init</a>. 
+The 32-bit systems have added mulitiline edit-controls using the keyword <b>big:</b>.
+This file is cached on the server, and must be reloaded after changes, by either restarting the server
+or using the [Reload STADLG] command from the Server dialog in the client. 
+The various Get and Set functions run on the client, many of them are in the file UNISTAT.LCX.
+</td> </tr>
+
+<tr><td> STATREES.INI (server) </td> <td> STATREES.INI </td> <td> Same purpose and concept in both systems. 
+There are settings in SERVER.INI indicating if the report layouts are in STAREP.INI or STATREES.INI. 
+Most recent installations have them separated. 
+This file is cached on the server, and must be reloaded after changes, by either restarting the server
+or using the [Reload STATREES] command from the Server dialog in the client. 
+</td> </tr>
+
+<tr><td> STAREP.INI (server) </td> <td> STAREP.INI </td> <td> Same purpose and concept. There are settings
+in SERVER.INI indicating if the report layouts are in STAREP.INI or STATREES.INI. Most recent installations
+have them separated. The file is not cached, but read during running of status index reports. 
+<a href="call3209.html">The functions on the fields </a> are run on the server. but functions 
+referred to for pushbutton actions are run on the client.
+</td> </tr>
+
+<tr><td> REFREP (table) / REFREP.LCX (client) </td> <td> REFREP (table) / REFREP.LCX </td> 
+<td> Same purpose and concept. 32-bit clients cache parts of REFREP the table as needed, so to re-read, a client
+must be stopped and re-started.  The LCX file handles actions from DDMATRIX
+</td> </tr>
+
+<tr><td> PCSD.INI (client) </td> <td> PCSD.INI </td> <td> 
+The main menu file on the client remains the same. There are a few enhancements, such as optional icons
+in the menu entries, and the tables handled by View and Entries are specified directly, so the client doesn't
+have to visit all the View INI files.
+</td> </tr>
+
+<tr><td> 
+<a href="evini.html"> VIEW.INI </a>(client) </td> <td> (none) </td> <td> 
+The VIEW.INI file defines default pushbuttons for all View, Entry, Inspect, and Report windows. These are 
+specified in the familiar way, as documented in the link, but do not have to be repeated across all the
+individual .INI files anymore.
+</td> </tr>
+
+<tr><td>
+<a href="evini.html"> V*.INI E*.INI </a>(client) </td> <td> V*.INI E*.INI </td> <td> 
+The individual View and Ini files contain specs for fields as before. There are some changes
+in the possible secondary fields, these are documented in the link. The main parts
+are still the same. Note that all fields that should be read-only in Entry windows, and
+are not the result of some other expression, now must be marked with the $Keep(1) command.
+This was not as strictly needed before
+</td> </tr>
+
+<tr><td> WinPCS Tools (WPTBOX) </td> <td> WBMGR </td> <td> 
+This toolbox contains the command buttons for manipulating tables and verifying layouts of RCONN and other tables.
+</td> </tr>
+
+<tr><td> Server Tools </td> <td> (none) </td> <td> 
+This allows several server-side actions to be done from the client. It also includes a viewer for cached items
+in the client, moving files up and down to and from the server, reloading of key tables. The selection of command
+buttons here and in the Toolbox will grow as we come up with new features.
+</td> </tr>
+
+<tr><td> (none) </td> <td> TOOLBAR </td> <td> 
+The floating toolbar is gone. Its actions are now straight on the System Menu, several of which are under their
+traditional names, notably Inspect, TRANS, and SYNFARE. 
+</td> </tr>
+
+<tr><td> (none) </td> <td> FORKS </td> <td> 
+The FORKS has not been re-implemented. It has been superseded for the most part by Standard Imports, Gang Connect
+and Gang Disconnect variations. 
+</td> </tr>
+
+<tr><td> (none) </td> <td> CCONN </td> <td> 
+The CCONN lists assiociated with the View Connections windows were seen as unnecessary, since Hierarchies and
+other VCONN lists and Views are plentiful and readily available.
+</td> </tr>
+
+<tr><td> One-column Gang Connect </td> <td> One-column Gang Connect </td> <td> 
+This remains much the same. The file GCONN.INI allows a set of pushbuttons for common choices to appear
+in the dialog, but anything else may be dragged in.
+</td> </tr>
+
+<tr><td> Two-column Gang Connect </td> <td> (none) </td> <td> 
+This allows a connection to be made from values in two columns in SYNFARE or Report views. 
+One column may be a tag number, another may be a check-sheet or subsystem or other tag. 
+There is a mechanism to choose tables from CORE or the rest of the system to find the home tables for these tags.
+</td> </tr>
+
+<tr><td> Gang Disconnect </td> <td> (none) </td> <td> 
+This allows a connection to be broken based on values in two columns in SYNFARE or Report views. 
+Rather similar to Gang Connect, but disconnects instead.
+</td> </tr>
+
+<tr><td> INSPECT </td> <td> INSPECT </td> <td> 
+This is nearly identical. Fields that are overlaid keys can be written to for searching, but values written here
+will not be stored on insertions and updates. 
+</td> </tr>
+
+<tr><td> TRANS </td> <td> TRANS </td> <td> 
+TRANS has a very different GUI. This is a non-modal dialog, that allows selection of the target and source
+data sets and their fields and linkages between them. The dialog may be pushed aside, and other windows in WinPCS
+may be consulted to examine the data.
+</td> </tr>
+
+<tr><td> SYNFARE </td> <td> SYNFARE </td> <td> 
+SYNFARE and Report windows are now the same code for the most part. SYNFARE has a few more tools available, 
+such as "run a macrofunction for each record"
+</td> </tr>
+
+<tr><td> (none) </td> <td> LISTVIEW </td> <td> 
+The List-view mode of the regular Views and Inspect windows is not yet re-implemented. There has been some 
+demand for it, so this may re-appear sometime. 
+</td> </tr>
+
+<tr><td> <a href="lcxh.html#SIRepGet">SIRepGet( )</a> <a href="lcxh.html#SIRepPut">SIRepPut( )</a> </td> <td> 
+<a href="lcxh.html#RepGet">RepGet( )</a><br/> <a href="lcxh.html#RepPut">RepPut( )</a> </td> <td> 
+Functions in status index reports that look at neighboring fields with <b>RepGet( )</b> and changed 
+them with <b>RepPut( )</b> in the 16-bit systems must use 
+the <b>SIRepGet( )</b> and <b>SIRepPut( )</b> functions instead, for this purpose.
+</td> </tr>
+
+<tr><td> <a href="lcxh.html#selectdialog">selectdialog( )</a> </td> <td> 
+<a href="lcxh.html#selectdialogb">selectdialogb( )</a> </td> <td> 
+The function <b>selectdialogb( )</b> in the 16-bit systems is replaced by the 32-bit <b>selectdialog( )</b> function, 
+which also cover the special cases of the old <b>selectdialogb( )</b>. 
+</td> </tr>
+
+</tbody>
+</table>
+
+
+<h2>Caching, what, when, where, and why</h2>
+<p>A number of data-elements are cached on use. The main reason is to save 
+on processor and IO on the server and
+save network traffic between the server and the client.  The effect of this seen
+from the user's point of view is that changes do not take effect immediately,
+but require some object or another to be re-loaded. </p>
+
+<p>The following table lists the objects that can be cached, where this happens, 
+and how to refresh them.  </p>
+
+<table border="1" cellspacing="5" cellpadding="2">
+<tbody>
+
+<tr>
+<td>File or other object</td><td>Server or Client</td> <td>How to re-cache</td></tr>
+<tr><td>STATREES.INI </td> <td> Server </td> <td> System/Server button [Reload STATREES] </td> </tr>
+<tr><td>STADLG.INI </td> <td> Server </td> <td> System/Server button [Reload STADLG] </td> </tr>
+<tr><td>STADLG.INI </td> <td> Client </td> <td> Re-start the client program </td> </tr>
+<tr><td>CXDICT </td> <td> Server </td> <td> System/Server button [Reload CXDICT] </td> </tr>
+<tr><td>All Server-side LCX files</td> <td> Server </td> <td> System/Server button [Reload Macrocode] </td> </tr>
+<tr><td>Settings in SERVER.INI </td> <td> Server </td> <td> Re-start the server </td> </tr>
+<tr><td>Paths in CLIENT.INI </td> <td> Client </td> <td> Re-start the client </td> </tr>
+<tr><td>GLOBAL.LCX</td> <td> Client </td> <td> These function are read on starting the client.
+There are also a number of global objects in the client, these can be seen via System/Globals.
+Some of these are strings, with values shown, others are Reports, and the contents can be seen by
+selecting one of them and clicking OK. To refresh any of this, restart the client program </td> </tr>
+<tr><td>REFREP definitions</td> <td> Client </td> <td> These are Globals. Re-start the client program </td> </tr>
+<tr><td>CXDICT definitions</td> <td> Client </td> <td> These are Globals. Re-start the client program </td> </tr>
+<tr><td>CERTAC1, CERTSYS etc. cached copies</td> <td> Client </td> <td> These are Globals. 
+Re-start the client program </td> </tr>
+<tr><td>PCSD.INI menu definitions</td> <td> Client </td> <td> Re-start the client program </td> </tr>
+<tr><td>REFBMP31.INI bitmap names</td> <td> Client </td> <td> Re-start the client program </td> </tr>
+<tr><td>Hierarchy specs in WINPCS.INI</td> <td> Client </td> <td> Re-start the hierarchy</td> </tr>
+<tr><td>View.INI settings </td> <td> Client </td> <td> Re-start the client</td> </tr>
+<tr><td>View and Entry INI files changes</td> <td> Client </td> <td> Re-start the view or entry</td> </tr>
+<tr><td>RCONN changes</td> <td> Client </td> <td> Re-start hierarchies and VCONN lists or the entire client.</td> </tr>
+
+</tbody>
+</table>
+
+<h2>Miscellaneous</h2>
+
+<p>For controlling whether status-setting has the hard work done on the 
+server or the client look at 
+<a href="ddmatrix.html#doubleclicks">DDMATRIX.INI</a> documentation.</p>
+
+
+
+<!-- 
+<h2>Index into the other documentation files.</h2>
+
+<p>This section contains a table of links, that go to various places in the documentation. 
+The idea is that it can be easier to find something from here. </p>
+
+<table border="1" cellspacing="5" cellpadding="2">
+<tbody>
+
+<tr>
+<td>Name</td><td>Description
+</td></tr>
+
+</tbody>
+</table>
+-->
+
+<p>File Date: 23 January 2006</p>
+
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+</body>
+</html>
+
+

@@ -1,0 +1,50 @@
+
+<html lang="en">
+<head>
+<title>Status Index Callbacks -- Category 9 (16-bit WinPCS)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name=description content="Status Index Callbacks -- Category 9 (16-bit WinPCS)">
+</head><body>
+<a name="Top"></a>
+
+<h1>Status Index Callbacks -- Category 9 (16-bit WinPCS)</h1> <p> 
+
+<h3>Enabling control in WinPCS:</h3>
+Function calls in this category are made when an operation function is defined in 
+STATREES.INI for a field in a SI report.  The function is called once per record where the 
+tree is complete, i.e. when a leaf record exists.  Calls are not made on records where 
+the leaves are missing.
+
+<h3>Disallowed functions:</h3>
+You may not start another Status Index from within the first one.
+DDE callback and document-drawing functions are only available inside the DDE 
+callback and Printing callback environments.  
+
+<h3>LCX files:</h3>
+All LCX functions referred to in STATREES.INI SI sections are expected to be found in 
+one of the files referred to via SI= in the [RCONN] section in WinPCS.ini
+
+<h3>Callback function:</h3>
+<pre><em>value_to_appear_in_field</em><b> = </b><em>function</em><b>(</b><em>value_found_in_field</em><b>, </b><em>treeline</em><b>, </b><em>rootitem</em><b>, </b><em>root_table</em><b>)</b></pre>
+
+<p>The value_found_in_field is the inbound value. The treeline is a set containing all the 
+tables in the tree-line being used at the moment. The last name is the leaf, the second to 
+last name is the penultimate level, corresponding to #PENULT and #LEAF.  The 
+rootitem is a two-part set on the form table+identity+ and the root_table is the table on 
+the top of the status index, where this rootitem lives. All current records in these tables 
+listed refer to the instances of all objects in the tree.
+The value_found_in_field argument and the function's return value need not have any  
+logical connection whatever.
+
+<h3>Execution context:</h3>
+Shared with <a href="call0012.html">
+Category 12 -- View report before/after functions</a>.  Also Re-entered. The 
+before function, then the Status callback functions, then the after function are called in 
+this order in the same execution context. Fields may set up global variables in early 
+fields and read them in later fields. Sometimes this is useful, for counting punch items
+for example. 
+
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> </p>
+</body>
+</html>
+

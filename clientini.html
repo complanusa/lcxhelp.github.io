@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>CLIENT.INI Client configuration file reference.</title>
+
+</head>
+<body>
+
+<h1>CLIENT.INI Client configuration file reference.</h1>
+<p> File Date: June 25 2005</p>
+
+<p>This references the secondary configuration file for the client. 
+Like other .ini files, this file has a number of sections
+with entries in them, and the sections may appear in any order. 
+</p>
+
+<p>The sections are: <br/>
+<a href="#section.20drives">[drives]</a><br/>
+<a href="#section.20LCX">[LCX]</a><br/>
+</p>
+
+<hr/>
+<a name="section.20drives"></a>
+<h2>[drives]</h2>
+<p>This defines the meaning of the numbered drives for the client. 
+The default is that all numbered drives, 0: thru 9: refer to the 
+system-directory where ANCHORC.DLL and the CLIENT.INI file are. 
+Entries here will override this default.  </p>
+
+<p>Note that when resolving paths (through <a href="lcxh.html#ReducePath">ReducePath( )</a>),
+the paths are tried in order from 0: to 9:, so 9: should be the most general one for this
+to work. Also, in many cases, the drive numbers for the server and client will 
+coincide, and the convention is also that drive 9: is set to the parent directory of the
+SERVER or SYSTEM32 directories, which is the root of the WinPCS installation in the most usual 
+cases.</p>
+
+<p>The entries in this section are all on the form:<br/>
+<em>digit</em><b>=</b><em>path</em></p>
+
+<p>The path can be relative to the System32 directory, such as the very common definition of drive 9:<br/>
+<b>9=..</b><br/>
+or it can be an absolute path referring to a available storage unit on a different machine, for example:<br/>
+<b>3=\\server_1\WinPCS_Scanned</b><br/></p>
+
+<p>As mentioned, any drive number not referenced here defaults to the system32 directory, so calling
+<a href="lcxh.html#ExpandPath">ExpandPath( )</a> 
+with drive numbers not otherwise defined, will return this directory.</p>
+
+<h3>See Also:</h3>
+<p>
+<a href="serverini.html#section.20drives">
+Similar [drives] definitions for the server</a><br/>
+<a href="lcxh.html#ExpandPath">ExpandPath( )</a><br/>
+<a href="lcxh.html#ReducePath">ReducePath( )</a><br/>
+</p>
+
+<hr/>
+<a name="section.20LCX"></a>
+<h2>[LCX]</h2>
+<p>The entries in this section list files being used client-side for certain activities.
+At the moment, only some of the status indexes' functions for pushbuttons are referenced
+in these files. Field-functions are done on the server.</p>
+
+<p>The entries are:<br/>
+<a href="#SI"><b>SI=</b></a><br/>
+<a href="#PRLIST"><b>PRLIST=</b></a><br/>
+</p>
+
+<a name="SI"></a>
+<h3>SI=</h3>
+<p>This entry should list a series of LCX macrofiles that contain all functions being used from
+pushbutton actions in SI-reports. Additionally, functions in the set of client-global code, 
+GLOBAL.LCX, are also available for use.</p>
+
+<a name="PRLIST"></a>
+<h3>PRLIST=</h3>
+<p>This entry lists the files to be used with the "print all" command
+in the Quick Reports.  </p>
+
+<h3>See Also:</h3>
+<p>
+<a href="call0013.html">FORALL2 action</a><br/>
+<a href="winpcsini.html#section.20Report">WinPCS.INI section [REPORT]</a>
+</p>
+
+<hr/>
+
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+</body>
+</html>
+
+

@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+
+<head>
+<title>Standard Reports Functions -- Category 11</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name=description content="Standard Reports Functions -- Category 11">
+</head><body>
+<a name="Top"></a>
+
+<h1>Standard Reports Functions -- Category 11</h1> <p> 
+
+
+<h3>Description, and Enabling control in WinPCS:</h3>
+<p>1. STDREP reports, category LD refer to a file and a function in the FILES and 
+FUNCTION fields.</p>
+<p>2. In response to any menu choice in WinPCS where the L action is defined.</p>
+
+<h3>Disallowed functions:</h3>
+DDE callback and document-drawing functions are only  available inside the DDE 
+callback and Printing callback  environments.  There is however no restrictions on 
+initiating printing or DDE-operations. This is really the main purpose of these functions 
+anyway.
+
+<h3>LCX files:</h3>
+One or more files are referenced in the FILES field in the STDREP record.
+
+<h3>Callback functions:</h3>
+The function is defined in the FUNCTION field. It is called as:
+function(reportname)
+and its return value is ignored.
+
+<h3>Execution context:</h3>
+Not shared and not re-entered.
+
+
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> </p>
+</body>
+</html>
+

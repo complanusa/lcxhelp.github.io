@@ -1,0 +1,129 @@
+
+<html lang="en">
+<head>
+<title>Quick Report Print List Functions -- Category 17</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name=description content="Quick Report Print List Functions -- Category 17">
+</head>
+<body>
+<a name="Top"></a>
+<h1>Quick Report Print List Functions -- Category 17</h1>
+
+<h3>Description:</h3>
+<p>The purpose of this function is to be able to run printing jobs from the Report. As the
+Quick Reports have internal state information that makes it remember where data in the fields
+came from, this is exploited.
+
+<h3>Enabling control in WinPCS:</h3>
+
+<p>The action is defined as a standard feature of the Quick Reports. These have 
+an additional pushbutton which invokes this function from the Report View.  The function will
+be called several times when this button is clicked.</p>
+
+<p>The icon name on the pushbutton is PRLIST, and this should be defined in REFBMP31.INI
+just like all other pushbuttons. If this is not defined there, the button will appear 
+grayed with the "Default" text on it.</p>
+
+<p>The name of the function is to be defined in WinPCS.INI, section [REPORTS] entry PRLIST_FUNCTION=
+If this is not present, it defaults to "noop".</p>
+
+<h3>Disallowed functions:</h3>
+<p>DDE callback and document-drawing functions are only available inside the DDE 
+callback and Printing callback environments.  There is however no restrictions on 
+initiating printing or DDE-operations. This is actually one of the major uses of these
+functions: to cause printing of all check-sheets or punchitems in a report.</p>
+
+<h3>LCX files</h3>
+<p>All functions referred to here one of the files referred to via PRVIEW= in the [LCX] section in 
+<a href="clientini.html"> client.ini</a>.</p>
+
+<h3>Callback functions:</h3>
+<p>The function is called repeatedly as:
+<pre>
+<em>function</em><b>(</b><em>report</em><b>,</b>  <em>row</em><b>,</b>  <em>turn</em><b>,</b> <em>itemcol</em><b>,</b>
+<em>itembase</em><b>,</b>  <em>itemfield</em><b>,</b>  <em>item</em><b>,</b> <em>relcol</em><b>,</b>
+<em>relbase</em><b>,</b>  <em>relfield</em><b>,</b>  <em>rel</em><b>);</b>
+</pre>
+</p>
+
+<p>It is called the first time with the value <b>BEGIN</b> for the <em>row</em>. During this
+call it may set up common state information in global variables that can be used later. It may
+also return a Cancel value to stop further processing. </p>
+
+<p>Each subsequent call then corresponds to a row in the report where both the selected
+columns have some useful, non-blank, values in it. For these calls, the <em>row</em>
+will refer to the conventional negative row numbers expected by functions such as
+RepGet
+
+
+<p>The argument <em>report</em> is a reference to the report-data
+
+
+ (the "vpx" that accesses
+the data within the report-view) "row" is the row from the report that the
+current call is made on, suitable for use with functions such as 
+<a href="lcxh.html#RepGet">RepGet( )</a>, if that should be
+interesting; the "turn" is a sequence number of the call, it starts at <b>-1</b>
+and steps upwards.
+
+The "item-" arguments are the column index, table, main field, and
+tag-number of the first selected column, the "rel-" arguments are for the
+second selected column.
+
+The function is called once before the printing run starts, with the
+string "BEGIN" instead of a row index, and once after the set of records
+printed ends, with the string "END" instead of the row index. Other values
+of the row index indicate actual data to be printed. The purpose of these
+Begin and End calls is to be able to start off with some question or
+dialog, and if necessary, close Word or similar clean-up afterwards.
+
+The function should return a numerical value to indicate if it is to
+continue,
+and it may return an optional string to be displayed in the odometer
+window as a second element of the set.
+
+The numerical value is 0 to continue normally with the next printing run;
+it should be -1 to stop prematurely, but make a call for "END". This is
+typical mid-run Cancel action.  And the function can return -2 to stop
+right away, without doing the end cleanup-call. This latter is probably
+most useful for handling the case of an initial question being "no, don't
+want to do anything".
+
+
+WinPCS.INI, section [REPORTS], optional
+----------
+PRLIST_INFO=Print items from the report.
+----------
+If the default information on the PRLIST button ("Print Checklist,
+certificate, or other form") isn't suitable, another information text can
+be placed here.
+
+The looping will display an odometer window, and this provides the
+familiar "cancel" possibility: Closing the odometer makes it finish the
+current print run, then perform the "END" call to close Word or suchlike,
+much like returning -1 from the printing function would have done.
+
+
+
+
+
+
+<h3>Return Value:</h3>
+
+
+<h3>Execution context:</h3>
+<p>The execution context is created before the first call (BEGIN) in the sequence and 
+lasts until after the last call (END). Global variable values set in any early calls
+will remain available in later calls.</p>
+
+<h3>See Also:</h3>
+<p>For the for-all record functions in TRANS see <a href="call0007.html"> category 7</a>.
+<p>For the for-all record functions in SI Reports see <a href="call0013.html">category 13</a>.
+<p>For the for-all record functions in Quick Reports see <a href="call0015.html"> category 15</a>.
+<p>For the for-all record functions in INSPECT and SYNFARE see <a href="call0016.html"> category 16</a>.
+
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> </p>
+</body>
+</html>
+
+

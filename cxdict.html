@@ -1,0 +1,185 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>CXDICT Reference</title>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<meta name="description" content="WinPCS Macro Language Help File"/>
+
+</head>
+<body>
+
+<h1>CXDICT Reference</h1>
+
+<h2>Introduction</h2> 
+<p>The table CXDICT
+contains the system guide to standard fields in all tables.
+There is one record per table, like FLOC, and a number of
+fieldnames referenced in each of these records. 
+The CXDICT table can be accessed as any other table, or more 
+usefully through the specialized 
+<a href="lcxh.html#StdField">StdField( )</a> function.
+This applies to the 16-bit or 32-bit WinPCS versions
+as noted here. </p>
+<p>CXDICT is cached in the server, and parts of it will be cached in the client, 
+as needed. To re-load, the server should have CXDICT reloaded, or the server should
+be re-started, and the client must be re-started. In the 32-bit systems, having a
+reference in CXDICT is just about mandatory; views, View connections, and Drag-drop
+actions will not start without a record present in CXDICT.</p>
+
+<h2>Layout</h2> 
+
+<a name="CXDICT_20LAYOUT"/>
+<p>The fields in CXDICT are as follows:</p>
+
+<table border="1" cellspacing="5" cellpadding="2"> <tbody>
+<tr><td>Fieldname</td><td>Description</td></tr>
+<tr><td>RSERIAL</td><td>The usual Record Number</td></tr>
+<tr><td>ITEMBASE</td><td> The table name. Many other CXDICT fields 
+	refer to fieldnames in this table.  </td></tr>
+
+<tr><td>ITEMFLD</td><td>
+The name of the main single key in the table. In an 
+	engineering index it will be the tag number, in a document list it is 
+	the document number and so on. The system expects this to be a 
+	key field, which is non-duplicateable. </td></tr>
+
+<tr><td>ITEMUNIFLD</td><td>
+The name of a field identifying the internal unique
+	record number, very commonly the name RSERIAL. This is normally the name of 
+	an auto-increment key field,
+	which is by its nature restricted to be a single non-duplicateable
+	integer. Tables without such a field may not be connected using the
+	standard RCONN functions and may not need this field. In this case, it
+	should be left blank.  </td></tr>
+
+<tr><td>ITEMRELFLD</td><td>
+The name of a field in the table, or blank. This can be used for
+	limiting the visibility of records in the table, based on matching
+	values of the field indicated here to the value of the currently 
+	logged-in user's SITE_CODE in their record in WUSER.  When the value
+	of ITEMRELFLD is blank, the records in this table will not be limited
+	in the hierarchies.  </td></tr>
+
+<tr><td>ITEMDESFLDS</td><td>
+One or more fieldnames with a space between them. These
+	fields are made available for use as description fields, and usually
+	there is only one of them, (some LCX functions currently extant may
+	expect this). The field does not have to be a key. 
+</td></tr>
+
+<tr><td>ITEMDFCOUNT</td><td>
+ITEMDFCOUNT is the number of fieldnames in the ITEMDESFLDS.
+</td></tr>
+
+<tr><td>DEFAULTICON</td><td>
+A string naming a default icon.
+</td></tr>
+
+<tr><td>ITEMICON</td><td>
+Depending on the ITEMICONMODE, this is 
+either the name of the field in 
+itembase where the bitmap name is held,  or
+the name of the bitmap itself
+</td></tr>
+<tr><td>ITEMICONMODE</td><td>
+ITEMICONMODE is either F indicating that the ITEMICON is a field-name, or C
+indicating that ITEMICON is the actual icon name.
+</td></tr>
+
+<tr><td>ISCORED</td><td>
+A Yes/No value. When it is Y, y, J, or j; the activity in 
+	the itembase will be logged in CEVENT and CORE. If it is any other value
+	(usually N), the itembase probably contains information of reference 
+	nature, which does not have to be placed in CORE, but the use of
+	CXDICT might still be required or desirable, for example by RCONN.
+</td></tr>
+
+<tr><td>KEEPFLD</td><td>
+The field where a company code or owner name is held. This
+	field is used in the Import and Exception Reporting ("Standard Import").
+</td></tr>
+
+<tr><td>BASEDESCR</td><td>
+The BASEDESCR field holds a descriptive text of the objects in the table.
+This should be in singular form, for example "Cable", or "Subsystem". 
+</td></tr>
+
+<tr><td>WFILTER</td><td>
+This is blank or it can contain an entire LCX function that takes the
+	values of the ITEMFLD and ITEMDESFLDS as arguments and returns a string
+	to be displayed in Hierarchies.  Some older systems use FILTER instead
+	for this name, but as that is an SQL reserved keyword, newer systems have
+	the initial W. The default function, that is, if the
+	WFILTER field is absent (as it is on older systems) or it is present
+	and blank, is the equivalent of
+<pre>
+	show(string id, string descr)
+	{
+		return(concat(id, " ", descr));
+	}
+</pre>
+This WFILTER is mostly used with Hierarchies, to generate the visible 
+strings there. See <a href="call3214.html">CXDICT Filter Functions</a> 
+for more details on this function.
+</td></tr>
+</tbody> </table>
+
+<h2>Reading CXDICT</h2> 
+
+<p>The function 
+<a href="lcxh.html#StdField">StdField(itemtable, <em>cxdictfieldname</em>)</a> 
+is the preferred way to uses to examine and read cached values of 
+the fields in CXDICT. </p>
+
+<p>In addition, the general <a href="lcxh.html#findexact">findexact( )</a> 
+function may be used on CXDICT, followed by <a href="lcxh.html#get">get( )</a> 
+or <a href="lcxh.html#multiget">multiget( )</a> 
+calls for the fieldnames. However, this is a lot more inefficient on 
+the network and thus not recommended; use 
+<a href="lcxh.html#StdField">StdField( )</a> instead.</p>
+
+<p>The possible values for the the <em>cxdictfieldname</em> 
+argument to the StdField function are:</p>
+
+<table border="1" cellspacing="5" cellpadding="2"> <tbody>
+<tr><td><em>cxdictfieldname</em>     </td><td>returned value        </td></tr>
+<tr><td>ISCORED    </td><td>"0" or "1"            </td></tr>
+<tr><td>WFILTER     </td><td>Text of the WFILTER field. Note that this is not the 
+	result of any LCX function but the function itself. The interpretation of this
+	in calls to other functions are done within the system. </td></tr>
+<tr><td>ITEMBASE   </td><td>Table name            </td></tr>
+<tr><td>ITEMDESFLD </td><td>One or more fieldnames</td></tr>
+<tr><td>ITEMDESFLDS</td><td>One or more fieldnames</td></tr>
+<tr><td>ITEMFLD    </td><td>Main Fieldname        </td></tr>
+<tr><td>ITEMFIELD  </td><td>Main Fieldname        </td></tr>
+<tr><td>BASEDESCR  </td><td>Item description Text </td></tr>
+<tr><td>KEEPFLD    </td><td>Keeper Fieldname      </td></tr>
+<tr><td>ITEMUNIFLD </td><td>Unique Fieldname      </td></tr>
+<tr><td>ITEMRELFLD </td><td>Visibility-control Fieldname</td></tr>
+<tr><td>ITEMICON   </td><td>Icon name or fieldname</td></tr>
+
+</tbody> </table>
+
+<p>These values can also appear with a prefixed # several other 
+places, notably in field-specs in 
+<!-- <a href="starepini.html">STAREP.INI</a> -->
+STAREP.INI and as the field arguments to 
+<a href="lcxh.html#ConSelect">ConSelect( )</a>.</p>
+
+<hr/>
+<p>File Date: 2012-02-06</p>
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+
+</body>
+</html>
+
+
+

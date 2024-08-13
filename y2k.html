@@ -1,0 +1,194 @@
+
+<html lang="en">
+<head>
+<title>WinPCS and year 2000</title>
+
+</head><body>
+
+<h1>WinPCS and year 2000</h1>
+
+<p>This is an update of a document originally published in connection with the Year 2000 transition
+and how WinPCS would handle this. It does also give some more background info on how WinPCS
+deals with dates in general, as this may not be obvious. </p>
+
+<h2>How WinPCS handles dates internally.</h2>
+
+<p>WinPCS stores dates as 4 bytes in the tables. Two bytes treated as
+a 15-bit integer are used for the full year, for a range from 1-32767; 
+one byte is used for the month number 1-12
+and one more for the day number 1-31. Year numbers from 32768 onwards are
+equivalents to negatively numbered years, before Christ.  </p>
+
+<p>Year number 0 is not used. The value N/A is encoded as January 14, 0,
+and may only be entered by typing or importing the string N/A.</p>
+
+<p>Other Year 0 dates show as blank. No other year, day, or month 
+number is given any special significance, except that as Year 0
+does not exist, null dates show in the year 65535, which is 
+interpreted as year 1 BC. Any end-of-file conditions and the like
+are reported by the operating system, or Btrieve/Pervasive, and do 
+not depend on any particular data values found.</p>
+
+<p>On input, if the date conversion function sees a blank
+string for the year, the date field is set to blank.
+If the year input is one or two digits, 0-9, 00-99, the year
+is expected to fall between 1990 and 2089. If the year input is
+three digits or more, even with leading zeros, the year is taken
+at face value. Year 000 translates into year 65535 (really year -1,
+or 1 BC) in these cases.</p>
+
+<p>If any number less than 100 for the year, including zero, 
+that is, from 0 to 99 inclusive; is found, the resulting year is
+placed in the range 1990-2089. Any year numbers greater than 100
+are taken as that year. The choice of the range 1990-2089 was made
+based on the scope of use of WinPCS by our customers.</p>
+
+<p>To summarize:
+<table border="1" cellspacing="5" cellpadding="2" columns="5">
+<tbody>
+<tr valign="top" > <td>Input year</td>      <td>Taken as, and stored as:</td></tr>
+<tr valign="top" > <td>N/A</td>             <td>No date (converts to January 14 Year 0)</td></tr>
+<tr valign="top" > <td>(blank)</td>         <td>No date (converts to January 1 Year 0)</td></tr>
+<tr valign="top" > <td>Any non-numeric</td> <td>No date (converts to January 1 Year 0)</td></tr>
+<tr valign="top" > <td>0</td>               <td>Year 2000</td></tr>
+<tr valign="top" > <td>00</td>              <td>Year 2000</td></tr>
+<tr valign="top" > <td>000</td>             <td>Year 65535 (really year 1 BC)</td></tr>
+<tr valign="top" > <td>1-9</td>             <td>Year 2001-2009</td></tr>
+<tr valign="top" > <td>01-09</td>           <td>Year 2001-2009</td></tr>
+<tr valign="top" > <td>001-009</td>         <td>Year 1-9</td></tr>
+<tr valign="top" > <td>10-89</td>           <td>Year 2010-2089</td></tr>
+<tr valign="top" > <td>90-99</td>           <td>Year 1990-1999</td></tr>
+<tr valign="top" > <td>010-089</td>         <td>Year 10-89</td></tr>
+<tr valign="top" > <td>090-099</td>         <td>Year 90-99</td></tr>
+<tr valign="top" > <td>100-32767</td>       <td>Year 100-32767</td></tr>
+</tbody></table> 
+</p>
+
+<p>The full year is always provided on output, no abbreviations are done, 
+even when the settings in WinPCS' server.ini for the 32-bit systems, or within
+the Windows Operating System for 16-bit systems prescribes
+2-digit year numbers.</p>
+
+<p>Users must beware of mis-typing years, for example, typing in "998" will
+result in the year 998, not 1998.</p>
+
+<h2>Date Formatting</h2>
+<p>On the old 16-bit WinPCS systems, dates were formatted as per the settings on the client machine
+running WinPCS. On the 32-bit WinPCS systems, the dates are formatted as per a setting in SERVER.INI,
+which can be different than the default for various users on that server or on the client machines.</p>
+
+<p>It has become apparent that different logged-in users on a Windows machine can have different date
+formatting settings, and this is not all that easy to control. There is also the problem of widely geographically
+separated clients having local settings that differ on which formatting to use. 
+By enforcing a uniform setting within the project, this becomes simplified. 
+At the moment (May 2005),  3 distinct ways of ordering year, month, and day are 
+being used on various projects around the world. </p>
+
+<p>On input, strings beginning with one of <b>Jan Feb Mar Apr May Mai Jun Jul Aug Sep Oct Okt Nov Dec Des</b> may 
+be used in the position of the month, and these will be converted to the conventional month numbers by WinPCS.
+
+<h2>How WinPCS calculates shifts of days and weeks</h2>
+
+<p>Day calculations are done using Julian Day numbers, which currently, and
+for the foreseeable future have values in the vicinity of 2.4 million,
+for example, </p>
+
+	<p>
+	11 August 1998 is Julian Day number 2451037<br/>
+	1 January 2000 is Julian Day number 2451545<br/>
+	29 February 2000 is Julian Day number 2451604<br/>
+	31 December 2099 is Julian Day number 2488069<br/></p>
+
+<p>The date conversion functions from date to J.Day number and the reverse
+base themselves on the Gregorian Calendar for all dates later than 
+15 October 1582; in which years divisible by 4, unless they are 
+century years not divisible by 400, are leap years. </p>
+
+<p>This particular day-numbering scheme was invented in 1583 by Joseph 
+Justus Scaliger, and is used today directly by astronomers.  The 
+conversion algorithms used in WinPCS have `astronomical scope` in 
+the sense that they work properly over thousands of years. For WinPCS'
+purposes, this enormous range is not really needed, but this system of
+linear day numbers results in a lot of simplification and absence of edge 
+and corner cases that require special treatment.  It also puts 
+to rest any concerns about any special dates thay could otherwise cause 
+systems to malfunction. Using the linear day-numbering also simplifies all sorts
+of day and period calculations. </p>
+
+<p>Although the standard Julian Day number changes at noon, there is still a one-to-one
+correspondence with the calendar date. In the Help/About/Res dialog box, the 
+Julian Day number shown there is the one beginning at noon today, which will
+be off by one compared to some other references, between midnight and noon. Strictly
+speaking, WinPCS uses what is called the chronological Julian Day, which,
+like common date stamps, begins at midnight, 12 hours before the reference noon. </p> 
+
+<p>No expectations need to be made about the numbers of days between any two dates,
+whenever this is of interest, the system calculates the Julian Day numbers
+of the two dates in question and finds the difference between them.</p>
+
+<p>WinPCS also uses a system of week numbers, which are six-digit strings
+with the first four being the year, and the last two are the number of
+that week in the year. The Julian Day numbering lies behind this as well,
+since the Julian day numbers are divisble by 7 once a week, on Mondays.</p>
+
+<p>Each week in WinPCS is reckoned from Monday to Sunday.  Functions
+exist to properly add and subtract these. These function calculates the
+Julian Day number of the Monday in the weeks of interest and uses
+them to find offsets or differences.</p>
+
+<p>With hindsight, it might have been preferable to put the Julian day
+numbers into the databases as well, and store them there as plain 
+32-bit integers. SQL systems, to which there are plans to move WinPCS,  
+do not have any standard way of handling blank and N/A date values, 
+so some customizations are going to be done here.
+For reasons of interoperability, the native date formats ought to be 
+used to the extent possible.  </p>
+
+<p>One issue that is necessary to be aware of: WinPCS formats the date as
+specified in server.ini or (for 16-bit systems) by Windows, and 
+this could be different between systems. Text data in reports 
+containing dates do not necessarily sort properly unless in the order 
+year-month-day. This ordering can be produced on any WinPCS system through
+the DateCanonical() function, and is generally recommended, but many
+projects still want to use day-month-year or month-day-year. </p>
+
+<p>Finally, the system that WinPCS runs on, must provide WinPCS with the
+proper date so that WinPCS activities have correct input. But
+given correct input, there is no design decisions causing shortcomings 
+in WinPCS that should preclude it from handling dates properly in 
+the future. </p>
+
+<h2>References</h2>
+
+<h3>WinPCS macro functions:</h3>
+<a href="lcxh.html#date">date( )</a> ,
+<a href="lcxh.html#julday">julday( )</a> ,
+<a href="lcxh.html#caldat">caldat( )</a> ,
+<a href="lcxh.html#DateFromWeek">DateFromWeek( )</a> ,
+<a href="lcxh.html#WeekShift">WeekShift( )</a> ,
+<a href="lcxh.html#WeekDelta">WeekDelta( )</a> ,
+<a href="lcxh.html#WeekFromDate">WeekFromDate( )</a> ,
+<a href="lcxh.html#DateCanonical">DateCanonical( )</a>.
+
+<h3>WinPCS (CWULIB) Internal DLL functions:</h3>
+	BT_datetoaA(),
+	BT_datetoaEx(),
+	BT_wkn(),
+	BT_weeksum(),
+	BT_weekdiff(),
+	BT_strtodateA(),
+	BT_strtodateEx(),
+	caldat(),
+	julday(),
+	JulMonday().
+
+<h3>Other sources:</h3>
+	<p>David Ewing Duncan: The Calendar, Fourth Estate, London 1998</p>
+
+
+<p> File Date: 2012-03-01</p>
+
+</body>
+</html>
+
+

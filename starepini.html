@@ -1,0 +1,95 @@
+
+<html lang="en">
+<head>
+<title>Starep.INI file reference</title>
+
+</head><body>
+
+<h1>Starep.ini file reference</h1>
+<p>File Date: 2022-04-05</p>
+
+<p>Each of the sections in this file refers to a report layout. These are referenced
+from records in REFREP, grandrep.ini, or the starepref argument to the functions that generate
+status index reports.</p>
+
+<p>Entries in the section are of several types:
+fields of the report
+parameter settings
+postprocess actions
+pushbuttons
+selection spec
+
+<h3>Fields</h3>
+
+<p>table field function=width (legend) (aname)</p>
+<p>Special value:<br/>
+$leaf=width (legend) (aname)<br/>
+equivalent to <br/>
+#leaf #itemfield=width (legend) (aname)</p>
+
+<p>table is actual tablename or #n for levels, #penult, #carrier, or #leaf for the lowest levels.</p>
+<p>field is actual fieldname or #cxdictname for standard fields (see 
+<a href="cxdict.html">CXDICT documentation</a> and <a href="lcxh.html#StdField"> the function StdField(&nbsp;)</a>)</p>
+
+<p>function is optional LCX function to be called as per <a href="call3209.html"> on-field functions, (category 9) </a></p>
+<p>width is the visual width of the field</p>
+<p>(legend) is the legend to be shown. In parentheses, so it allows spaces</p>
+<p>(aname) is the optional alias name for the field. Use with <a href="lcxh.html#RepInfo"> RepInfo("alias <em>aname</em>", <em>identifier</em>); </a></p>
+
+
+<h3>Parameters</h3>
+<p>$param name=value</p>
+
+<p>Parameters are subsequently read through calls to 
+<a href="lcxh.html#RepInfo"> RepInfo("param </b><em>name</em>", <em>identifier</em>); </a></p>
+
+<h3>Pushbuttons</h3>
+<p>$button text=action 0 (info) arguments</p>
+<p>$button icon=action 1 (info) arguments</p>
+
+<p>Specific actions:</p>
+
+<p>$button text=QREPORTsuf 0 (Run a Quantitative summary report) Qreport S: L: G: T: </p>
+<p>See the pushbutton references for Qreports in qreportini.html for more details on this.</p>
+
+<p>$button text=LCXCALL 0 (Do something) LCXfunction argument-tail</p>
+<p>$button text=LCXCALLA 0 (Do something if allowed to) LCXfunction argument-tail</p>
+<p>See <a href="call3206#Cat6432">Category 6 #4 actions</a> for the details on these functions.</p> 
+
+
+<h3>Selection spec</h3>
+<p>$select lilprint Print!=1 (Print Y/N) I:3 Y N #carrier RECEIVED PrintOut</p>
+<p>$button Print!=FORALL2 0 (Print Selected Records) function args </p>
+<p>See more details in the <a href="call0013.html"> docs on the forall functions, category 13</a></p>
+
+<h3>Postprocessing</h3>
+
+<p>$postprocess=CMI+L:#0+L:#1+P:ASORT</p>
+
+<p>Actions similar to the ones available in 
+<a href="lcxh.html#RepControl">RepControl(&nbsp;)</a></p>
+
+<!--
+Specialties:
+
+Fields:
+$leaf=width (legend) (alias)
+$Trunk
+$Branches
+
+Other specialties:
+
+$omit=
+$title=
+$head=
+$foot=
+$levelfields=
+$before=
+$after=
+-->
+
+
+</body>
+</html>
+
+

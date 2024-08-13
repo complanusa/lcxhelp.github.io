@@ -1,0 +1,176 @@
+
+<html lang="en">
+<head>
+<title>LCX Error Codes</title>
+
+</head><body>
+
+<h1>LCX Error Codes</h1>
+<p> File Date: May 27 2003</p>
+
+<p>During execution, the LCX interpreter may stop because of
+errors in the code. Common errors include missing brackets or 
+semicolons, or variables not being defined before use.
+
+<p>In many places in WinPCS, there will be displayed the long error
+message, including the point in the code where the error occurred,
+but sometimes this is missing, and just the error number is shown.</p>
+
+<p>The various error numbers are as follows. Some are very infrequent
+and others indicate bugs or catastrophic system failures, rather than
+macrofunction interpretation errors, but here is the entire list:</p>
+
+<table border="1" cellspacing="5" cellpadding="2"> <tbody>
+
+<tr valign="top" width="9%"><td>Number</td>
+<td>Name</td><td>Description</td></tr>
+
+<tr valign="top" width="9%"> <td> 0 </td>
+<td>OK</td><td>No specific Error or Halt.</td></tr>
+
+<tr valign="top" width="9%"> <td> 1 </td>
+<td>ARGC_ERR</td><td>Ran out of arguments when gathering parameters prior to a function call. </td></tr>
+
+<tr valign="top" width="9%"> <td> 2 </td>
+<td>BAD_ARGCOUNT</td><td>too few arguments given</td></tr>
+
+<tr valign="top" width="9%"> <td> 3 </td>
+<td>COLON_EXPECTED</td><td><b>:</b> in Conditional is missing</td></tr>
+
+<tr valign="top" width="9%"> <td> 4 </td>
+<td>DIVZERO</td><td>Division by zero is illegal!</td></tr>
+
+<tr valign="top" width="9%"> <td> 5 </td>
+<td>ELSE_WO_IF</td><td><b>else</b> keyword found but no <b>if</b> keyword before it</td></tr>
+
+<tr valign="top" width="9%"> <td> 6 </td>
+<td>EQUALS_EXPECTED</td><td><b>=</b> expected</td></tr>
+
+<tr valign="top" width="9%"> <td> 7 </td>
+<td>EXTERN_FAILURE</td><td>External function failed</td></tr>
+
+<tr valign="top" width="9%"> <td> 8 </td>
+<td>FUNC_REDEF</td><td>function is redefined</td></tr>
+
+<tr valign="top" width="9%"> <td> 9 </td>
+<td>FUNC_UNDEF</td><td>function is undefined</td></tr>
+
+<tr valign="top" width="9%"> <td> 10 </td>
+<td>GLOBAL_SYNTAX</td><td>expression found outside function</td></tr>
+
+<tr valign="top" width="9%"> <td> 11 </td>
+<td>LEXICAL_EXCESS</td><td>too many searches: probably bad input.</td></tr>
+
+<tr valign="top" width="9%"> <td> 12 </td>
+<td>MARK_UNDEF</td><td>Undefined mark-point</td></tr>
+
+<tr valign="top" width="9%"> <td> 13 </td>
+<td>NEST_FUNC</td><td>too many nested function calls</td></tr>
+
+<tr valign="top" width="9%"> <td> 14 </td>
+<td>UNTERMSTRING</td><td>Unterminated String</td></tr>
+
+<tr valign="top" width="9%"> <td> 15 </td>
+<td>NOLOOPBREAK</td><td>Keyword <b>break</b> found outside a loop</td></tr>
+
+<tr valign="top" width="9%"> <td> 16 </td>
+<td>NOT_TEMP</td><td>not a string</td></tr>
+
+<tr valign="top" width="9%"> <td> 17 </td>
+<td>NOT_VAR</td><td>not a variable</td></tr>
+
+<tr valign="top" width="9%"> <td> 18 </td>
+<td>NO_EXP</td><td>no expression present</td></tr>
+
+<tr valign="top" width="9%"> <td> 19 </td>
+<td>OPENCOMMENT</td><td>Unterminated comment found</td></tr>
+
+<tr valign="top" width="9%"> <td> 20 </td>
+<td>PARAM_ERR</td><td>parameter error</td></tr>
+
+<tr valign="top" width="9%"> <td> 21 </td>
+<td>LPAREN_EXPECTED</td><td><b>(</b> expected</td></tr>
+
+<tr valign="top" width="9%"> <td> 22 </td>
+<td>QUOTE_EXPECTED</td><td>closing quote expected</td></tr>
+
+<tr valign="top" width="9%"> <td> 23 </td>
+<td>RET_NOCALL</td><td><b>return</b> without call</td></tr>
+
+<tr valign="top" width="9%"> <td> 24 </td>
+<td>SEMI_EXPECTED</td><td><b>;</b> expected</td></tr>
+
+<tr valign="top" width="9%"> <td> 25 </td>
+<td>SYNTAX</td><td>syntax error</td></tr>
+
+<tr valign="top" width="9%"> <td> 26 </td>
+<td>TOO_MANY_ARGS</td><td>too many arguments</td></tr>
+
+<tr valign="top" width="9%"> <td> 27 </td>
+<td>TOO_MANY_LVARS</td><td>too many local variables</td></tr>
+
+<tr valign="top" width="9%"> <td> 28 </td>
+<td>TYPE_EXPECTED</td><td>type specifier expected</td></tr>
+
+<tr valign="top" width="9%"> <td> 29 </td>
+<td>UNBAL_BRACES</td><td>unbalanced braces</td></tr>
+
+<tr valign="top" width="9%"> <td> 30 </td>
+<td>UNBAL_PARENS</td><td>unbalanced parentheses</td></tr>
+
+<tr valign="top" width="9%"> <td> 31 </td>
+<td>UNIMP_C</td><td>Unimplemented standard C operator</td></tr>
+
+<tr valign="top" width="9%"> <td> 32 </td>
+<td>UNKNOWN_HASH_COMMAND</td><td>Unknown #-directive</td></tr>
+
+<tr valign="top" width="9%"> <td> 33 </td>
+<td>WHILE_EXPECTED</td><td><b>while</b> expected</td></tr>
+
+<tr valign="top" width="9%"> <td> 34 </td>
+<td>IFBRACE_EXPECTED</td><td><b>if</b> or <b>{</b> expected</td></tr>
+
+<tr valign="top" width="9%"> <td> 35 </td>
+<td>LBRACE_EXPECTED</td><td><b>{</b> expected</td></tr>
+
+<tr valign="top" width="9%"> <td> 36 </td>
+<td>RPAREN_EXPECTED</td><td><b>)</b> expected</td></tr>
+
+<tr valign="top" width="9%"> <td> 37 </td>
+<td>COMMA_RPAREN_EXPECTED</td><td><b>)</b> or <b>,</b> expected</td><td>
+
+<tr valign="top" width="9%"> <td> 38 </td>
+<td>WONTREACH</td><td>Warning: Unreachable code</td></tr>
+
+<tr valign="top" width="9%"> <td> 39 </td>
+<td>NOLOOPCON</td><td>Keyword <b>continue</b> found outside a loop</td></tr>
+
+<tr valign="top" width="9%"> <td> 40 </td>
+<td>CHAR_NOTEXPECTED</td><td>Unexpected character found</td></tr>
+
+<tr valign="top" width="9%"> <td> 41 </td>
+<td>LOCAL_REDEF</td><td>Warning: Local variable hides previous variable</td></tr>
+
+<tr valign="top" width="9%"> <td> 42 </td>
+<td>NEVERWRITE</td><td>Warning: Variable used without proper value set</td></tr>
+
+<tr valign="top" width="9%"> <td> 43 </td>
+<td>NEVERUSE</td><td>Warning: Variable never used</td></tr>
+
+<tr valign="top" width="9%"> <td> 44 </td>
+<td>NEGTHRESHOLD</td><td>Internal error: Threshold is negative.</td></tr> 
+
+<tr valign="top" width="9%"> <td> 45 </td>
+<td>TOO_MANY_FUNCS</td><td>Too many functions defined</td></tr>
+
+<tr valign="top" width="9%"> <td> 46 </td>
+<td>TOO_LONG_STRING</td><td>Allocation failure or requested string is too long</td></tr>
+
+
+</tbody> </table>
+
+
+</body>
+</html>
+
+

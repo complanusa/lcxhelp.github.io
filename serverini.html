@@ -1,0 +1,864 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=iso-8859-1"/>
+<title>SERVER.INI file reference.</title>
+
+</head><body>
+
+<h1>SERVER.INI file reference</h1>
+<!-- File Date: September 13 2006 --> 
+<p> File Date: 2010-07-02</p>
+
+<p>This references the configuration file for the server. This applies to the 
+Windows version.  Like other .ini files, this file has a number of sections
+with entries in them, and the sections may appear in any order. </p>
+
+<p>The sections are: <br/>
+<a href="#section.20options">[options]</a><br/>
+<a href="#section.20periodic">[periodic]</a><br/>
+<a href="#section.20xfer">[xfer]</a><br/>
+<a href="#section.20cdat">[cdat]</a><br/>
+<a href="#section.20LCX">[LCX]</a><br/>
+<a href="#section.20drives">[drives]</a><br/>
+<a href="#section.20paths">[paths]</a><br/>
+<a href="#section.20client">[client]</a><br/>
+<a href="#section.20groups">[groups]</a><br/>
+<a href="#section.20systemtables">[systemtables]</a><br/>
+<a href="#section.20techologies">[technologies]</a><br/>
+<a href="#section.20methods">[methods]</a><br/>
+<a href="#section.20techname">[ <em>(name of technology)</em> ]</a><br/>
+<a href="#section.20methname">[ <em>(name of method)</em> ]</a><br/>
+<a href="#section.20offline">[offline]</a><br/>
+</p>
+
+<p>Section and entry names are case-insensitive. Simple keyword-style 
+values such as On, Off, Yes, No, are also case-insensitive. Filenames
+and descriptions are generally case-sensitive.</p>
+
+<hr/>
+<a name="section.20options"></a>
+<h2>[options]</h2>
+<p>Server options are all those miscellaneous things that do not fit
+in any other section, and do not generalize enough to warrant their
+own sections. </p>
+
+<p>The entries in this section are:<br/>
+<a href="#options.unc">unc=</a><br/>
+<a href="#options.debug">debug=</a><br/>
+<a href="#options.debuglevel">debuglevel=</a><br/>
+<a href="#options.stadlg">stadlg=</a><br/>
+<a href="#options.statrees">statrees=</a><br/>
+<a href="#options.starep">starep=</a><br/>
+<a href="#options.endpoint">endpoint=</a><br/>
+<a href="#options.auth">auth=</a><br/>
+<a href="#options.dllsinfo">dllsinfo=</a><br/>
+<a href="#options.corelock">corelock=</a><br/>
+<a href="#options.dateformat">dateformat=</a><br/>
+<a href="#options.periodic">periodic=</a><br/>
+<a href="#options.wwwroot">wwwroot=</a><br/>
+<a href="#options.htrestrict">htrestrict=</a><br/>
+<a href="#options.htrealm">htrealm=</a><br/>
+<a href="#options.dispatcher">dispatcher=</a><br/>
+<a href="#options.sitelimit">sitelimit=</a><br/>
+<a href="#options.csvdata">csvdata=</a><br/>
+<a href="#options.defgroup">defgroup=</a><br/>
+<a href="#options.clientdir">clientdir=</a><br/>
+<a href="#options.resynchlog">resynchlog=</a><br/>
+<a href="#options.updatelog">updatelog=</a><br/>
+<a href="#options.shadow">shadow=</a><br/>
+<a href="#options.shadowserver">shadowserver=</a><br/>
+<a href="#options.shadowport">shadowport=</a><br/>
+</p>
+
+<a name="options.unc"></a>
+<h3>unc=</h3>
+<p>This controls whether UNC paths can be used.  It is set to either
+<b>unc=1</b> for UNC paths allowed, or <b>unc=0</b> for no UNC paths. In
+this latter case, a mapped drive letter must be used.  </p>
+
+<a name="options.statrees"></a> <a name="options.stadlg"></a> <a name="options.starep"></a>
+<h3>stadlg= statrees= starep=</h3>
+<p>These three entries indicate which ini-files are used for 
+status-dialog, (STADLG), status-treelines (STATREES) and 
+status-report layouts (STAREP).   </p>
+
+<p>Traditionally, the status-dialog information is in the STADLG.INI file,
+and tree-lines and reports are either all in STATREES.INI or they may be
+split between STATREES.INI and STAREP.INI.  The three entries here indicate
+the location and names of these three files, for example. </p>
+
+<p><b> stadlg=0:\stadlg.ini<br/>
+statrees=0:\statrees.ini<br/>
+starep=0:\starep.ini<br/></b></p>
+
+<p>The major difference tends to be, on some really old systems, that 
+the report-layouts are with the tree-line information in the STATREES.INI
+file, and the entry for this would then become<br/>
+<b>starep=0:\statrees.ini</b></p>
+
+<p>Note that on Linux systems, the file-names (but not the INI file entries)
+are case-sensitive, and the file-names are likely to be lower-case. The most
+likely entries on such systems are: </p>
+
+<p><b> STADLG=0:/stadlg.ini<br/>
+statrees=0:/statrees.ini<br/>
+starep=0:/starep.ini<br/></b></p>
+
+<p>Incidentially, these will work fine on Windows systems as well. </p>
+<p>The slash separating the directory can be either way; the common unix
+convention of using the backslash as an escape-code is not applied here. 
+</p>
+
+<a name="options.debug"></a>
+<h3>debug=</h3>
+<p>This indicates whether serial-port or other debug-tracing 
+is turned on or off. The default value and the one usually 
+desired is <b>Debug=OFF</b>.</p>
+
+<p>Debugging info can be directed to a serial line, 
+or another machine on the network running 
+<a href="netdebug.html#netrx">netrx</a> or 
+<a href="netdebug.html#udprx">udprx</a>:</p>
+
+<p> <b>Debug=udp </b><i>ip-address</i><b>:</b><i>port</i> sends the
+information to a udprx program running on the machine with indicated
+IP-address and listening on the indicated port. This is frequently chosen
+in the vicinity of 16385. Note that several udprx instances can run
+at the same time, to receive messages from the server and from the 
+client, whose WINPCS.INI will have a similar DEBUG= setting.</p>
+
+<p> 
+<b>Debug=net </b><i>ip-address</i><b>:</b><i>port</i> or <br/>
+<b>Debug=tcp </b><i>ip-address</i><b>:</b><i>port</i> <br/>
+makes the server send information using the TCP protocol, to 
+any netrx listeners that can display it. As is the case with 
+udprx, there may be more than one of these udprx listeners on 
+separate ports, handling emissions from servers and clients.</p>
+
+<p>For debugging on serial lines, there are the entries<br/>
+<b>Debug=COM1</b> <br/>
+<b>Debug=COM2</b> (and so on) This
+sends info on the named serial line with 9600 Baud, for a dumb terminal to 
+pick it up at the far end. </p>
+
+<p>On the Linux server, serial line debugging can also be specified as<br/>
+<b>Debug=TTYS </b><i>device</i><b>:</b><i>baudrate</i><br/>
+instead, where the device is the path name of the device file. For 
+example,<br/>
+<b>Debug=TTYS /dev/ttyS0:9600</b><br/>
+<b>Debug=TTYS /dev/ttyUSB0:9600</b><br/>
+</p>
+
+<p>The names COM1, COM2 etc. will be translated to 
+/dev/ttyS0, /dev/ttyS1 and so on.</p> 
+
+<p>See also the documentation of the 
+<a href="lcxh.html#AimDebugOutput">AimDebugOutput( ) function</a>. </p>
+
+<!-- <a href="serverini.html#options.debuglevel"> </a> -->
+<!-- <a href="serverini.html#options.debug"> </a> -->
+
+<a name="options.debuglevel"></a>
+<h3>debuglevel=</h3>
+<p>This can be <br/>
+<b>debuglevel=DLL</b> <br/>for showing all WinPCS server activity,
+or <br/><b>debuglevel=LCX</b><br/> for capturing the output of 
+<a href="lcxh.html#trace">trace(&nbsp;)</a> and 
+<a href="lcxh.html#message">message(&nbsp;)</a>
+on the server-side <b>LCX</b> code.</p>
+
+<a name="options.endpoint"></a>
+<h3>endpoint=</h3>
+<p>The WinPCS server is always set to listen on some network port.
+For the Windows DCERPC version using ncacn_ip_tcp and for all TCP versions
+this is the TCP port number.  When set, this overrides the various defaults
+that are assigned via settings in ANCHORS.DLL or given by the Dispatcher.</p>
+
+<p>The default is the port number as defined as the Endpoint 
+in the ANCHORS.DLL or the port number given by the Dispatcher. </p>
+
+<p> <a href="winpcsini.html#endpoint">
+A corresponding entry will have to be present on the client, 
+in WinPCS.INI, unless the default value is acceptable.  </a> </p>
+
+
+<p>The <a href="https://www.iana.org/">IANA</a> has allocated 
+
+<a href="https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml?search=5166">
+port 5166 as available for WinPCS</a>. 
+This port number is usually what is set as the default in the 
+ANCHORS.DLL and ANCHORC.DLL files.  </p>
+
+<p>Note that although any endpoint number will work with the WinPCS Client, 
+browsers will not access certain ports by default, since accessing the
+standard servers on these ports with a http client will be unsafe,
+and/or disruptive. These restricted ports include the following:</p>
+<table>
+<thead>
+<tr><td> Port</td><td>Service </td></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>tcpmux</td></tr>
+<tr><td>7</td><td>echo</td></tr>
+<tr><td>9</td><td>discard</td></tr>
+<tr><td>11</td><td>systat</td></tr>
+<tr><td>13</td><td>daytime</td></tr>
+<tr><td>15</td><td>netstat</td></tr>
+<tr><td>17</td><td>qotd</td></tr>
+<tr><td>19</td><td>chargen</td></tr>
+<tr><td>20</td><td>ftp data</td></tr>
+<tr><td>21</td><td>ftp control</td></tr>
+<tr><td>22</td><td>ssh</td></tr>
+<tr><td>23</td><td>telnet</td></tr>
+<tr><td>25</td><td>smtp</td></tr>
+<tr><td>37</td><td>time</td></tr>
+<tr><td>42</td><td>name</td></tr>
+<tr><td>43</td><td>nicname</td></tr>
+<tr><td>53</td><td>domain</td></tr>
+<tr><td>77</td><td>priv-rjs</td></tr>
+<tr><td>79</td><td>finger</td></tr>
+<tr><td>87</td><td>ttylink</td></tr>
+<tr><td>95</td><td>supdup</td></tr>
+<tr><td>101</td><td>hostriame</td></tr>
+<tr><td>102</td><td>iso-tsap</td></tr>
+<tr><td>103</td><td>gppitnp</td></tr>
+<tr><td>104</td><td>acr-nema</td></tr>
+<tr><td>109</td><td>POP2</td></tr>
+<tr><td>110</td><td>POP3</td></tr>
+<tr><td>111</td><td>sunrpc</td></tr>
+<tr><td>113</td><td>auth</td></tr>
+<tr><td>115</td><td>sftp</td></tr>
+<tr><td>117</td><td>uucp-path</td></tr>
+<tr><td>119</td><td>NNTP</td></tr>
+<tr><td>123</td><td>NTP</td></tr>
+<tr><td>135</td><td>loc-srv / epmap</td></tr>
+<tr><td>139</td><td>netbios</td></tr>
+<tr><td>143</td><td>IMAP2</td></tr>
+<tr><td>179</td><td>BGP</td></tr>
+<tr><td>389</td><td>LDAP</td></tr>
+<tr><td>465</td><td>SMTP+SSL</td></tr>
+<tr><td>512</td><td>print / exec</td></tr>
+<tr><td>513</td><td>login</td></tr>
+<tr><td>514</td><td>shell</td></tr>
+<tr><td>515</td><td>printer</td></tr>
+<tr><td>526</td><td>tempo</td></tr>
+<tr><td>530</td><td>courier</td></tr>
+<tr><td>531</td><td>chat</td></tr>
+<tr><td>532</td><td>netnews</td></tr>
+<tr><td>540</td><td>uucp</td></tr>
+<tr><td>556</td><td>remotefs</td></tr>
+<tr><td>563</td><td>NNTP+SSL</td></tr>
+<tr><td>587</td><td>submission</td></tr>
+<tr><td>601</td><td>syslog</td></tr>
+<tr><td>636</td><td>LDAP+SSL</td></tr>
+<tr><td>993</td><td>IMAP+SSL</td></tr>
+<tr><td>995</td><td>POP3+SSL</td></tr>
+<tr><td>2049</td><td>nfs</td></tr>
+<tr><td>4045</td><td>lockd</td></tr>
+<tr><td>6000</td><td>X11 </td></tr>
+</tbody></table>
+
+
+<a name="options.dllsinfo"></a>
+<h3>dllsinfo=</h3>
+<p>This is 1 for the server emitting info on the DLLs on its console window
+on startup. Set to 0 to make the server quiet about this.  
+Default is 1 for on.</p>
+
+<a name="options.auth"></a>
+<h3>AUTH= (DCERPC) </h3>
+<p>The AUTH= setting is only used with the DCERPC version of the WinPCS 
+server (W31SVR.EXE) and the matching version of the client-side NEXUS31.DLL. 
+The TCP version of the WinPCS server, (W31TCP.EXE) does not use this 
+setting. </p>
+
+<p>For the DCERPC version of WinPCS, this and its matching entry on 
+the client-side WinPCS.INI file there controls authentication of the 
+DCERPC calls. For Windows XP SP 2 and later, the setting must be AUTH=ON
+for the server, and usually have to be AUTH=ON for the client as well. 
+The setting on the client must generally be the same as on the server.</p>
+
+<a name="options.corelock"></a>
+<h3>corelock=</h3>
+<p>This controls whether the CORE table is used for strict 
+uniqueness enforcement,
+or if it is just advisory, applying to Exception Reports. This is set to 
+0 for advisory. Default is 1, strict enforcement, but some projects may need
+to have an override. The setting is read and cached, so the server has to be
+restarted for changes here to take effect.</p>
+
+<a name="options.dateformat"></a>
+<h3>dateformat=</h3>
+<p>This controls the formatting of dates in the system. This has been 
+shown to depend on not just the locale setting of the server machine, but 
+also which user the WinPCS server runs as.  This gets confusing, so we have
+to make sure that a particular WinPCS installation makes all dates formatted
+the same. All clients connecting to the server will use this date format,
+not the format defined on the client.</p>
+
+<p>Typical values would be: <b>yyyy/mm/dd</b> or <b>yyyy-mm-dd</b> for two
+common variations on the ISO-8601 standard date format. <b>dd/mm-yyyy</b> would
+be a useful one in most of Europe, and the Americans would probably like
+<b>mm/dd/yyyy</b>. Even though the year part could be given as <b>yy</b>, 
+suggesting 2 digits; WinPCS will always display and stor the full
+4 digits for a year number. On input, 2-digit years will map into 
+the range 1990-2089, as discussed in 
+<a href="y2k.html"> WinPCS and the Year 2000</a>.</p>
+
+<p>The default is <b>yyyy/mm/dd</b>.</p>
+
+<p>The interpreted settings are: <br/>
+<b>yy</b> for 2-digit year<br/>
+<b>yyyy</b> for 4-digit year<br/>
+<b>m</b> for month 1-12<br/>
+<b>mm</b> for month 01-12<br/>
+<b>mmm</b> for abbreviated month name Jan Feb Mar etc.<br/>
+<b>mmmm</b> for full month name January February March etc.<br/>
+<b>d</b> for day 1-31<br/>
+<b>dd</b> for day 01-31<br/>
+<b>ddd</b> for abbreviated weekday Mon Tue Wed etc.<br/>
+<b>dddd</b> for full weekday name Monday Tuesday Wednesday and so on<br/>
+</p>
+
+<a name="options.wwwroot"></a>
+<h3>wwwroot= (TCP) </h3>
+
+<p>The WinPCS server can respond to http GET requests, and
+if the object to be got is a file, this setting indicates where
+in the directory tree the file can be found. Some URLs are 
+treated in special ways, see
+<a href="webio.html">WEBIO Browser functions</a> 
+for these. Other URLs that refer to actual files makes the 
+server expect to find them here.</p>
+
+<a name="options.htrestrict"></a>
+<a name="options.htrealm"></a>
+<h3>htrestrict= and htrealm= (TCP) </h3>
+<p>When serving web pages, the htrestrict entry identifies a directory
+part of the url that has to be limited only to people allowed to use
+WinPCS. The entered username and password are checked against what is
+in WUSER and if the user is known there, he may see the web-page
+in question. Default is blank, which means to pass all pages without
+any log-in requirements.</p>
+
+<p>The htrealm= entry is there to identify to the user what the
+web-page in question is meant for, and this string appears in the
+username/password dialog that the web browser client pops up. 
+The default value is "WinPCS Project"</p>
+
+<a name="options.dispatcher"></a>
+<h3>dispatcher= (TCP) </h3>
+<p> On installation using TCP systems where a dispatcher process
+is running, this is set to the address of the server where the dispatcher
+is running. This is often the same as the WinPCS server itself, which
+allows the setting to be <b>dispatcher=127.0.0.1</b>. If there is a cluster of
+servers, the dispatcher should run on one of them, and this setting is
+then the address of the server where the dispatcher runs. </p>
+
+<p>Installations not using a dispatcher should have this entry
+omitted or set to address <b>0.0.0.0</b>. </p>
+
+<a name="options.sitelimit"></a>
+<h3>sitelimit=</h3>
+<p>This serves as a master switch for the mechanism that allows
+data in hierarchies to be limited based on the user's defined 
+values of the SITE_CODE field in WUSER.  Default is <b>0</b> for off, 
+set to <b>1</b> to enable this mechanism. There needs to be the correct
+field-names in the ITEMRELFLD in all the records of CXDICT for 
+the mechanism to work properly. </p>
+
+<p>See also the discussion of <b>ITEMRELFLD</b> in the
+<a href="cxdict.html">documentation on CXDICT</a>. </p>
+
+<a name="options.csvdata"></a>
+<h3>csvdata=</h3>
+
+<a name="options.defgroup"></a>
+<h3>defgroup=</h3>
+<p>This indicates which of the groups listed in the [groups] section
+is to be the default for this system. There is now three possible
+options for these, but they will require an appropriate set of 
+server-side DLLs in order to work properly. </p>
+
+<p>Systems using Pervasive will have <b>defgroup=WINPCS71</b></p>
+
+<a name="options.clientdir"></a>
+<h3>clientdir=</h3>
+<p>This is the location of the co-located client files directory, 
+usually named system32. </p>
+
+<a name="options.resynchlog"></a>
+<h3>resynchlog=</h3>
+
+<a name="options.periodic"></a>
+<h3>periodic=</h3>
+<p>This entry controls any periodic jobs. These usually are scheduled
+to take place one or more times every 24 hours at specified times. Details
+for this is in the [periodic] section. This entry is set to ON to turn 
+this functionality on, or left to OFF or absent, to turn it off. </p>
+
+<a name="options.updatelog"></a>
+<h3>updatelog=</h3>
+<p>This entry controls if the log-file for recording update-activities
+("blue tree") on clients is turned on or not. The value of this should be
+<b>on</b> for logging, when the actions are recorded in a file
+<b>updates.log</b> in the server directory.</p>
+
+<a name="options.shadow"></a>
+<h3>shadow=</h3>
+<p>This specifies the location of the shadow or backup files
+to be generated when the function
+<a href="lcxh.html#FilePutShadow">FilePutShadow( )</a> 
+is called, to transfer a file to the server, and make the backup copy
+(the "shadow") at the same time. Think of the British "shadow government",
+rather than the ominous element of Jungian psychology.  </p>
+
+<p>This is a path, possibly defined on some other disk volume or server
+different from the one the main WinPCS system is located.</p>
+
+<p>When not defined, there will be no shadowing made of these files and 
+<a href="lcxh.html#FilePutShadow">FilePutShadow( )</a> 
+will work the same as 
+<a href="lcxh.html#FilePut">FilePut( )</a>.
+
+<a name="options.shadowserver"></a>
+<a name="options.shadowport"></a>
+<h3>shadowserver=</h3>
+<h3>shadowport=</h3>
+
+<p>Refers to another server somewehere that can receive data
+for remote back-up (sfile.c) of these shadowed files moved using
+<a href="lcxh.html#FilePutShadow">FilePutShadow(&nbsp;)</a> when the shadowing is requested. 
+The shadowserver name must be non-blank for this to happen, and the
+shadowport will be the port that this server listens on.  </p>
+
+<p>This receiver server stores the files in directories identifying
+the project date and time of the file being stored. The same file stored
+later will be located in a different location.</p>
+
+<p>The function <a href="lcxh.html#RemoteBack">RemoteBack(&nbsp;)</a> allows transferring to the 
+remote server without depending on this shadowing mechanism. It might be useful
+to use <a href="lcxh.html#serverinistring">serverinistring(&nbsp;)</a>
+in order to re-use the values of <tt>shadowserver</tt> and <tt>shadowport</tt>
+from the server.ini file, instead of having them hardcoded in all the various calls.  </p>
+
+
+<hr/>
+<a name="section.20periodic"></a>
+<h2>[periodic]</h2>
+
+<p>Section <b>[periodic]</b> contains a number of entries describing the 
+jobs to be done.  The entry <b>count=</b> indicates how many such jobs,
+and each one of these is indexed as <b>1=</b>, <b>2=</b> etc. </p>
+
+<p>The right hand side of the job entry inidicates the time and 
+which macrofunction to be run at that time. 
+For example, the periodic section shown here:</p>
+
+<pre>
+[periodic]
+count=2
+1=D (01:30) FormSICache
+2=H (6 21 36 51) UpdatePlots
+</pre>
+
+<p>means that there are two jobs, one of which is to run the function
+<b>FormSICache()</b> once a day, at 01:30 (1.30 AM) and the other one
+is to run the function UpdatePlots() every 15 minutes throughout the
+day, at 6, 21, 36, and 51 minutes past each hour throughout the day. </p>
+
+<p>The clock-times or minute-marks are listed inside the ( ). D indicates
+Daily actions, and H indicates Hourly actions. </p>
+
+<p>Like all other macrocode on the server, this function is expected to be
+in one of the files indicated for the server, which it loads at startup, 
+section <b>[LCX]</b> entry <b>files=</b>. </p>
+
+<hr/>
+<a name="section.20xfer"></a>
+<h2>[xfer]</h2>
+<p>There is one entry, <b>folders=</b>, which lists somethinge 
+</p>
+
+<h3>Example:</h3>
+<pre>
+[xfer]
+folders=9:\data 9:\back-up
+</pre>
+
+
+<hr/>
+<a name="section.20cdat"></a>
+<h2>[cdat]</h2>
+
+<p>There are 3 entries defined here:</p>
+<pre>
+<b>subsymbase=</b>
+<b>tracekey=</b>
+<b>barcodediscovery=</b>
+</pre>
+
+<h3>subsymbase= and tracekey=</h3>
+
+<p>The two entries <b>subsymbase</b> and <b>tracekey</b> are used in the CDAT Transfer phase, 
+for it to find the suitable grouping objects. In many projects, the defaults referring to CERTAC1
+are sufficient, but some project may also use WORKPACK objects, for some of the 
+check-sheets that are scanned-in and have status on them set.</p>
+
+<p>The entry <b>subsymbase=</b> should list all the various tables (including CERTAC1)
+that may be used for grouping, and the entry <b>tracekey=</b> is a list of the 
+corresponding <a href="lcxh.html#traceconn">traceconn( )</a> 
+search entry in <b> STATREES.INI</b> section <b>[$TRACE]</b>. </p>
+
+<p>The default values of this section and its entries, when it is not present, is:</p>
+
+<pre>
+[cdat]
+subsymbase=CERTAC1
+tracekey=FIND_CERTAC1
+</pre>
+
+<h3>Example:</h3>
+<p>On a project where either CERTAC1 or WORKPACK are used for grouping, the following
+entries in this section will be appropriate:</p>
+<pre>
+[cdat]
+subsymbase=CERTAC1 WORKPACK
+tracekey=FIND_CERTAC1 FIND_WORKPACK
+</pre>
+
+<p>Of course, the entry <b>FIND_WORKPACK=</b> must also exist in STATREES.INI in the 
+<b>[$TRACE]</b> section there.</p>
+
+<a name="section.20cdat.barcodediscovery"></a>
+<h3>barcodediscovery=</h3>
+
+<p>The entry <b>barcodediscovery=</b> is expected to refer to an LCX function being called 
+when CDAT works its way through barcodes during verification.   The default is NOOP
+which is taken to mean there is no such function defined. The function runs on the client,
+so all client-side functions, notably 
+<a href="lcxh.html#message">message(&nbsp;)</a>
+will work as expected.</p>
+
+<p>This function is called as per: </p>
+
+<pre>
+<em>action+index+newident</em><b> = bd_function(</b><em>barcodeset</em><b>, </b><em>count</em><b>);</b>
+</pre>
+
+<p>The function is expected to be found in the file referenced in 
+<a href="winpcsini.html#section.20Rconn">
+winpcs.ini section [rconn] entry stadlg=
+</a></p>
+
+<p>The purpose of this function is to allow abbreviated barcode strings. Some projects may have long
+tag numbers, and when these are concatenated with check-sheet numbers they may overflow
+the available space.  This allows some kind of project-specific abbreviations to take place.</p>
+
+<p>Its return value is expected to be a three-part set, <tt>makeset(action, index, newident)</tt>.</p>
+
+<p><tt>newident</tt> is the new identity. </p>
+
+<p><tt>index</tt> refers to the element in the incoming set of barcode strings to be replaced with the newident string.
+Typical logic is to loop through the passed-in barcode strings, identifying the abbreviated one,
+changing that to the full one, then returning the index of this string (as per the convention used with
+<a href="lcxh.html#setitem">setitem(&nbsp;)</a> ) along with the full string in <tt>newident</tt> </p>
+
+<p><tt>action</tt> has to be 1 or 2 in order to tell the system to use the newident in place of the 
+barcode-string at the indicated index.</p>
+<p><tt>action</tt> = 1 stops further barcode-checks, <tt>action</tt> = 2 allows further barcode checks.</p>
+<p>Other values of <tt>action</tt> are no-ops.</p>
+
+
+<h3>See Also:</h3>
+<p>
+<a href="#section.20paths">server.ini section [paths]</a> <br/>
+<a href="winpcsini.html#section.20Rconn"> winpcs.ini section [rconn] entry stadlg=</a> <br/>
+<a href="lcxh.html#message">message(&nbsp;)</a> <br/>
+<a href="lcxh.html#setitem">setitem(&nbsp;)</a> <br/>
+<a href="lcxh.html#statusdialog"> STADLG.ini entry cdatset= with the statusdialog(&nbsp;) function </a> <br/>
+</p>
+
+<hr/>
+<a name="section.20LCX"></a>
+<h2>[LCX]</h2>
+<p>This section lists parameters relevant to macrofiles.  All macrocode 
+that the server uses is loaded on start or on reload-commands, and is 
+used for all the various jobs, such as status-indexes, programmed reports,
+make/break callbacks and so forth. During execution, clones of these are 
+actually used for the various environments, thus the
+<a href="lcxh.html#killfunction">killfunction( )</a> 
+calls will not cause problems for other clients. </p>
+
+<p>There is one entry, <b>FILES=</b>, which simply lists the number of files
+to be prescanned and loaded. If this is changed while the server is running,
+a reload-command from the client may be used to cause the updated file set
+to be prescanned and used from that time on. </p>
+
+<h3>Example:</h3>
+<p><b>FILES=plcounts.lcx printsis.lcx clist.lcx sgraf.lcx itrprts.lcx bookmark.lcx itrreps.lcx pmreps.lcx </b></p>
+
+<p>All these files are expected to be in the server's home directory. </p>
+
+<hr/>
+<a name="section.20drives"></a>
+<h2>[drives]</h2>
+<p>The entries in this section defines the server's numbered drives, for
+path resolution. Drive <b>0:</b> is the place where the server's 
+ANCHORS.DLL and this server.ini file is located. Drives <b>1:</b> 
+thru <b>9:</b> may be defined to other paths relative to this, if 
+so desired. Any one of drives <b>1:</b> thru <b>9:</b> 
+not defined to be somewhere else will default to the server home directory.</p>
+
+<p>The path numbers are frequently chosen to coincide with the client's, 
+matching the paths specified in the <b>client.ini</b> file. </p>
+
+<h3>Example:</h3>
+<p><b>9=..<br/>
+8=..\help<br/>
+7=..\TXS<br/>
+6=..\INI<br/>
+5=..\DATA<br/>
+4=..\FORMS<br/></b></p>
+
+<p>Note that on Linux servers, the pathnames are case-sensitive,
+and the slashes usually go the other way, e g.:<br/>
+<b>9=..<br/>
+8=../help<br/>
+7=../txs</b><br/>etc</p>
+
+<p>Either form of slash are interpreted as a directory separator.</p>
+
+
+<h3>See Also:</h3>
+<p>
+<a href="clientini.html#section.20drives">
+Similar [drives] definitions for the client</a><br/>
+<a href="lcxh.html#ExpandPath">ExpandPath( )</a><br/>
+<a href="lcxh.html#ReducePath">ReducePath( )</a> 
+</p>
+
+
+<hr/>
+<a name="section.20paths"></a>
+<h2>[paths]</h2>
+<p>Paths used for locating certificate proformas and other details
+used by LCX code on the client, the server, and CDAT. Slashes as directory
+separators can be either variety.  </p>
+
+<h3>Example:</h3>
+<pre>
+[paths]
+chronfiles=9:\ChronFiles
+REFITR1=9:\FORMS\Asheets
+REFFTC1=9:\FORMS\Bsheets
+AUTOPL=9:\Scanned\PL
+CONPL=9:\Scanned\PL
+TEMPLATES=9:\FORMS\TEMPLATES
+</pre>
+
+<h3>See Also:</h3>
+<p>
+<a href="winpcsini.html#section.20Paths">Client [PATHS] in WinPCS.INI</a><br/>
+<a href="lcxh.html#ExpandPath">ExpandPath( )</a> ,
+<a href="lcxh.html#ReducePath">ReducePath( )</a> 
+</p>
+
+<hr/>
+<a name="section.20client"></a>
+<h2>[client]</h2>
+<p>This section is used to identify reference information for the master
+client copy located on the server machine.  The information here is used
+by the server when an Installer program wants to perform a check of 
+which files have changed on the client, and asks for the master set
+of files from the server. </p>
+
+<p>There is one entry:<br/>
+<b>folders=</b><br/>
+which is a list of folders that are the master copies that will be 
+transmitted to the clients when these are installed or updated.  The
+numbered-drive naming convention is used, where the 9: identifies the root 
+directory for either server or client. (parent of SYSTEM32 or SERVER)</p>
+
+<h3>Example:</h3>
+<pre>
+folders=9:\ini 9:\system32 9:\prog_client
+</pre>
+
+<p>This will mark the three folders as containing the master copies of 
+configuration and client executable files, to be updated to the clients. Any
+configuration changes should be done here and then propagated. </p>
+
+<h3>See Also:</h3>
+<p>
+<a href="#options.clientdir">CLIENTDIR=</a><br/>,
+<a href="checksv.html">CHECKSV.EXE documentation (obsolete)</a></p>
+ 
+<hr/>
+<a name="section.20systemtables"></a>
+<h2>[systemtables]</h2>
+<p>This section indicates what groups certain systemtables are defined under. 
+This really applies in these cases where several simultaneous data-storage
+mechanisms and techologies are in use.  For the time being, the only relevant
+table is DDMATRIX, and this is associated with the only existing group, 
+that is:</p>
+<p><b>DDMATRIX=RCONN BTRS70</b></p>
+<p>Of course, others may be added at some time later.</p>
+
+<hr/>
+<a name="section.20groups"></a>
+<h2>[groups]</h2>
+<p>This identifies the various groupings of storage methods and technologies
+are actually in effect.  The actual name of the group is non-critical. </p>
+
+<p>The entries 
+refer to two names, the first one is a storage-method, the second is the
+storage techology, which must have entries in the [methods] and 
+[technologies] sections sections defined for them, as well as sections
+with their own names defined. </p>
+
+<p>At the moment, there are three possible groups defined <br/>
+<b>WINPCS71=RCONN BTRS70</b><br/>
+<b>WINPCS73=RCONN SQLI30</b><br/>
+<b>WINPCS74=RCONN MSQL10</b><br/>
+corresponding to the only pairs of method (RCONN) and techology. </p>
+
+
+<hr/>
+<a name="section.20techologies"></a>
+<h2>[technologies]</h2>
+<p>This section lists the supported storage-techologies. This identifies some
+way of storing data in a tabular form, and extract these, at least ISAM-style.</p>
+
+<p>For the time being, the possibilities are BTRS70, SQLI30, PSQLIO, and MSQL10, as follows:<br/>
+<b>BTRS70=1 (Pervasive / Btrieve)</b><br/>
+<b>SQLI30=1 (SQLite )</b><br/>
+<b>PSQLIO=1 (PGSQL)</b><br/>
+<b>MSQL10=1 (Microsoft SQL)</b><br/>
+</p>
+
+<hr/>
+<a name="section.20methods"></a>
+<h2>[methods]</h2>
+<p>The entries in this section names the supported methods used for
+connection objects. There is only the familiar RCONN implementation, where
+everything that may be connected is specfied in the RCONN table, and
+other major information is in the CXDICT table. </p>
+
+<p><b>RCONN=1 (Network defined in RCONN and CXDICT tables)<br/> </b></p>
+
+<hr/>
+<a name="section.20techname"></a>
+<h2>[ <em>(name of technology)</em> ]</h2>
+<p>In these sections, various specific parameters to the named storage 
+technology is specified. At the moment, BTRS70, SQLI30, PSQLIO, MSQL10 are
+defined.  </p>
+
+<p>Section BTRS70 has three entries, the data-file extension, the directory 
+for server-side TXS files, and the directory for data files:</p>
+
+<pre>
+[BTRS70]
+extension=DS5
+TXS=0:\TXS
+DATA=9:\DATA
+</pre>
+
+<p>SQLI30 has two entries, examples of typical values are shown:</p>
+
+<pre>
+[SQLI30]
+extension=DB
+DATA=9:\DATA
+</pre>
+
+<p>MSQL10 has one entry defined. </p>
+
+<pre>
+[MSQL10]
+servicename=SQLexpress
+</pre>
+
+<p>This entry allows the system to run either with
+SQL express (<b>servicename=SQLexpress</b>), or on the 
+larger SQL server system whose service name is different. </p>
+
+<p>PSQLIO has the following entries:</p>
+
+<pre>
+[PSQLIO]
+host=127.0.0.1
+port=5432
+dbname=compde16
+username=winpcs
+havepassword=no
+</pre>
+
+<p>Here, the entries are: <br/>
+<b>host=</b> address of the host where the postgres server runs, default 127.0.0.1<br/>
+<b>port=</b> TCP port on this host where the postgres server runs, default 5432<br/>
+<b>dbname=</b> Name of the database. This defaults to the project string defined in 
+the Anchor files, and alternate names may be specified here. Note that this
+is case-sensitive, <b>COMPDE16</b> does NOT match <b>compde16</b>.  <br/>
+<b>username=</b> Name of the database user, typically <b>winpcs</b><br/>
+<b>havepassword=no</b> means this user does not have a password defined<br/>
+<b>havepassword=yes</b> means this user has a password defined somewhere else.<br/>
+Further entries are likely to be added as necessary.</p>
+
+
+
+
+
+<hr/>
+<a name="section.20methname"></a>
+<h2>[ <em>(name of method)</em> ]</h2>
+<p>In these sections, various specific parameters to the named storage 
+method is specified. At the moment, only RCONN has any of these, there
+is a dummy entry, PLACEHOLDER=, for the others. </p>
+
+<p>The possible entries for [RCONN] are: <b>makecontrol=</b> and
+<b>breakcontrol=</b>, which should refer to a function within the files 
+referenced in the [LCX] section, which are to be called whenever some 
+connection is to be made or broken. These entries may be absent or blank,
+in which case only the functions referenced in the RCONN table are used. </p>
+
+<p>This is the normal arrangement. </p>
+
+<h3>Example:</h3>
+<p><b>makecontrol=MakeOK<br/>
+breakcontrol=BreakOK<br/></b></p>
+
+<hr/>
+<a name="section.20offline"/>
+<h2>[offline]</h2>
+
+<p>This section indicates if the WinPCS server is running as the main server in a project, or as
+a satellite server on a tablet or similar, and has to perform change-logging for subsequent updating
+into the main system. </p>
+
+<h3>offline=</h3>
+<p>This is set to <b>No</b> for the main server and <b>yes</b> for the satellite server. </p>
+
+<h3>remotechangefile=</h3>
+<p>This is set to the name of the change-log file for the satellite server. It is ignored 
+on the main server, which does not bother with the change-log file at all. </p.
+
+<p>Example: <b>remotechangefile=9:\changes.txt</b></p>
+
+<hr/>
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+</body>
+</html>
+
+
+

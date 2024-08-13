@@ -1,0 +1,69 @@
+
+<html lang="en">
+<head>
+<title>Add Status -- Category 2</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name=description content="Add Status -- Category 2">
+</head><body>
+<a name="Top"></a>
+
+<h1>Add Status -- Category 2</h1> <p> 
+
+<h3>Availability:</h3>
+This callback is only defined in 16-bit systems. Multiple-items status is not defined in the
+32-bit systems. 
+
+<h3>Description:</h3>
+Function calls in this category are made when the status on a leaf item in a status tree is 
+examined, after the <a href="call0001.html">  Get( ) </a>
+function is called. The purpose of the function is to control the combining of the status values.
+
+<h3>Enabling control in WinPCS:</h3>
+<b>add=</b> entries in STADLG.INI, for a dialog-definition referred to in 
+<b>STATREES.INI</b>, in the <b>[$SINGLE]</b> section there for various status-carriers.
+
+<h3>Disallowed functions:</h3>
+DDE callback and document-drawing functions are only  available inside the DDE 
+callback and Printing callback environments.  There is however no restrictions on 
+initiating printing or DDE-operations, although the nature of the call does not indicate 
+that this is a particularly good idea.
+
+<h3>LCX files:</h3>
+LCX files holding Add functions are to be listed in <b>WINPCS.INI</b>, section 
+<b>[RCONN]</b>, entry <b>stadlg=</b><em>files ... </em>
+
+<h3>Callback function:</h3>
+<pre><em>newstatus</em><b> = </b><em>add_function</em><b>(</b><em>oldstatus</em><b>, </b><em>itemstatus</em><b>)</b></pre>
+
+The function receives the old status, <em>oldstatus</em> and status on current item, <em>itemstatus</em> and returns the sum-
+status to be used given the combination of these status values.
+
+<h3>Special replacements: n$</h3>
+As the slowdown due to the interpreter overhead can be noticeable for large trees, there 
+are some internal functions that may be used. These are referred to as follows:
+
+<li>0$ Copy new status across
+<li>1$ Return highest numeric value of old and new status.
+<li>2$ Return sum of old and new
+<li>3$ 3-state status
+<li>4$ 4-state status
+<li>5$ Variant of 4-state Commissioning and 3-state MC status combined<br>
+
+<p>Other numbers are reserved for future use. Avoid using these until they are defined.
+The numbers here correspond to the operation codes of the 
+<a href="lcxh.html#hierstatus">hierstatus( )</a> function.
+
+<h3>Execution context:</h3>
+Shared with <a href="call0001.html">  Get( ), Set( ) </a>
+and <a href="call0003.html"> Info Init </a> categories 1 and 3.
+
+<h3>See Also:</h3>
+STADLG.INI documentation, 
+<a href="lcxh.html#hierstatus">hierstatus( )</a>, 
+<a href="call0001.html">  Get( ), Set( ) </a>,
+<a href="call0003.html"> Info Init </a> 
+
+<!-- -->
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> </p>
+</body>
+</html>

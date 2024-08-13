@@ -1,0 +1,67 @@
+
+<html lang="en">
+<head>
+<title>For all records functions -- Category 16</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name=description content="For all records functions -- Category 16">
+</head><body>
+<a name="Top"></a>
+
+<h1>For all records functions -- Category 16</h1>
+
+<h3>Enabling control in WinPCS:</h3>
+<p>Selection of a file and function in the Macro [M()...] dialog in INSPECT and SYNFARE. </p>
+
+<h3>LCX files</h3>
+<p>The file is selected as part of the dialog. So is the function. Note that the functions in the selected
+file as well as all the Global functions in the client are available. </p>
+
+<h3>Arguments and Return Value</h3>
+<p>The function takes no arguments, and returns a value indicating whether this record is to
+be updated or not. For Inspect, this means updating the table; for SYNFARE this means updating the
+data in the Report View. The actual return value is specified in the Dialog, the usual convention is to
+return 1 for update and 0 for do not update, but this is merely a convention and is not hardcoded in any way.</p>
+
+<h3>Disallowed functions:</h3>
+<p>DDE callback and document-drawing functions are only available inside the DDE 
+callback and Printing callback  environments.  Though there is no restrictions on 
+initiating printing or DDE-operations, this does not seem to make much sense for 
+typically long-winded and repeated jobs like these.
+For the same reason, the message( ), input( ), yesno( ) or question( ) 
+functions, although legal, are not very useful beyond debugging purposes.</p>
+
+<h3>Special functions:</h3>
+<p>
+<b>InValue(field )</b><br/>
+This returns the value of the specified field in the record of the input under consideration. The input 
+may be from the SYNFARE view or the table being INSPECTed. </p>
+
+<p>
+<b>OutValue(field, value) </b><br/>
+This prepares placing the selected value to a specified field in the data set, either the table 
+or the SYNFARE report.  Only if the record is to be updated will these values make it into the permanent
+set.</p>
+
+<p>
+<b>SourceName()</b><br/>
+<b>TargetName()</b><br/>
+These function returns the table name of the main table being INSPECTed, or the file-name (shown in the title)
+for SYNFARE report views. Both names are synonyms for the same function. </p> 
+
+<h3>Execution context:</h3>
+<p>One execution context that lasts from the first to the last record in each invocation,
+and is re-entered for every record. A Global variable set up in one early invocation is available in 
+subsequent fields. </p>
+
+<h3>See Also:</h3>
+<p>For the for-all record functions in TRANS and Standard Imports (and 16-bit FORKS) 
+see <a href="call0007.html"> category 7</a>.
+<p>For the for-all record functions in SI Reports see <a href="call0013.html">category 13</a>.
+<p>For the for-all record functions in Quick Reports see <a href="call0015.html"> category 15</a>.
+<p>For the print all records functions in Quick Reports see <a href="call3217.html">category 17</a>.
+
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> </p>
+</body>
+</html>
+
+

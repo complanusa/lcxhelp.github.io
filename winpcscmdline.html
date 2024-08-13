@@ -1,0 +1,76 @@
+
+<html lang="en">
+<head>
+<title>WinPCS Client Command-Line</title>
+
+</head><body>
+<a name="anchor32"></a>
+
+<h1>WinPCS Client Command-Line</h1>
+
+<p>File Date: 2012-05-04</p>
+
+<p>The WinPCS client command-line should be the invocation of the
+WINPCS.EXE program, with the working directory being SYSTEM32.
+This is the client-side system 
+directory, where the AnchorC.DLL project-specific DLL is. </p>
+
+<p>The server may be on the other side of a VPN inside a WAN, in this case, 
+the server-side directories DATA and SERVER do not need to be copied across
+to the client. Only the client-side directories such as SYSTEM32, INI, 
+and FORMS are required locally. With this division, no disk mapping needs
+to be done to the server for WinPCS to operate. </p>
+
+<h2> -U username</h2>
+<p>This argument forces the specified user-name to be entered rather than
+the network-login name.</p>
+
+<h2> -L</h2>
+<p>This argument present forces a login-dialog, even if this is not otherwise
+required. If passwords are enabled via 
+<a href="astring32.html#astring601">
+Anchor string 601</a>, this dialog will always appear. </p>
+
+<h2> -S servernumber</h2>
+<p>This allows easy selection of alternate servers, without having to maintain
+different system directories for them.  The default server is the one 
+shown as server=... in WinPCS.INI, the others may be identified as server1=...
+server2=... and so on, they are selected via -S 1 or -S 2 on the command-line. </p>
+
+<h2> -D directory</h2>
+<p>This argument allows the working directory, where the ANCHORC.DLL file is,
+to be specified on the command-line. </p>
+
+<h2> -N debug-command</h2>
+<p>This argument allows the client to emit debugging information
+to a listening 
+<a href="netdebug.html">netrx</a>
+server,
+<a href="netdebug.html">udprx</a>
+server, or a COM port. The debug-command is the same
+as used with the DEBUG= entry in 
+<a href="winpcsini.html">WinPCS.INI</a>. </p>
+
+<h3>Example</h3>
+<pre>-N "udp 192.168.2.107:16381"</pre>
+<p>will make this client transmit debug text to a 
+<a href="netdebug.html">udprx</a> listener on the
+machine 192.168.2.107 port 16381, even though the standard DEBUG= setting 
+in <a href="winpcsini.html">WinPCS.INI</a> is different.
+The quotes around the string ensure that the space between net 
+and the IP-address becomes part of the argument.  </p>
+
+<h3>See also:</h3>
+<p>
+<a href="lcxh.html#CWULIB">CWULIB( )</a> ,
+<a href="lcxh.html#AimDebugOutput">AimDebugOutput( )</a> ,
+<a href="winpcsini.html">WinPCS.INI</a> ,
+<a href="netdebug.html">netrx and udprx</a> ,
+<a href="lcxh.html#ExpandPath">ExpandPath( )</a> ,
+<a href="lcxh.html#Machinename">Machinename( )</a> 
+</p>
+
+</body>
+</html>
+
+

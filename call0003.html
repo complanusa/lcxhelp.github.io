@@ -1,0 +1,243 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>Info Init -- Category 3</title>
+<meta http-equiv="Content-Type" content="text/html"/>
+<meta name="description" content="Info Init -- Category 3"/>
+</head><body>
+<a name="Top"></a>
+
+<h1>Info Init -- Category 3</h1>
+
+<h3>Description:</h3>
+<p>The functions in this category are called during the construction and 
+use of a Status Dialog. These are defined in 16-bit and 32-bit systems. </p>
+
+<p>Status dialogs are opened as the standard response to the double-click on an object in a Hierarchy,
+(see the <a href="ddmatrix.html">ddmatrix</a> reference for settings to control this.)
+and custom dialogs can be created and opened through calls to the LCX function
+<a href="lcxh.html#wildstatus">wildstatus(&nbsp;)</a></p>
+
+<p>Note that in general, one will want these functions to be quite
+simple and merely return informational content to the dialog. If there is 
+a need for a larger number of these controls, a better alternative may be
+to use an use a call to <a href="lcxh.html#entrydialog"> entrydialog( ) </a> 
+as part of the 
+<a href="call0001.html">Set</a> 
+action instead.</p>
+
+<p>(<b>select</b>, <b>info</b>, or <b>command</b> entries in the <b>DIALOG=</b> entries in <b>STADLG.INI</b>) </p>
+
+<h3>Enabling control in WinPCS:</h3>
+<p>Function calls in this category are made when a dialog item in a status dialog 
+is to be filled.  The following possibilities are defined:</p>
+
+<pre><b>select:</b><em>labelfunc</em><b>+</b><em>PBtext</em><b>+</b><em>PBaction</em></pre>
+<pre><b>edithelped:</b><em>labelfunc</em><b>+</b><em>PBtext</em><b>+</b><em>PBaction</em></pre>
+<pre><b>edit:</b><em>labelfunc</em></pre>
+<pre><b>big:</b><em>labelfunc</em></pre>
+<pre><b>info:</b><em>infotxt</em></pre>
+<pre><b>command:</b><em>settxt</em><b>+</b><em>Action</em> </pre>
+
+<p>In the 32-bit systems, the variable-names associated with the control can be
+customized by placing it in a set of parentheses</p>
+
+<pre><b>select(</b><em>varname</em><b>):</b><em>labelfunc</em><b>+</b><em>PBtext</em><b>+</b><em>PBaction</em></pre>
+<pre><b>edithelped(</b><em>varname</em><b>):</b><em>labelfunc</em><b>+</b><em>PBtext</em><b>+</b><em>PBaction</em></pre>
+<pre><b>edit(</b><em>varname</em><b>):</b><em>labelfunc</em></pre>
+<pre><b>big(</b><em>varname</em><b>):</b><em>labelfunc</em></pre>
+<pre><b>info(</b><em>varname</em><b>):</b><em>infotxt</em></pre>
+<pre><b>command(</b><em>varname</em><b>):</b><em>settxt</em><b>+</b><em>Action</em> </pre>
+
+<h3>Disallowed functions:</h3>
+<p>DDE callback and document-drawing functions are only available inside the DDE 
+callback and Printing callback environments.  There is however no restrictions on 
+initiating printing or DDE-operations. </p>
+
+<h3>LCX files:</h3>
+<p>LCX files holding Info Init functions are to be listed in 
+<b>WINPCS.INI</b>, section 
+<b>[RCONN]</b>, entry <b>stadlg=</b><em>files ... </em></p>
+
+<h3>Operations and callback functions:</h3>
+
+<p><b>select:</b><em>labelfunc</em><b>+</b><em>PBtext</em><b>+</b><em>PBaction</em><br/>
+<b>select(</b><em>varname</em><b>):</b><em>labelfunc</em><b>+</b><em>PBtext</em><b>+</b><em>PBaction</em><br/>
+<b>edithelped:</b><em>labelfunc</em><b>+</b><em>PBtext</em><b>+</b><em>PBaction</em><br/>
+<b>edithelped(</b><em>varname</em><b>):</b><em>labelfunc</em><b>+</b><em>PBtext</em><b>+</b><em>PBaction</em></p>
+
+<p>This places two texts and a pushbutton onto the dialog. The 
+<em>labelfunc</em> function places a value to the first text on the left, 
+indicating what this is supposed to be.  
+The <em>PBtext</em> function may be used to place a text on the 
+pushbutton, and if the default <b>Select...</b> text is OK as is, 
+the <b>NOOP</b> replacement for this function may be used.   </p>
+
+<p>When the button is pushed, the <em>PBaction</em> function is called. 
+It may use the <a href="lcxh.html#FlagDialog">FlagDialog( )</a> function to 
+force a status-change and a call to the 
+<a href="call0001.html">  Set-Status </a>
+action even though the status values shown have remained unchanged.</p>
+
+<p>The variants that don't specify another variable name also generate an 
+associated global variable named DLG_SELECT1 for the first or only 
+<b>select</b> control; DLG_SELECT2 for the second one, if there are more than 
+one. The <b>edithelped</b> controls wll get similarly named variables 
+DLG_EDITHELPED1, DLG_EDITHELPED2 etc. 16-bit systems don't have the 
+<b>edithelped</b> control.</p>
+
+<p>The returned value from <i>PBaction()</i> will be displayed on the
+window and stored into the associated DLG_SELECT<i>n</i> global variable 
+when the function returns. The <b>select</b> command uses a static 
+textfield here, while <b>edithelped</b> uses an edit-control for this 
+text. Later changes to the text in this edit-control will then be caught
+when the associated variable is read afterwards, in a 
+<a href="call0001.html">set</a> 
+or <a href="lcxh.html#wildstatus ">accept</a> function</p>
+
+<p>The value of the text can be inspected and changed 
+throughout. On the 32-bit systems, a more memorable name can be chosen
+by the optional <em>varname</em> in the set of parentheses. </p>
+
+<p><b>edit:</b><em>labelfunc</em><br/>
+<b>edit(</b><em>varname</em><b>):</b><em>labelfunc</em><br/>
+<b>big:</b><em>labelfunc</em><br/>
+<b>big(</b><em>varname</em><b>):</b><em>labelfunc</em></p>
+
+<p>This places an edit-text field on the screen.  The <b>edit:</b> variant 
+makes a single-line edit control, and the <b>big:</b> variant makes 
+a large, multiline edit control.  The <em>labelfunc</em> 
+function is called to set the legend-text describing the purpose of the
+edit-control or its value initially.  The text of the edit control itself 
+should be written in the 
+<a href="call0001.html">get</a> 
+function and may be read back, with changes, 
+
+in the <a href="call0001.html">set</a> 
+function.  This reading and writing is done through
+though the global variable corresponding to it. </p>
+
+<p>This variable is given the name <em>varname</em>, or if this 
+is not preseent, it will be called <b>DLG_EDIT</b><em>n</em> in 
+32-bit system, where n is 1 for the first edit-control, n is 2 for 
+the second one etc.</p>
+
+<p>In 16-bit systems, the variable is called <b>DLGVAR</b><em>n</em>
+where n is 0 for the first dialog-control, 1 for the second dialog-control,
+counting all the various varieties.  </p>
+
+<p><b>info:</b><em>infotxt</em><br/>
+<b>info(</b><em>varname</em><b>):</b><em>infotxt</em></p>
+
+<p>This places a text field on the screen. The <em>infotxt</em> function 
+is called to set the text initially.  Later the text may be read and 
+written though the global variable corresponding to it.  </p>
+
+<p>Unless another name <em>varname</em> is chosen, this variable is 
+called <b>DLG_INFO</b><em>n</em> in 32-bit systems,
+where n is 1 for the first info-control, n is 2 for the second one etc.  </p>
+
+<p>It may be useful and convenient to use the <b>DLG_INFO</b><em>n</em>
+variable itself for passing the value to be displayed from the 
+<a href="call0001.html">get</a> 
+function. In these cases, assign the desired text to <b>DLG_INFO</b><em>n</em>
+in the <a href="call0001.html">get</a> function, and let the <em>infotxt</em>
+function merely pass this value through. For Example:</p>
+
+<pre>
+SomeInfo() 
+{ 
+	return(DLG_INFO1); 
+}
+</pre>
+
+<p>As the value of the string is also passed to the function, the following
+function is even more general, in those cases when the OnGet() function 
+can establish the value, since it doesn't depend on the name of the info
+variable: </p>
+
+<pre>
+EchoInfo(string infoitem) 
+{ 
+	return(infoitem); 
+}
+</pre>
+
+<p>In 16-bit systems, the variable is called <b>DLGVAR</b><em>n</em>
+where n is 0 for the first dialog-control, 1 for the second dialog-control,
+counting all the various varieties of these.  </p>
+
+<p><b>command:</b><em>settxt</em><b>+</b><em>Action</em><br/>
+<b>command(</b><em>varname</em><b>):</b><em>settxt</em><b>+</b><em>Action</em></p>
+
+<p>This places a pushbutton on the dialog. The <em>settxt</em> function may 
+be used to place a text on the button; if the default <b>Select...</b> 
+text is OK as is, the <b>NOOP</b> replacement for the <em>settxt</em> 
+function may be used. </p>
+
+<p>When the button is pushed, the <em>Action</em> function is called. 
+It may use the 
+<a href="lcxh.html#FlagDialog">FlagDialog( )</a> function to force 
+a status-change and a call to the 
+<a href="call0001.html">  Set-Status </a>
+action even though the status values shown have remained unchanged.</p>
+
+<p>This also generates an associated global variable. This will have the name
+specified as <em>varnname</em> or if this is not given, it will be named 
+DLG_COMMAND1 for the first or only select-control; DLG_COMMAND2 for the 
+second one, if there are more than one, and so on.</p>
+
+<h3>Special replacements:</h3>
+<p><b>NOOP</b> in the cases where the default behavior of the function, 
+as described above, is acceptable.</p>
+
+<h3>Execution context:</h3>
+<p>Shared with 
+<a href="call0001.html"> Get/Set</a>
+and on 16-bit systems,  <a href="call1602.html"> Add status</a></p>
+
+<h3>Example:</h3>
+<p>The STADLG entry is, where the select is for selecting one
+of many disciplines:</p>
+<pre>dialog=3 WWW select:D_left+D_pb+D_action</pre>
+
+<p>The action functions for this select-command would be:</p>
+<pre>
+D_left() { return("Discipline:"); }
+D_pb() { return("Select"); } 
+D_action() 
+{ 
+    string dx, ddef; 
+    ddef = DLG_SELECT1; 
+    dx = G_SelectDisp("REFDISP", 1);
+    /* Do not change values on cancel */ 
+    if(notext(dx)) { dx = "1"; }  /* 1 means disciplines */ 
+    if(dx == -1) { return(ddef); } 
+    DLG_SELECT1 = dx; 
+    return(dx);
+}
+</pre>
+
+<p>The logic is that the incoming selection from DLG_SELECT1 is saved, 
+and retained if the selection-dialog is cancelled. </p>
+
+<h3>See Also:</h3>
+<p>STADLG.INI documentation<br/>
+<a href="call0001.html"> Get and Set Status -- Category 1 </a><br/>
+<a href="lcxh.html#wildstatus">Function <b>wildstatus( )</b></a> <br/>
+<a href="call1602.html"> Add status -- Category 2 (16-bit systems only) </a><br/></p>
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a>
+</p>
+
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+
+</body>
+</html>

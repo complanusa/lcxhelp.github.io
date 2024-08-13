@@ -1,0 +1,263 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>Make and Break -- Category 4 (32-bit WinPCS)</title>
+<meta http-equiv="Content-Type" content="text/html"/>
+<meta name="description" content="Make and Break -- Category 4 (32-bit WinPCS)"/>
+</head>
+<body>
+<a name="Top"></a>
+
+<h1>Make and Break -- Category 4 (32-bit WinPCS)</h1>
+
+<h3>Enabling controls</h3>
+<p>Function calls in this category are made when an item is 
+connected to or disconnected from another item, and there 
+is a reference to a function to be called in the process. If no
+function is specified, no extra action will take place.</p>
+
+<p>The call for Make takes place immediately prior to the Insert action for the connection table,
+and the main purpose of it is to allow additional initial values to go into the table. 
+Common items are initial status values, creation dates, and user-identities.</p>
+
+<p>The call for Break takes place immediately prior to the Delete action for the
+connection table.  Its purpose could typically be to forestall a disconnection, or make sure that
+other related items in other tables, such as references, are updated. </p>
+
+<p>These functions are specified in the following places:</p>
+
+<p>
+<b>1.</b> Table <b>RCONN</b>, field <b>ONMAKE</b> or 
+<b>ONBREAK</b> for the defining record</p>
+
+<p>
+<b>2.</b> File <b>SERVER.INI</b> section <b>[RCONN]</b> 
+entry <b>MAKECONTROL=</b> or <b>BREAKCONTROL=</b></p>
+
+<p>If the <b>ONMAKE</b> or <b>ONBREAK</b> fields are blank for any specific connection,
+the functions mentioned in the entries <b>MAKECONTROL=</b> and <b>BREAKCONTROL=</b>, as per no. 2 above, are used instead. 
+Since these are global, they apply to all connections.  </p>
+
+<p>The fields <b>ONMAKEMODE</b> and <b>ONBREAKMODE</b> in <b>RCONN</b> 
+are used to determine whether the make- or break-functions are to be called
+on the server side or on the client side. This applies to any function 
+specified, whether individual functions as per no.1 or global functions as per no.2 above. </p>
+
+<p>The value <b>C</b> for 
+<b>ONMAKEMODE</b> and <b>ONBREAKMODE</b>
+here means the corresponding function should run on 
+the client. Other values means it will
+run on the Server; it is recommended that an <b>S</b> be put in here to
+emphasize this. For development and testing purposes, the Client-side
+ONMAKEMODE/ONBREAKMODE may be used with the 
+<a href="lcxh.html#Functions.20available.20with.20the.2032.2dbit.20Server"> 
+Server-side functions (32s) </a> functions and
+<a href="lcxh.html#message">message( )</a>, then when there is no more need 
+for debugging and messaging, the code and the 
+ONMAKEMODE/ONBREAKMODE may be moved to Server-side.  </p>
+
+<p>It should be noticed that having call-back functions on the client makes
+it impossible to perform efficient gang-connect or gang-disconnect, since these
+depend on the server being able to perform many connections or disconnections
+without any interaction. Having to stop and check for these functions on the 
+client does not work very well over WANs or long-haul connections. If at all
+possible, therefore, the callback-functions should be done on the server-side.
+Any messages needed to be passed to the client, in order to explain to the user
+why the connection or disconnection attempt failed, can be generated in the callback
+function and returned as the second part of the return value.  </p>
+
+
+<p>In most cases, these functions and modes will have to be the same for 
+both records in the pair defining the connection. There is room for making
+these slightly different however, for example, a warning message (for client
+side action) may be desired for connections in the one direction but not the
+other. However, any actions preparing the connection table record or any
+additional tables generally must be performed in both directions. </p>
+
+<p>Of course, the mode for Make can be different from the mode for Break. </p>
+
+<h3>Difference from 16-bit:</h3>
+<p>Functions have more arguments, 5 instead of 3. These are still 
+Item and Rel identified, not Left and Right, since although commonly 
+used, the LEFT and RIGHT notation is merely a convention, not any 
+hardcoded field-name.  If someone wanted to call them THIS and THAT,
+they could, and as long as the fieldnames referenced in RCONN 
+are modified accordingly, this would work. </p>
+
+<p>There are no functions referenced for make and break in STADLG.INI 
+on 32-bit systems.  Any such references there are ignored.  The file 
+where the functions are expected to be should be one of the ones 
+referenced in the 
+file <b>SERVER.INI</b> section <b>[LCX]</b> entry <b>FILES=</b> 
+there.  These files contain all macro functions to be used by the server. </p>
+
+<h3>Disallowed functions:</h3>
+<p>DDE callback and document-drawing functions are only available inside the DDE 
+callback and Printing callback environments.  </p>
+
+<p>When these functions run on the server, there will not
+be any place to emit any output or message boxes. Only the functions 
+marked as 
+<a href="lcxh.html#Functions.20available.20with.20the.2032.2dbit.20Server">
+32s (Functions available with the 32-bit server) </a>
+are available in this case. For client-side calls, all the 
+<a href="lcxh.html#Functions.20available.20with.20the.2032.2dbit.20client">
+32c (Functions available with the 32-bit client) </a>
+functions may be used, subject to reasonable limitations.</p>
+
+<p>When the make- or break- activities are to be performed on the server, 
+no client-mode functions can be called. The behavior during make or break
+activities is not defined in these cases.  It is therefore recommended to 
+put these functions on the server if at all possible. </p>
+
+<h3>Functions that are not recommended:</h3>
+<p>Since make and break operations may occur in a noninteractive 
+context, for example with Gang Connect or Gang Disconnect, 
+they should not normally  contain calls to functions that require user 
+interaction, such as 
+<a href="lcxh.html#message">message( )</a> or 
+<a href="lcxh.html#input">input( )</a>. These functions are obviously
+OK for development and trace printing purposes, however.  For the 
+same reason, the DDE-initiating, 
+status index dialog, and certificate functions do not make much sense either.</p>
+
+<p>Further calls to connect or disconnect the same kind of 
+objects must not be attempted either; 
+since this can cause an infinite recursion and eventually a crash. </p>
+
+<p>Also note that the client-side callback functions can be a cause of 
+inefficiencies with Gang Connect and Gang Disconnect. Use the return value
+option from a server-side function instead, if at all possible.</p>
+
+<h3>LCX files:</h3>
+<p>Server-side functions are expected to be found in the files referenced in 
+<b>SERVER.INI</b> section <b>[LCX]</b> entry <b>FILES=</b> there. </p>
+
+<p>Similarly, Client-side functions are expected to be found in the files
+reference in <b>WINPCS.INI</b> section <b>[RCONN]</b> 
+entry <b>FILES=</b> there. </p>
+
+<p>It is possible to co-locate these files, however, this does not fit
+well with operations on wide-area networks and is therefore not really 
+a good idea.</p>
+
+<h3>Callback functions:</h3>
+<pre><em>code</em><b> = </b><em>makefunction</em><b>(</b><em>Conbase</em><b>, </b><em>relbase</em><b>, </b><em>itembase</em><b>, </b><em>itemID</em><b>, </b><em>relID</em><b>, </b><em>parameter</em><b>)</b>
+<em>code</em><b> = </b><em>breakfunction</em><b>(</b><em>Conbase</em><b>, </b><em>relbase</em><b>, </b><em>itembase</em><b>, </b><em>itemID</em><b>, </b><em>relID</em><b>)</b>
+</pre>
+
+<h3>Arguments:</h3>
+<p><em>relbase</em> and <em>itembase</em> are the names of the two tables 
+to be connected.  The connection between them is the <em>Conbase</em>. 
+itemID and relID are the identities (CXDICTs or RCONNs ITEMFLD) of the objects
+in these two tables. </p>
+
+<p>On entry to the function, the itembase and relbase will be positioned on the records 
+corresponding to the objects being connected or disconnected, as they are known as itemID and relID.  </p>
+
+<p>For Make, the Conbase will have the candidate data in its record for 
+the itemID-relID connection about to be made. The values in the various 
+fields here may be examined using 
+<a href="lcxh.html#get"> get( )</a> and changed using
+<a href="lcxh.html#put"> put( )</a>
+in the usual way. Once the makefunction returns with a "proceed" code, 
+the connection will be established by the system. Note that repositioning 
+the connection-table will invalidate the
+connection-record and will result in the connection attempt failing.</p>
+
+<p>The <em>parameter</em> is the value that was passed in as the 
+5th argument to the <a href="lcxh.html#connect">connect( )</a>  function. 
+This can be omitted if it is not of interest. It will be blank if not passed
+in the <a href="lcxh.html#connect">connect( )</a> call. </p> 
+
+<p>For the Break function, the Conbase will be positioned on the record 
+about to be deleted.  Repositioning the record of this table is OK, 
+since its position will be re-established prior to the deletion.</p>
+
+<h3>Current records:</h3>
+<p>RCONN is positioned on the records where its fields OPERATION and 
+ITEMBASE match the two tables being connected. The two connectee tables 
+(RCONNs ITEMBASE and RELBASE) are 
+positioned on their respective records, and the connection 
+table's current record is the one about to be deleted on break, 
+or the data to be put into the new record on make. Note that if this
+table is repositioned during the make-function the proposed information
+could be lost. To avoid this, there are special functions that allow
+access to a copy of this record.</p>
+
+<h3>Special functions:</h3>
+<p>There are two functions that may be used for the Make callback on the client side. These
+access the potentially inserted record in the connection-table, and allows reading and
+writing this, similar to using the <a href="lcxh.html#put">put( )</a> or <a href="lcxh.html#get">get( )</a> 
+functions. The difference is that there can be repositioning of the connection table, but the
+actual, not-yet-existing record to be inserted would then be lost and cannot be retrieved. The
+effect would be to have things connected wrongly. With other connection technologies than RCONN, 
+there might not even be a separarate table or record to access via 
+<a href="lcxh.html#put">put( )</a> or <a href="lcxh.html#get">get( )</a>, in these cases, using 
+<a href="lcxh.html#InValue">InValue( )</a> or <a href="lcxh.html#OutValue">OutValue( )</a> will be mandatory.  </p>
+
+<p>
+<b>InValue(field )</b><br/>
+This returns the value of the specified field in the proposed record to be created as a
+consequence of making this connection.  This may not always be a real record, but the net
+effect will be to have read the value as it applies to this connection instance.</p>
+
+<p>
+<b>OutValue(field, value) </b><br/>
+This places the selected value to a specified field in the proposed record to be created
+as the consequence of making this connection, or a property of the object created. </p>
+
+<h3>Return Value:</h3>
+<p>The return value can be a single value or a 2-part set, where the single value or the
+first part of the set are as follows:</p>
+
+<p> <b>0</b> for OK, the system should proceed to make (Insert) or break (Delete) the connection.</p>
+
+<p> <b>-1</b> for indicating that the callback function did the make 
+or break action and the system should not
+perform the Insert or Delete action again. This may also be used for 
+quiet failures. The second part of the set can be a message which
+is added to the returned message about the status.  </p>
+
+<p> <b>-2</b> for fail with an error message. 
+Connections are not changed (made or broken) by the system if 
+the return value is negative.  The second part of the set can 
+be a message which is added to the returned message about the failure.  
+</p>
+
+<h3>Special replacements:</h3>
+<p>
+<b>NOOP</b> which is the same as a blank value <br/>
+<b>DISALLOW</b><br/></p>
+
+<h3>Execution context:</h3>
+<p>Not shared and not re-entered. The execution context on a client is
+different from the one where the 
+<a href="lcxh.html#connect"> connect() </a> function itself is called.</p>
+
+<p>When the execution context is on the server no message boxes 
+or dialogs can be opened there.</p>
+
+<h3>See Also:</h3>
+<p> STADLG.INI documentation <br/>
+<a href="serverini.html">Server.ini documentation</a> <br/>
+<a href="lcxh.html#Functions.20available.20with.20the.2032.2dbit.20Server">
+    Functions available with the 32-bit server </a> <br/>
+<a href="lcxh.html#Functions.20available.20with.20the.2032.2dbit.20client">
+    Functions available with the 32-bit client </a> <br/>
+<a href="call1604.html"> Make and Break -- Category 4 16-bit </a></p>
+
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> </p>
+
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+</body>
+</html>
+

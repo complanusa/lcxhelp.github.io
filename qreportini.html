@@ -1,0 +1,418 @@
+
+<html lang="en">
+<head>
+<title>Qreport.INI file reference</title>
+
+</head><body>
+
+<h1>Qreport.ini file reference</h1>
+<p>File Date: November 23 2005</p>
+
+<p>The file 
+Qreport.ini defines the quantitative reports that can be run based on information from
+status index reports. They are started from pushbutton commands in status index reports. This file
+lives in the main directory of the client program, (often called SYSTEM32).</p>
+
+<p>Summaries are made for a combination of values 
+
+<h2>Pushbutton definitions</h2>
+<p>The start commands are 
+specified via pushbutton definitions in the report layouts in the file STAREP.INI. These 
+pushbuttons have the QREPORTx command-word. Note that these definitions are found in STAREP.INI not QREPORT.INI, but
+it makes more sense discussing the details here.</p>
+
+<p>The relevant pushbutton definitions are as per</p>
+
+<pre><b>$button</b> <em>icon</em><b>=QREPORT</b><em>suffix</em><b> 1 (</b><em>Explanation</em><b>) </b> <em>sectionname</em> <b>L:</b><em>leadindex</em> <b>S:</b><em>setindexlist</em> <b>G:</b><em>groupindexlist</em> <b>T:</b><em>countindexlist</em> </pre>
+
+<pre><b>$button</b> <em>text</em><b>=QREPORT</b><em>suffix</em><b> 0 (</b><em>Explanation</em><b>) </b> <em>sectionname</em> <b>L:</b><em>leadindex</em> <b>S:</b><em>setindexlist</em> <b>G:</b><em>groupindexlist</em> <b>T:</b><em>countindex</em> </pre>
+
+<p>The <em>suffix</em> is some string that allows us to make a distinction between several possible
+quantitative reports from the same status index report, per system, subsystem, discipline, 
+site, or whatever else is of interest. The <em>text</em> 
+is the text to appear on the pushbutton, the <em>icon</em> is the name of the symbol defined in REFBMP31.INI to
+appear on the pushbutton, and the <em>Explanation</em> is the helpful description of the pushbutton. These are 
+standard items that apply to all kinds of pushbuttons.</p>
+
+<p>The <em>sectionname</em> identifies the sections in the QREPORT.INI file that holds the specifications of this
+quantitative or summary report. There is a pair of sections referenced in this file this way, one section defines
+parameters surrounding the report, and the other section, suffixed -FIELDS, refers to the fields in the report.</p>
+
+<p>The trailing commands refer to the fields in the status index report that are used for input. The somewhat 
+non-mnmemonic letters reflects the design language of the reports: There is one or more <b>G</b>roups of distinct
+values that are to be <b>L</b>isted with combinations of fields giving the <b>L</b>eading text, either all in one list, or
+optionally divided further, for each one found in some <b>S</b>et of high-level organizational objects. 
+Additionally, values in other columns can optionally be <b>T</b>allied and the counts summarized. Hence the letters. </p>
+
+<p>The typical case is that the Groups are the status values, these are Listed by discipline, and these combinations
+are repeated for each subsystem, often defined by including both the subsystem numbers and their descriptions. </p>
+
+<p>The commands S: L: G: T: can appear in any order. S: and T: are optional, though S: is usually present, 
+and L: and G: are mandartory. Their arguments are one or more integers referring to the columns in the input status index
+report, first column is indexed as 0, and so on to the right. </p>
+
+<p>The <i>setindexlist</i> can refer to one or more fields, whose concatenation of values form the distinct Set values.
+This concatenation can be exploited to generate more informative strings for the set-values, by including for example 
+both the unique tag number (system number, sheet number etc.) and the description fields. The resulting concatenated
+string will still be distinct. </p>
+
+<p>This indexing is also used for miscellaneous LCX macrofunctions that may be run via LCXCALL pushbuttons. See the 
+<a href="call3206.html"> Pushbutton Operations (client/server) (32-bit) </a> and the 
+<a href="call1606.html"> Pushbutton Operations (monolithic) (16-bit) </a> pages for the details on these.</p>
+
+<p>The Yes/No columns associated with $select= entries are
+indexed at the end, although this field appears at the extreme left. Adding or removing any such field does not affect
+the indexing for the purposes of subsequent reports.</p>
+
+<h3>Examples</h3>
+
+<p>The following section from a STAREP.INI shows a few QREPORT buttons and 
+a couple other fairly typical elements of such a status index report layout:</p>
+
+<pre>
+[plsi_2]
+$param deltacol=CERTUNIT+0+CERTSYS+0+CERTAC1+1
+$postprocess=CMI+L:#0+L:#1+L:#2+L:#4+P:ASORT
+#0 #ITEMFLD=15 (Site/System/Group)              ; 0
+#1 #ITEMFLD=15 (SubSystem/Area)                 ; 1
+#LEAF SHORT_NO=15 (Short Number)                ; 2
+#LEAF PL_NO=15 (PL Number)                      ; 3
+#penult #ITEMFLD=25 (Tag/Line/Cable)            ; 4
+#LEAF DISCIPLINE=10 (Discipline)                ; 5
+#LEAF RAISED_BY=12 (Raised By)                  ; 6
+#LEAF PL_TYPE=4 (Cat)                           ; 7
+#LEAF STATUS SCODED=10 (Status)                 ; 8
+#LEAF DETAILS=430 (PL Item Description)         ; 9
+#LEAF CLEAR_BY_GROUP=10 (Action By Grp)         ;10
+#LEAF ITEM_RESP=10 (Responsible Group)          ;11
+#LEAF MATERIAL_REQUIRED=10 (Mat.)               ;12
+#LEAF CLEARED_DATE=15 (Cleared Date)            ;13
+#LEAF CLEARED_BY=15 (Cleared by)                ;14
+#LEAF VERIFIED_DATE=10 (Verified Date)          ;15
+#LEAF VERIFIED_BY=15 (Verified By)              ;16
+#LEAF CONTRACTOR=6 (Contractor)                 ;17
+#LEAF REQUIRED_DATE=15 (Req'd by)               ;18
+#LEAF MANHOURS=10 (Manhours Estimate to Clear)  ;19
+#LEAF PHASE=10 (Clear in Phase)                         ;20
+#leaf CREATED_ON convTOweek=20 (Created Year/week)      ;21
+#leaf CLEARED_DATE convTOweek=20 (Cleared Year/week)    ;22
+
+#1 #ITEMDESFLDS=80 (Unit Descr)                 ;23
+#2 #ITEMDESFLDS=80 (TO System Descr)            ;24
+#LEAF CREATED_ON=30 (Created Date)              ;25
+#penult AREA=15 (Area)                          ;26
+
+$param CREATED_ON=21
+$param CLEARED_ON=22
+
+$button CalcX=QREPORT1 1 (SubSystem Discipline) QPLSYS S:1 L:5 G:8,8
+$button CalcS=QREPORT2 1 (Site/System Discipline) QPLSYS S:0 L:5 G:8,8
+$button CSSy=QREPORT3 0(Cat. by Subsystem) QPLCAT S:1 L:7 G:8,8
+$button CSy=QREPORT4 0 (Cat. by System) QPLCAT S:0 L:7 G:8,8
+
+$button SGraph=LCXCALL 1 (Graphical Summary Report) PLgraph 21,22,8
+</pre>
+
+<p>The comments at the end of each line defining the fields (;0 ;1 and so on)
+indicate the field index. These are not really defined as comments, it's just that
+the program that is reading the entries in these files does not care about what goes 
+after the right parenthesis delimiting the field legend. </p>
+
+<p>There are 4 different pushbutton defining various quantitative reports here, they are 
+distinguished as QREPORT1, QREPORT2 and so on. It is typical that numerical suffixes like 
+these are used, but there is nothing special about these other than that they serve to make
+the button references different, for the benefit of possible subsequent calls to 
+<a href="lcxh.html#RepControl">RepControl( )</a>.</p>
+
+<p>Two of the QREPORTs refer to section QPLSYS (and QPLSYS-FIELDS) in QREPORT.INI, the others
+refer to QPLCAT. We also see that they refer to different Listing fields, and there are two Groups, 
+both being the field for Status, column 8, the entry above reading:</p>
+<pre>
+#LEAF STATUS SCODED=10 (Status)                 ; 8
+</pre>
+<p>Column 5 is Discipline, Column 7 is the Category, and the two sets of quantitative reports therefore lists
+counts of all combinations found of status-values and disciplines or categories. </p>
+
+<h3>Definitions in programmed Reports</h3>
+<p>The Q-reports can also be invoked from programmed Reports, the ones created using 
+<a href="lcxh.html#RepCreate">RepCreate( )</a>. In the definition
+arguments, where fields and pushbuttons are defined, a pushbutton definition such as</p>
+
+<pre><b>makeset("PB","CalcX", "QREPORT1 1 (SubSystem Discipline) QPLSYS S:1 L:5 G:8,8"), </b></pre>
+
+<p>will allow running these kinds of summary reports here. Notice that the third element in the set is the same 
+as whatever is to the right of the = sign in the STAREP.INI entry. </p>
+
+<h2>The sections [<i>sectionname</i>]</h2>
+<p>There are the following entries in this section:</p>
+
+<p><a href="#entry.20input">input=</a> This refers to where the input data can be found. </p>
+<p><a href="#entry.20mode">mode=</a> This indicates if there is the Wide or the Rectangular version. </p>
+<p><a href="#entry.20title">title=</a> This defines the title.</p>
+<p><a href="#entry.20orientW">orientW=</a> This sets the paper orientation for the wide form of the report</p>
+<p><a href="#entry.20orientR">orientR=</a> This sets the paper orientation for the rectangular form of the report</p>
+<p><a href="#entry.20formfile">formfile=</a> This is the formatting file reference</p>
+<p><a href="#entry.20formfunctionW">formfunctionW=</a> This is the formatting layout function for the Wide report</p>
+<p><a href="#entry.20formfunctionR">formfunctionR=</a> This is the formatting layout function for the Rectangular </p>
+<p><a href="#entry.20formfunction">formfunction=</a> This is the default formatting layout function</p>
+<p><a href="#entry.20hidezero">hidezero=</a> This indicates how zero values are to be shown</p>
+<p><a href="#entry.20omitzerosum">omitzerosum=</a> This indicates whether zero sum rows are to be omitted</p>
+<p><a href="#entry.20root">root=</a> This gives the title and size of the Leading text, L: field. </p>
+<p><a href="#entry.20sumtitle">sumtitle=</a> This is the title or keyword of the sum for each of the</p>
+<p><a href="#entry.20sumtotal">sumtotal=</a> This is the keyword for the sum over everything in the Rectangular Report. </p>
+<p><a href="#postprocessW">postprocessW=</a> Allows for a postprocessing function to be run on the Wide report, after the report is generated but before it is displayed</p>
+<p><a href="#postprocessR">postprocessR=</a> Allows for a postprocessing function to be run on the Rectangular report, after the report is generated but before it is displayed</p>
+
+<p>More details are given on these under the various headings below, for each of these entries. </p>
+
+<a name="entry.20input"/>
+<h3>input=</h3>
+<p>This refers to where the input data can be found. The only defined value is VIEWREP, thus this
+will always read</p>
+<pre>
+input=VIEWREP
+</pre>
+
+<a name="entry.20mode"/>
+<h3>mode=</h3>
+<p>This is set to W, R, or WR, to indicate if the report is to be shown in its 
+Wide or Rectangular version, or both. The Wide report has a set of columns for each 
+combination of the Group-fields and List-fields, while the Rectangular report adds another 
+row for each of these combinations.  The 16-bit systems had problems with the Wide reports
+when there were too many columns; the 32-bit systems have no such problems.
+</p>
+
+<a name="entry.20title"/>
+<h3>title=</h3>
+<p> This defines the title to be displayed in the window.
+Since several different phases can share a quantitative report, there is a mechanism for making
+all or part of the title from an LCX function, where the statement 
+<b>$macro(</b><em>file</em><b>, </b><em>function</em><b>)</b> is 
+replaced by the return value from that function. </p>
+
+<p>The file is expected to be in the same directory where qreport.ini itself is. 
+The function takes a single argument which identifies the parent SI report, and it 
+can use this in functions such as <a href="lcxh.html#RepInfo">RepInfo( )</a> or 
+<a href="lcxh.html#RepGet ">RepGet ( )</a> to look at data in the report. </p>
+
+<p>Example:</p>
+<p><b>title=$macro(mcform.lcx, QABreptitle) Status Report Summary</b></p>
+<p>The function <b>QABreptitle</b> is defined as:
+<pre>
+QABreptitle(string SIReport)
+{
+    string aorb, rti, rti1, rti2;
+    rti = RepInfo("title", SIReport);
+    rti1 = substr(rti, 1, 1);
+    rti2 = substr(rti, 1, 2);
+    if("V" == rti1) { aorb = "Vendor A-Sheet"; }
+    else if("S" == rti1) { aorb = "Software A-Sheet"; }
+    else if("Co" == rti2) { aorb = "Component"; }
+    else if("A" == rti1) { aorb = "A-Sheet"; }
+    else if("B" == rti1) { aorb = "B-Sheet"; }
+    else { aorb = substr(rti, 1, 7); }
+    return(aorb);
+}
+</pre>
+and this simply looks at the beginning of the title of the SI report and generates the part
+of the title text from that, so it becomes "A-Sheet Status Report Summary" 
+or "Component Status Report Summary" and so on. So far, only the title= entry 
+uses this particular substitution mechanism.</p>
+
+<a name="entry.20orientW"/>
+<a name="entry.20orientR"/>
+<h3>orientW= orientR= orient=</h3>
+<p> This sets the paper orientation for the wide or rectangular forms of the report, 
+or both of them at the same time. orientW= and orientR= take precedence over orient=. 
+If the argument is a nonzero integer or a word beginning with L, the format will be Landscape, 
+if the argument is zero or a word beginning with any other letter, the format will be Portrait. 
+It is recommended that one of the words Landscape or Portrait be used. 
+</p>
+
+<a name="entry.20formfile"/>
+<h3>formfile=</h3>
+<p> This is the reference to the file where the formatting function or functions are to be found
+The file or files (there can be more than one, listed with spaces between them) are expected to 
+be in the system directory.</p>
+
+<a name="entry.20formfunctionW"/>
+<a name="entry.20formfunctionR"/>
+<a name="entry.20formfunction"/>
+<h3>formfunctionW= formfunctionR= formfunction=</h3>
+<p> This defines the formatting layout function for the W and R mode reports, or a common one if
+the distinction between the formatting functions is of interest.  Some systems have used the number
+of columns to try and determine which report mode is used, but that is error-prone. It may be easier
+to have a separate function for each mode. </p>
+
+<p>The specified formatting layout function, should exist in one of the files listed in formfile=</p>
+
+<p>The functions follow the usual spec for a 
+<a href="call0010.html">report-formatting function</a>.</p>
+
+<a name="entry.20hidezero"/>
+<h3>hidezero=</h3>
+<p> This indicates if zero values are to be shown as '0' or blank. Set to 1 makes it show zero values 
+and counts as blank, set it to 0 to make the 0s appear.</p>
+
+<a name="entry.20omitzerosum"/>
+<h3>omitzerosum=</h3>
+<p> This indicates if zero sum values are to be shown as blanks or 0. 
+Set to 1 to make the zero sum values go away, and 0 to make these show 0s instead of blanks. </p>
+
+<a name="entry.20root"/>
+<h3>root=</h3>
+<p> This gives the title and size of the Leading text, L: field. The entry is expected to be
+two elements, first an integer showing the width, then the legend in a pair of round parentheses.  
+</p>
+
+<a name="entry.20sumtitle"/>
+<h3>sumtitle=</h3>
+<p> This is the title or keyword of the sum for each of the groups. 
+A Typical useful word is OVERALL.
+</p>
+
+<a name="entry.20sumtotal"/>
+<h3>sumtotal=</h3>
+<p> This is the keyword for the sum over everything in the Rectangular Report. 
+A Typical useful word is TOTALS.
+</p>
+
+<a name="postprocessR"/>
+<a name="postprocessW"/>
+<h3>postprocessR= postprocessW=</h3>
+<p>These allow some LCX function to be used for doing postprocessing, 
+on the report, for adding additional records for example. The postprocessR= 
+is for the rectangular report and postprocessW= is for the Wide report. 
+Unlike the others that have R and W versions, there is no common one here; the
+W and R ones will have to be specified separately, as they commonly are different.</p>
+
+<p>The synopsis for this entry is<br/>
+<b>postprocessR=</b><em>functionname optionalargs</em><br/>
+<b>postprocessW=</b><em>functionname optionalargs</em></p>
+
+<p>The function will then be called as:<br/>
+<em>functionname(reportref, optionalargs, qreportinisection)</em><br/>
+where 
+<ul> 
+<li> <em>functionname</em> is the name given in the postprocessW or postprocessR entry
+<li> <em>reportref</em> will be the report-handle of the quantitative report, suitable for
+	use with functions such as
+	<a href="lcxh.html#RepGet">RepGet( )</a>,
+	<a href="lcxh.html#RepInfo">RepInfo( )</a>, or
+	<a href="lcxh.html#RepPut">RepPut( )</a> in order to look at the report and
+	modify its contents before it is shown. </li>
+
+<li> <em>optionalargs</em> is the rest of the text following the function-name in the entry.
+	The string could be anything useful, such as a set or list of column index numbers
+	that might be slightly different between otherwise similar reports, making it possible
+	to use the same function from different reports or modes of reports. </li>
+
+<li> <em>qreportinisection</em> is the name of the section where this function reference was made.
+	It can be used with <a href="lcxh.html#getinistring">getinistring( )</a> 
+	to look at other strings in this section, possibly for additional parameters or whatever else
+	might be of interest. </li>
+
+</ul>
+</p>
+<p>The function should return <b>0</b>. Although its return value is ignored now, this could change 
+sometime. By then, the return <b>0</b> will be interpreted as the original behavior, so all the existing
+reports won't break.  </p>
+
+<p>The function is expected to be in one of the pre-loaded files, that is, in winpcs.ini section [winpcs]
+entry library=</p>
+
+<p>The modified qreport is shown once the function returns.</p>
+
+<h3>Example</h3>
+<pre>
+[QPLSYS]
+input=VIEWREP
+mode=WR
+title=Punchlist Status Quantitative Report
+orientW=Landscape
+orientR=Portrait
+formfile=mcform2.lcx repform.lcx
+formfunction=qPLformat
+hidezero=1
+omitzerosum=1
+root=15 (Disp.)
+sumtitle=OVERALL
+sumtotal=TOTALS
+postprocessW=KRLtestp 1,2,3,4
+postprocessR=KRLtestp 5,6,7,8
+</pre>
+
+<pre>
+KRLtestp(string report, string tail, string inisection)
+{
+	string rcount, colcount;
+	rcount = RepInfo("rows", report);
+	colcount = RepInfo("cols", report);
+
+	message(__HERE__, "Hello from qreport ", report, " tail = ", tail, 
+		" qreport.ini section [", inisection, "] size ", rcount, " by ", 
+		colcount); 
+
+	return(0);
+}
+</pre>
+
+<p>The postprocess function will probably not have any calls to user-interface functions such as 
+<a href="lcxh.html#message">message( )</a> or <a href="lcxh.html#selectdialog">selectdialog( )</a>; 
+the above example just shows that it does work. It has to pick apart the string of arguments appearing 
+in the <tt>tail</tt> variable using 
+<a href="lcxh.html#converttoset">converttoset( )</a> 
+<a href="lcxh.html#setitem">setitem( )</a> 
+<a href="lcxh.html#strchr">strchr( )</a> 
+or similar functions. </p> 
+
+
+<h2>The sections [<i>sectionname</i>-FIELDS]</h2>
+<p>The entries in this section defines the fields in the quantitative report. </p>
+
+<p>Each entry defines a group number, an operation code and a key value, while the right side
+defines the column width and a legend. <p>
+
+<p>The group number is a small integer, corresponding to the groups listed as arguments to the 
+G: parameter to the pushbutton on start. The number 1 refers to the first group field listed after
+the G:, the number 2 refers to the second one and so on, for as many as are defined.  </p>
+
+<p>The opcodes are one of PRIM SUM SEC PERCENT, where the PRIM indicates that this is a primary
+value that is to be counted and displayed. SEC indicates a secondary value that is to be grouped 
+with one of the PRIM values, they are identified by specifying the same width and column title on 
+the right side of the = as their associated PRIM. SUM indicates a sum column for the group, there 
+should be exactly one SUM entry for each group.  PERCENT refers to one of the PRIM columns, and is used
+to display the fraction of the value shown there to the value in the SUM field.</p>
+
+<p>The keyword, which appears in a pair of round parenthesese, is expected to match values found
+in the columns under consideration. PRIM and SEC expects to find matches in the input status 
+index report, the PERCENT looks for the title of one of the PRIM columns. </p>
+
+<h3>Example</h3>
+<p>In a punchlist, the status may be shown with one of the strings "Cleared", "Verified", and "Active".
+There are two groups, both using the status values, to handle the counting of these three and their
+combinations. The logic goes that Group 1 counts the cleared and verified ones together in one column,
+labeled "No. Cleared"
+and the active ones in another column, while Group 2 separates the ones that are Verified from the
+ones that are merely Active and Cleared. The percentages of Cleared and Verified are also shown, and
+the SUM for group 2 is set to 0 width so that field becomes invisible.
+</p>
+
+<pre>
+[QPLSYS-FIELDS]
+1 SUM (any)=15 (Total)
+1 PRIM (Cleared)=10 (No. Cleared)
+1 SEC (Verified)=10 (No. Cleared)
+2 PRIM (Verified)=10 (No. Verified)
+1 PRIM (Active)=10 (No. Active)
+1 PERCENT (No. Cleared)=15 (% Cleared)
+2 PERCENT (No. Verified)=15 (% Verified)
+2 SEC (Cleared)=0 (No. Unverified)
+2 PRIM (Active)=0 (No. Unverified)
+2 SUM (any)=0 (Total 2)
+</pre>
+
+</body>
+</html>
+
+

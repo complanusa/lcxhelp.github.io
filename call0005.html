@@ -1,0 +1,283 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>Drag and Drop Actions -- Category 5</title>
+<meta http-equiv="Content-Type" content="text/html"/>
+<meta name="description" content="Drag and Drop Actions -- Category 5"/>
+</head><body>
+<a name="Top"></a>
+
+<h1>Drag and Drop Actions -- Category 5</h1>
+
+<h3>Enabling controls in WinPCS:</h3>
+
+<p>Function calls in this category are made when an item is picked up from 
+a <a href="evini.html#DDSERV"> $DDSERV( ) </a> field in a View, a Hierarchy, or a View Connections list; 
+and then dropped on another <a href="evini.html#DDSERV"> $DDSERV( ) </a> field 
+in some other View, another VCONN list, 
+another Hierarchy, or one of the enabled on-screen WinPCS drop-client icons. The DDMATRIX table 
+is consulted and if a matching record is found there, the function referred to is called. This 
+function may also be called in response to a right-button click on some object in a hierarchy.</p>
+
+<p>In 16-bit systems, the response to an external DDE-Execute as 
+described in <a href="dde.html#WinPCS.20as.20a.20DDE.20server"> 
+WinPCS as a DDE server </a> also uses this category,
+but the discussion of these is better deferred to that section. </p>
+
+<h3>Description:</h3>
+<p>Drag-Drop operations are controlled by the DDMATRIX records.
+Two special cases exist, both involving View Connections Lists.</p>
+
+<p>1. The behavior of the Trash-can is standardized: dropping some object from a VCONN 
+list invokes a Break operation between the object dropped in the can and the object seen
+in the View. In this case, the 
+<a href="call3204.html"> 
+Break-connection </a>
+function will be called, not the one in DDMATRIX.</p>
+
+<p>2. Dropping anything into a View Connections (VCONN) list causes the 
+system to attempt to make the connection between that object and the 
+object shown in the View.  In this process, it will call the 
+<a href="call3204.html"> 
+Make-connection </a>function. If the connection attempt is successful, 
+the freshly made connection will be shown. (TBC!)</p>
+
+<p>Dropping objects from Views' <a href="evini.html#DDSERV"> $DDSERV( ) </a>or any Hierarchy 
+onto the Trashcan will cause a normal DDMATRIX lookup. Dropping objects 
+from a VCONN list to anywhere else except another VCONN List or the 
+Trashcan will also cause a normal DDMATRIX lookup.  Thus, except for 
+the two cases mentioned above, drag-drop generally is controlled by 
+entries in DDMATRIX, identifying origin, target, and LCX file and 
+macro function to run.  The field FILE identifies one or more LCX files 
+and the field WFUNCTION identifies the function to execute. This one must 
+be present in one of the files listed, but not necessarily the first one. </p>
+
+<h3>Disallowed functions:</h3>
+<p>DDE callback and document-drawing functions are only available inside 
+the DDE callback and Printing callback environments.  There is however 
+no restrictions on initiating printing or DDE-operations.</p>
+
+<h3>LCX files:</h3>
+<p>Paths are to be given in the FILE field in the relevant record of 
+DDMATRIX. More than one file may be specified here.</p>
+
+<h3>Callback functions (32-bit):</h3>
+<p>The field WFUNCTION (or FUNCTION on some older non-SQL-based systems) in DDMATRIX identifies 
+the LCX function to execute. 
+This one must be present in one of the files listed in the FILE field, 
+(or in the client-side library of pre-loaded files, in winpcs.ini section [WINPCS] entry LIBRARY=)
+but does not necessarily have to be the first one.  The return value 
+of this callback function is used to indicate the need for refreshing the
+hierarchy view. The functions are invoked as:</p>
+
+<pre><em>updateinfo</em><b> = </b><em>function</em><b>(</b><em>This_group</em><b>, </b><em>This_type</em><b>, </b><em>This_icon</em><b>, </b><em>This_name</em><b>,
+	</b><em>Target_group</em><b>, </b><em>Target_type</em><b>, </b><em>Target_icon</em><b>, </b><em>Target_name</em><b>, 
+	</b><em>origin</em><b>, </b><em>hierinfo</em><b>)</b></pre>
+
+<p>The <em>This_...</em> arguments refer to the object being dragged, 
+and the <em>Target_...</em> arguments refer to the location or object 
+it was dropped on. The <em>origin</em> indicates whether the 
+dragged object came from a View, VCONN, or Hierarchy, and the 
+<em>hierinfo</em> contains available information about connected objects. </p>
+
+<p>For the time being, the <em>..._group</em> arguments contain no 
+useful info and may be ignored. </p>
+
+<p>The <em>This_type</em> arguments contains the table name of the 
+object, <em>This_icon</em> is the icon-name and 
+<em>This_name</em> is the item-identity of the object, as can be 
+found in the field returned by
+<a href="lcxh.html#StdField">StdField(<em>This_type</em>, "ITEMFLD")</a> </p>
+
+<p>The <em>Target_type</em>, <em>Target_icon</em>, and 
+<em>Target_name</em> similarly identifies
+the target being dropped on or the object being dropped on. </p>
+
+<p><em>origin</em> is one of:</p>
+<ul>
+<li><b>VCONN</b> for objects dragged out of a VCONN list</li>
+<li><b>HSVCONN</b> for objects dragged out of a Hierarchy</li>
+<li><b>EVIEW</b> for objects dragged out of a View <a href="evini.html#DDSERV"> $DDSERV( ) </a></li>
+</ul>
+
+<p><em>hierinfo</em> is a set of objects which are connected on higher 
+levels. Each object is defined within a 2-part subset, 
+<em>type+name+</em>, or <em>tablename+itemname+</em>.</p>
+
+<ul>
+<li>for <em>origin</em>==<b>VCONN</b> this is a 4-part set giving the object in the View followed by the one picked up from VCONN</li>
+<li>for <em>origin</em>==<b>HSVCONN</b> this is a 2<em>n</em>-part set giving all the <em>n</em> parent objects in the Hierarchy</li>
+<li>for <em>origin</em>==<b>EVIEW</b> this is a 2-part set giving the 
+identity of the object</li>
+</ul>
+
+<p>In all cases, the last 2 elements of the set will be the same as the 
+values of the arguments <em>This_type</em> and <em>This_name</em>.</p>
+
+<h3>Return Value (32-bit) </h3>
+<p>The function should return a value or a set, identified as <em>updateinfo</em>, where 
+the value or first element in the set indicates what is to happen in the hierarchy when 
+the item is dropped on or dragged out and the right-click-menu selection function 
+is performed:</p>
+<ul>
+<li>0 = Don't refresh the hierarchy. </li>
+<li>1 = Refresh the appearance of the item. Typical case is when changing status of preservation items or check-sheets. </li>
+<li>2 = Close and re-open the item. Typical use of this is creation of punch-items.</li>
+<li>3 = Close and re-open the parent of the item. Typical case is changing status of punch-items 
+that may affect the appearance of the parent and sibling objects.</li>
+<li>4 = Close and re-open the entire hierarchy. Typical case is when 
+preservation schedule has to change. </li> 
+</ul>
+
+
+<h3>No Positioning of tables. (32-bit) </h3>
+<p>There are no specific current records defined in any tables, such 
+records must be established through calls to functions such as 
+<a href="lcxh.html#findexact">findexact( )</a> 
+or <a href="lcxh.html#finddual">finddual( )</a>.  For example:</p>
+
+<pre> SomeAction(string group, string table, string icon, string itemid, 
+	string Tgroup, string Ttable, string Ticon, string Titemid, 
+	string wherefrom, string hierinfo)
+{
+	string hlen, Ptable, Pitem;
+
+	if("VCONN" == wherefrom || "HSVCONN" == wherefrom)
+	{
+		hlen = setlen(hierinfo);
+		Ptable = setitem(hierinfo, hlen-4);
+		Pitem = setitem(hierinfo, hlen-3);
+
+		finddual(Ptable, table, StdField(table, "ITEMFLD"), itemid, StdField(Ptable, "ITEMFLD"), Pitem);
+
+		/* Do what may be done in Hierarchies or VCONNs. The current records of these 4 tables will be set right:
+			"RCONN"
+			table
+			Ptable
+			get("RCONN", "CONBASE");
+		 */
+	}
+	else
+	{
+		findexact(table, StdField(table, "ITEMFLD"), itemid);
+		/* Do whatever can be be done when there are no additional connections defined.  */
+	}
+	/* Return value to indicate updating in hierarchies: 0 is none, 
+		1 is refresh the appearance of the item itself, 
+		2 is close and re-open the item 
+		3 is close and re-open the item's parent and the item */ 
+	return(makeset(1, "tbd") );
+}
+</pre>
+
+<p>This will establish the record of the item's table, and when possible 
+(that is for VCONN or HSVCONN), the table of 
+its parent item, the connection table between them, and RCONN. </p>
+
+<h3>Callback functions (16-bit):</h3>
+<p>The DDMATRIX field FUNCTION identifies the function to execute. 
+This one must be present in one of the files listed in the FILE 
+field, but does not necessarily have to be the first 
+one.  The return value of the callback function is not used for 
+anything. The callback functions are invoked as:</p>
+
+<pre>example_function(frombase, fromfield, tobase, tofield, 
+            bmpinfo, orginfo, iteminfo, wherefrom, hierinfo) </pre>
+
+<p>The <em>frombase</em> and <em>fromfield</em> are the table and 
+field where the item dragged originates and the <em>tobase</em> 
+and <em>tofield</em> is where it is dropped. 
+Note that by themselves these do not identify the item itself, 
+only its beginning and ending positions. 
+The name of the bitmap representing the object is available in 
+the <em>bmpinfo</em>. </p>
+
+<p><em>orginfo</em> indicates the current value of the originating 
+field, and similarly, the <em>iteminfo</em>
+indicates the nature of the item. These two arguments appear as 
+three-part sets, where part 1 
+(<a href="lcxh.html#setitem"> setitem(<em>info</em>, 0)</a>) 
+is the name of the base, part 2 
+(<a href="lcxh.html#setitem"> setitem(<em>info</em>, 1)</a>) 
+is the fieldname, and part 3 
+(<a href="lcxh.html#setitem"> setitem(<em>info</em>, 2)</a>) 
+is the value of this fieldname in the record corresponding to 
+the item being dragged.</p>
+
+<p><em>orginfo</em> contains the fieldname of the originating 
+<a href="evini.html#DDSERV"> $DDSERV( ) </a> field, for drags from a View. Drags from a connection 
+list have the RCONN ITEMFLD values here instead.</p>
+
+<p>The more useful one is the <em>iteminfo</em>. It contains 
+the entire information necessary to locate the item in the base. 
+The first two parts are the same as <em>frombase</em> and 
+<em>fromfield</em>; and the  third part is the unique identifying 
+value.  Though the <em>item</em> is present in the Views and 
+Connect lists, there may also have been other 
+movements, that cause the current record to have changed. 
+The callback function ought therefore to begin as shown in the following 
+example <b>SomeItem()</b> function:</p>
+
+<pre> SomeItem(string frombase, string fromfield, string tobase, 
+    string tofield, string bitmapid, string itemID, 
+    string originID, string wherefrom, string hierinfo)
+{
+    string item;
+
+    item = setitem (originID, 2);
+    findexact (frombase, fromfield, item);
+    /* Operate on current record of frombase, this is the
+        item having been dropped.... */
+    return (0);
+}
+</pre>
+
+<p>The argument <em>wherefrom</em>indicates where the dragged object came from. 
+This is <b>EVIEW5</b> if it came from a <a href="evini.html#DDSERV"> $DDSERV( ) </a> location 
+and <b>VCONN</b> for things originating in a VCONN list, 
+and <b>HSVCONN</b> if the origin was a hierarchy.</p>
+
+<p>The argument <em>hierinfo</em> contains information from 
+the hierarchy, similar to that argument of the same name 
+in the 32-bit systems. </p>
+
+<h3>Positioning of tables. (16-bit) </h3>
+<p>For all of them: The table where an object lives is positioned on the record 
+corresponding to the object.  For VCONN-origin, the table being Viewed 
+is positioned on the object being viewed, and RCONN is positioned on  
+the record where ITEMBASE is in the View and RELBASE is 
+the home table of the dragged object.  For Hierarchy-origin drags, 
+all tables shown in the tree rising up from the object being dragged 
+are positioned on the objects which are the ancestors of the dragged 
+object.  RCONN is positioned on  the record where ITEMBASE is the 
+parent of the object as seen in the Hierarchy and RELBASE is the home 
+table of the dragged object. If the object dragged is from the top of 
+the hierarchy, the ITEMBASE field of the RCONN record is blank, but 
+RELBASE is still the table of the object dragged.</p>
+
+<h3>Special replacements:</h3>
+<p>None. If the function is non-existent a configuration error 
+message will appear in its place. If there is no DDMATRIX definition 
+for a particular drag-drop, no action will occur. </p>
+
+<h3>Execution context:</h3>
+<p>Not shared and not re-entered.</p>
+
+<h3>See Also:</h3>
+<p>
+<a href="evini.html#DDSERV"> $DDSERV( ) </a><br/>
+Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> 
+</p>
+
+<hr/>
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+</body>
+</html>

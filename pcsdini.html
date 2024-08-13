@@ -1,0 +1,117 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>PCSD.INI Reference</title>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<meta name="description" content="PCSD.INI Reference"/>
+
+</head><body>
+
+<h1>PCSD.INI Reference</h1>
+
+<h2>Introduction</h2>
+<p>The file pcsd.ini defines the structure and contents of the menus
+that WinPCS runs. The name is historical: back in the very early days,
+when what became WinPCS was a collection of executable programs, the
+main part was PCSD.EXE, which with its configuration file would allow
+opening of View and Entry screens (EIVIEW.EXE and EIEN.EXE). </p>
+
+<p>Like all ini files, this file contains a number of sections, 
+with entries in them.  The section-names generally correspond to
+the drop-down menus, and the entries within the sections become 
+the entries in the menus. </p>
+
+<h2>Fixed parts of the menu</h2>
+<p>The dropdown menus <em>System</em>, <em>Edit</em>, <em>Window</em>, 
+and <em>Help</em>, are standard and
+hardcoded, and for the most part are not controlled by the entries
+in PCSD.INI. However, the <em>System/Run</em> sub-menu can be populated from
+the <b>[Run]</b> section in pcsd.ini, and there can be additional items
+added to the <em>Help</em> menu from entries in a section <b>[Help]</b>.</p>
+
+<p>The presence and absence of other items in the System and Edit menus
+can be controlled wholesale via entries in 
+<a href="winpcsini.html#section.20Menu">the <b>[MENU]</b> section in 
+winpcs.ini</a>.  </p>
+
+<p>All other sections in the pcsd.ini file become top-level or sub-level
+drop-down menus. </p>
+
+<h2>Entries format</h2>
+
+<p>All menu entries have the same general format, beginning with the text
+to be shown as the menu item as the name of the entry, much like the 
+section-names also are the texts shown for the drop-down menus. </p>
+
+<pre>
+<em>text</em><b>=</b><em>file</em> <em>action</em> <em>arguments</em>
+<em>text</em><b>=</b><em>file</em> <em>action</em><b>(</b><em>icon</em><b>)</b> <em>arguments</em>
+</pre>
+
+<p>The <em>file</em> is a reference to a file, this is the INI file for
+a View or Entry, an LCX-file for running LCX functions, or the help-file
+or executable file to be opened and run. What is to be done with the file
+is determined by the <em>action</em> value. An optional icon to be shown
+in the menu, making it prettier and more user-friendly, is then included
+in a set of parentheses right after the action code. Following this are
+additional required arguments for the particular action: Views have to refer
+to some table, and LCX-calls have to identify the function to be run. </p>
+
+<p>The following action-codes are defined and currently in use:</p>
+
+<table border="1" cellspacing="5" cellpadding="2"> <tbody>
+
+<tr><td>Action</td><td>Description</td>
+<td>Arguments</td>
+<td>Example</td></tr>
+
+<tr><td>L</td><td>Run an LCX function</td>
+<td>LCXfunction, then any string to be passed to the function</td>
+<td>LCX Info=0:\openfile.lcx L(WINPCS) ShowHTML http://lcxhelp.com</td></tr>
+
+<tr><td>La</td><td>Run an LCX function in a separate thread</td>
+<td>LCXfunction, then any string to be passed to the function</td>
+<td>Tags without check-sheets=0:\tagcheck.lcx La(BMTAG) TagChecks </td></tr>
+
+<tr><td>L/</td><td>Run the LCX function in response to the user typing the forward slash, for the purpose of searching.</td>
+<td>LCXfunction, then any string to be passed to the function</td>
+<td>Search for Item=0:\winpcs.lcx L/(CORE) FindTag2</td></tr>
+
+<tr><td>V</td><td>Open a View on some table</td>
+<td>The table to be Viewed.</td>
+<td>Master Equipment=6:VEQUIP.INI V(ENGEQUIP) ENGEQUIP</td></tr>
+
+</tbody></table>
+
+<p>Addtitionally, these actions were once defined but have fallen
+out of use, since the LCX functions are much more flexible:</p>
+<table border="1" cellspacing="5" cellpadding="2"> <tbody>
+<tr><td>Action</td><td>Description</td></tr>
+<tr><td>E</td><td>Open Entry on some table, syntax is similar to the one for Views.</td></tr>
+<tr><td>H</td><td>Open a Help file. No arguments. Obsolete as we are no longer writing .hlp files.</td></tr>
+<tr><td>X</td><td>Run some executable file.</td></tr>
+
+</tbody></table>
+
+<p>The file-reference can be, and usually is, given with the numbered drive, as defined in CLIENT.INI, 
+so the actual location in the file-system at any one time will not matter. See 
+<a href="lcxh.html#ExpandPath">ExpandPath( )</a> for details.</p>
+
+<hr/>
+<p>File Date: 2011-10-26</p>
+
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+
+</body>
+</html>
+
+
+

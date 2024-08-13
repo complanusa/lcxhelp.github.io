@@ -1,0 +1,100 @@
+
+<html lang="en">
+<head>
+<title>View, Entry, and Report Pushbuttons Operations -- Category 6 (16-bit WinPCS)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name=description content="View, Entry, and Report Pushbuttons Operations -- Category 6 (16-bit WinPCS)">
+</head><body>
+<a name="Top"></a>
+
+<h1>View, Entry, and Report Pushbuttons Operations -- Category 6 (16-bit WinPCS)</h1> <p> 
+
+<h3>Function calls in this category are made:</h3>
+1. In reponse to pushing a button in a View, defined to do the 
+LCXCALL or LCXCALLA operation.<br>
+2. In response to a $LCXMACRO command on a field in an Entry 
+Form. (on 32-bit systems, this kind of field may appear in 
+View Forms as well) See Entry $LCXMACRO calls  for more details on this.<br>
+3. In response to the use of the System/Run Macro command.<br>
+4. In response to an LCXCALL pushbutton in a status index  report as defined in STDREP.<br>
+
+<h3>1. Enabling control in WinPCS: </h3>
+The LCXCALL definition in View .INI files
+
+<p>There is one call per push.
+<p>The LCXCALL definition in View .INI files is:
+  <p>  Legend=LCXCALL 0 (explanation) filename function tailarg ...
+
+<h3>LCX files and Callback function for View .INI files:</h3>
+
+    status = function(view, base, tailarg ... )
+
+<p>where view is EVIEW5 and the base is the name of the base being 
+Viewed. The tailarg arguments are the words on the rest of the line 
+in the LCXCALL definition. This is often used for additional fieldnames. 
+The filename and function name is referred to in the button definition 
+in the View .INI file.
+
+<h3>3. Enabling control in 16-bit WinPCS: </h3>
+System/Run Macro command
+
+<p>The user selects the macro file and function in the 
+following dialogs. There are no 
+arguments, and the return value is ignored.
+
+<h3>4. Enabling control in 16-bit WinPCS:</h3>
+The LCXCALL definition in STADLG.INI Report sections
+( sipush.c LCXrun(MC->SCU->LChLC, MC->SCU->LCfselname, 
+MC->SCU->LCargv, 5, txt, 128); )
+
+<p>This is defined in SI sections as:
+$button legend=LCXCALL odraw (Explanation) function optional tail-args
+and when the button is pushed, the call takes place as
+function(tail, tableset, rootitem, rootbase, SIname) 
+<p>
+tail = any trailing text on the line in STATREES.INI<br>
+tableset = set of tables used initially, only useful in single-leaf-type status indexes<br>
+rootitem = Trunk-item identity<br>
+rootbase = Trunk-level table<br>
+SIname = Name of SI as defined in STATREES.INI<br>
+
+<p>Use the <a href="lcxh.html#RepInfo">RepInfo("ident")</a> 
+function to get the identity of the default Report-object corresponding to the SI report.
+
+<h3>Example:</h3>
+
+$button LCX=LCXCALL 0 (Where is this?) zzyzx Tail-arg.goes.here and here
+
+where the function zzyzx( ) looks like:
+
+zzyzx(string tail, string junkset, string a, string b, string c)
+{
+    string rod, n2, n1;
+    rod = RepInfo("ident");
+    n2 = RepInfo("rows", rod);
+    n1 = RepInfo("rows");
+    message("zzyzx", "Tail = ", tail,
+        " Report ID = ", rod,
+        " Rows I=", n2, " nI=", n1);
+    return(0);
+}
+
+
+This produces the message box text along the following lines:
+
+Tail =  Tail-arg.goes.here and here
+Report ID = 15624 Rows I=28 nI=28
+
+<h3>Special replacements:</h3>
+None. If the function is non-existent an error message will appear in its place. 
+<h3>Execution context:</h3>
+Not shared and not re-entered.
+
+<h3>See Also:</h3>
+<a href="call3206.html">Pushbutton Operations -- Category 6 32-bit</a><br>
+<a href="evini.html#Introduction"> View and Entry INI files</a><br>
+
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> </p>
+</body>
+</html>
+

@@ -1,0 +1,341 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<title>
+Date and time functions overview.
+</title>
+</head>
+<body>
+<h1>Date and time functions overview. </h1>
+
+<p>The concept of time is central to many of WinPCS' subcomponents.
+Whenever some structure is being constructed or planned, or there 
+is some status-carrying object that is created or updated, 
+there will always be some time stamps for when the action took place, 
+along with who did this job, perhaps also why it was done, as is the
+case for punchitems, as well as when it ought to be finished; that
+could be input from the planning side. </p>
+
+<h2>Time functions</h2>
+<p>Time is handled by WinPCS in two forms: internally as the data going into and out of type T fields
+in tables, and as text strings on the format HH:MM:SS.CC or a substring of this, using the conventional 
+24-hour clock.  Notation with 12 hours and AM and PM are not implemented. Since clock-time values are 
+mostly used within WinPCS and does not appear in reports, there is not much need for complicated 
+formatting of time values.  This is in contrast to date values, which are of major importance.</p>
+
+<p>Time spent by workers and recorded or planned are handled in units of manhours, and these are simple 
+integers or fixed-point decimal numbers. </p>
+
+<p>The LCX functions that handle clock time values are: </p>
+
+<table border="1">
+<!--  cellspacing="5" cellpadding="2"--> 
+<tbody>
+
+<tr valign="top">
+<td> <a href="lcxh.html#time">time( )</a> </td>
+<td>Returns the system time on the server in the format HH:MM.SS.CC</td>
+</tr>
+
+<tr valign="top">
+<td> <a href="lcxh.html#ztime">ztime( )</a> </td>
+<td>Returns the system time on the machine where the lcx code is run, in the format HH:MM.SS.CC</td>
+</tr>
+
+<tr valign="top">
+<td>
+<a href="lcxh.html#multiget">multiget( )</a> <br/>
+<a href="lcxh.html#get">get( )</a>
+</td>
+<td>Returns the value of a type T field in the format HH:MM.SS.CC</td>
+</tr>
+
+<tr valign="top">
+<td>
+<a href="lcxh.html#multiput">multiput( )</a>  <br/>
+<a href="lcxh.html#put">put( )</a>
+</td>
+<td>Expects a time-value with at least the hours and minutes, on the form HH:MM.SS.CC, where 
+the omitted centiseconds or seconds will be 0, and puts the value into a field type T.<br/>  
+Reading the value from this field later on will return the entire string in the form HH:MM.SS.CC</td>
+</tr>
+</tbody> </table>
+
+
+
+<h2>Date functions</h2>
+<p>Most activities in WinPCS have dates associated with them. These generally appear visibly in one of two forms, 
+either as standard readable dates, with day, month, and year in some format or another, or it can be the 
+week-number, conventionally specified as a 6-digit number, where the first 4 digits are the year, and the last 
+two digits are the number of the week in that year, 1--53.  
+In addition, there is the sequential Julian Day number system, which is useful for calculations.   In the LCX system, 
+all of these are available, and there are functions to convert back and from each format.  The internal binary date
+format underlying the field type D in the tables is not available on the outside; instead, all date values are converted
+to and from the system defined standard date format.
+More details and discussion of how WinPCS has no problems handling dates at the turn of the millennium is found
+on the page <a href="y2k.html"> WinPCS and Year 2000</a>.</p>
+
+<p>The ISO dates, week numbers, and Julian Day numbers sort naturally in the correct order. Julian Day numbers are also
+most useful when calculating differences and offsets in days. The functions dealing with week-numbering all use 
+the Julian Day number functions internally. </p>
+
+<p>These are the four different ways of spelling out date values:</p>
+
+<table border="1">
+<!--  cellspacing="5" cellpadding="2"--> 
+<tbody>
+
+<tr valign="top"> <td>Format<br/>Name</td>
+<td>Description</td>
+</tr>
+
+<tr valign="top"> 
+<td>isodate</td>
+<td>Date on the form YYYY-MM-DD -- this is returned by the 
+<a href="lcxh.html#DateCanonical">DateCanonical( )</a> 
+function, in order for us to be able to split date-strings into their constituent parts reliably, 
+with <a href="lcxh.html#substr">substr( )</a>. This is also used by the standalone system functions 
+(<a href="lcxh.html#zfunctions">zAssemBleDate( )</a> , 
+<a href="lcxh.html#zfunctions">zdate( )</a> , 
+<a href="lcxh.html#zfunctions">zDateAust( )</a> , 
+<a href="lcxh.html#zfunctions">zDateFormatted( )</a> , 
+<a href="lcxh.html#zfunctions">zDateCanonical( )</a> , 
+<a href="lcxh.html#zfunctions">zDateFromWeek( )</a> , 
+<a href="lcxh.html#zfunctions">ztime( )</a> , 
+<a href="lcxh.html#zfunctions">zweek( )</a> , 
+<a href="lcxh.html#zfunctions">zWeekFromDate( )</a> , 
+<a href="lcxh.html#zfunctions">zcaldat( )</a> , 
+<a href="lcxh.html#zfunctions">zjulday( )</a> )
+</td>
+</tr>
+
+<tr valign="top"> 
+<td>symdate</td>
+<td>Standard Date string format to be used in the system. This is defined in 
+<a href="serverini.html#section.20options">server.ini, section [options] entry dateformat= </a> 
+This is the format that type D fields show, and which appear in reports and is expected input on importing data.  
+All LCX functions expecting or returning date-values for conversion or storage use this format.
+</td>
+</tr>
+
+<tr valign="top"> 
+<td>jday</td>
+<td>Julian Day number. This is an integer identifying the day, in continual increasing order: tomorrow's 
+Julian Day number will be one greater than today's. This number is divisible by 7 on Mondays.
+Most useful for calculating intervals of days. 
+<a href="lcxh.html#julday">julday( )</a> converts a date to the Julian Day number, and 
+<a href="lcxh.html#caldat">caldat( )</a> converts a Julian Day number to the date.
+</td>
+</tr>
+
+<tr valign="top"> 
+<td>weekno</td>
+<td>Week numbers -- this identifies a year and the week in the year. This is used a lot with periodic activities, 
+where a useful unit of time for the periodicity is measured in weeks. The functions 
+<a href="lcxh.html#WeekShift">WeekShift( )</a> and 
+<a href="lcxh.html#WeekDelta ">WeekDelta ( )</a> 
+can be used to calculate ranges of weeks.</td>
+</tr>
+</tbody> </table>
+
+<p>The following functions deal with date values in all these formats, including conversions. 
+The arguments and return values indicate the format-name as shown in the table above. Values shown
+as <em>count</em> are integers, indicating number of days or weeks. </p>
+
+<table border="1">
+<!--  cellspacing="5" cellpadding="2"--> 
+<tbody>
+
+<tr valign="top">
+<td> 
+<em>symdate</em>=
+<a href="lcxh.html#date">date( )</a> </td>
+<td>Returns the system date on the server in the standard format specified in server.ini.</td>
+</tr>
+
+<tr valign="top">
+<td> 
+<em>isodate</em>=
+<a href="lcxh.html#date">zdate( )</a> </td>
+<td>Returns the system date on the machine where the lcx code is run, in the format YYYY-MM-DD</td>
+</tr>
+
+<tr valign="top">
+<td>
+<em>symdate</em>=
+<a href="lcxh.html#AssembleDate">AssembleDate</a> 
+(<em>year, month, day</em>)
+</td><td>
+Assembles the specified year, month, and day into a date string in the standard format.
+</td>
+</tr>
+
+<tr valign="top">
+<td>
+<em>isodate</em>=
+<a href="lcxh.html#DateCanonical">DateCanonical</a> 
+(<em>symdate</em>)
+</td><td>
+Converts the date in standard format to the ISO YYYY-MM-DD format. This makes it suitable for picking out year, month, and day
+using
+<a href="lcxh.html#substr">substr( )</a> 
+later on. 
+</td>
+</tr>
+
+
+<tr valign="top">
+<td>
+<em>datestring</em>=
+<a href="lcxh.html#DateAust">DateAust</a> 
+(<em>symdate</em>)
+</td><td>
+Converts the date in standard format to the Australian (and partially Europeian) DD/MM/YYYY format. This makes it suitable for use with Javascript.
+</td>
+</tr>
+
+<tr valign="top">
+<td>
+<em>datestring</em>=
+<a href="lcxh.html#DateFormatted">DateFormatted</a> 
+(<em>symdate</em>, <em>dateformat</em>)
+</td><td>
+Converts the date in standard format to the format specified by
+the second, <em>dateformat</em>, argument. These are the same as discussed
+for 
+<a href="serverini.html#options.dateformat ">Server.ini entry DATEFORMAT</a> 
+</td>
+</tr>
+
+<tr valign="top">
+<td>
+<em>symdate</em>=
+<a href="lcxh.html#caldat">caldat</a> 
+(<em>jday</em>)
+</td><td>
+Convert a Julian Day number to the corresponding date. 
+</td>
+</tr>
+
+<tr valign="top">
+<td>
+<em>jday</em>=
+<a href="lcxh.html#julday">julday</a> 
+(<em>symdate</em>)
+</td><td>
+Convert a date to the corresponding Julian Day number. This will be divisible by 7 on Mondays.
+</td>
+</tr>
+
+<tr valign="top">
+<td>
+<em>weekno</em>=
+<a href="lcxh.html#week">week( )</a> 
+</td><td>
+Returns the week number of the current week. 
+</td>
+</tr>
+
+<tr valign="top">
+<td>
+<em>symdate</em>=
+<a href="lcxh.html#DateFromWeek">DateFromWeek</a> 
+(<em>weekno, day</em>)
+</td><td>
+Given a week number, and the day (0-6, 0 is Monday) in that week, return the date of that day. 
+</td>
+</tr>
+
+<tr valign="top">
+<td>
+<em>weekno</em>=
+<a href="lcxh.html#WeekFromDate">WeekFromDate</a> 
+(<em>symdate</em>)
+</td><td>
+Given a date, return the corresponding week number, that is, the week in which this date appears.
+</td>
+</tr>
+
+<tr valign="top">
+<td>
+<em>weekno</em>=
+<a href="lcxh.html#WeekShift">WeekShift</a> 
+(<em>weekno, count</em>)
+</td><td>
+Given a week and an offset of count weeks, calculate the resulting week number. 
+</td>
+</tr>
+
+<tr valign="top">
+<td>
+<em>count</em>=
+<a href="lcxh.html#WeekDelta">WeekDelta</a> 
+(<em> weekno1, weekno2 </em>)
+</td><td>
+Return the difference between two week numbers, (weekno1-weekno2). The returned value will be the number of weeks between them. 
+It will be negative if weekno2 is before weekno1. 
+</td>
+</tr>
+
+</tbody> </table>
+
+
+<h2>Examples</h2>
+
+
+<h3>Europian date format</h3>
+
+<p>The following function uses
+<a href="lcxh.html#DateCanonical">DateCanonical( )</a> and <a href="lcxh.html#substr">substr( )</a> 
+to pick apart a date string, then re-assembles it in the DD/MM-YYYY format commonly used in Europe and Australia.</p>
+
+<pre>
+/* Convert system-formatted date (as per the dateformat= in server.ini)
+    into the Europeian-style DD/MM-YYYY */
+DateEuro(string symdate)
+{
+    string zdate, eudate;
+    string y, m, d;
+ 
+    zdate = DateCanonical(symdate);
+    y = substr(zdate, 1, 4);
+    m = substr(zdate, 6, 2);
+    d = substr(zdate, 9, 2);
+    eudate = concat(d, "/", m, "-", y);
+    return(eudate);
+}
+</pre>
+
+<h3>Comparing dates</h3>
+
+<p>Direct comparison of system-formeat date strings is not always possible. 
+Instead, the dates can be converted to Julian Day numbers, and these will compare reliably. </p>
+
+
+<p>Week numbers may also be compared, but note that all seven days of any week will fold into the same week number. If the
+desire is to determine if two dates are in the same week or not, this is however just what is needed. </p>
+
+<h3>Days or weeks into the past or future</h3>
+
+<p>To find a date in the future, convert to Julian Day number, and add the number of days ahead. 
+For the past, subtract the number of days instead. Then convert the Julian Day number back to the date format. </p>
+
+<p>For weeks, use the WeekShift() with a positive offset for the future and a negative offset for the past. </p>
+
+<hr/>
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+<p>File Date:
+2011-05-10
+</p>
+
+</body>
+</html>
+
+

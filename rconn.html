@@ -1,0 +1,280 @@
+
+<html lang="en">
+<head>
+<title>RCONN Reference</title>
+</head>
+<body>
+
+<h1>RCONN Reference</h1>
+
+<p>File Date: 2006-10-31</p>
+
+<h2>Introduction</h2> 
+
+<p>Objects in WinPCS are represented by records in tables. The table-name for the object
+serves as a type-identifier of sorts, and there are two unique values in each record, 
+in general, one being the public identified (the 
+<a href="cxdict.html#CXDICT%20LAYOUT"> ITEMFIELD</a> in 
+<a href="cxdict.html">CXDICT</a> terms) and the other
+being WinPCS' private identifier, the record-number in an autoincrement field which is 
+most commonly called RSERIAL.</p>
+
+<p>The table RCONN contains the definitions for all potential connections 
+between various kinds of objects, in other words, tables, in the system. 
+The table contains pairs of records corresponding to these connections. </p>
+
+<p>One side of the connection
+is called the "item", and the other side is called the "rel". 
+These are interchanged between the records, so that any look-up
+activity from Hierachies, Status Indexes and elsewhere, can be done
+with one access to RCONN. The baseline is that whatever refers to
+"item" in one record in the pair should in general match the references to the
+"rel" of the other record in the pair, and vice versa. The bilateral
+symmetry is further emphasized by the customary use of the fieldnames 
+LEFT and RIGHT for the key fields in the connection-tables.  There is thus always 
+three tables involved in a connection, the two tables containing one 
+record each representing the two objects being connected, and
+a record in the connection table telling everyone that these particular
+two objects have a connection between them. </p>
+
+<p>In some cases, the objects that these connections represent are themselves
+of interest. For example, when generic check-sheet proformas are connected
+to equipment tags, the status on each check-sheet is being held on the
+connection-record. This is then reflected in the "cat-flag" in the tree-line 
+entries in STATREES.INI. </p>
+
+<p>Subtler asymmetries are easily handled by making
+some fields in the two records slightly different.  For example. the visible
+icon for status-carrying objects may have to be obtained from the connection
+table when seen from one side and not the other. More on this particular arrangement
+is discussed with the field CONICON below.  </p>
+
+<p>In general, the "item" is the object seen in a hierarchy or View, and the "rel"
+are the objects connected to this "item" as revealed when opening VCONN or
+the next level in the Hierarchies.   </p>
+
+
+<h2>Layout of RCONN</h2> 
+
+<p>The fields in RCONN are as follows. A few fields are obsolete and do not have to 
+be present, these are leftovers from the old 16-bit systems. </p>
+
+<table border="1"> <tbody>
+<tr><td>Fieldname</td><td>Matching Field<br/>in other record<br/>where applicable</td><td>Description</td></tr>
+
+<tr><td>RSERIAL</td><td>&nbsp;</td><td>The usual Record Number. It is used to
+identify the record in the table, as there is no other single-segment
+unique key here. Although it may be convenient to someone looking at the RCONN table
+with Inspect, there is no system requirement that the pairs of records are adjacent 
+and have neighboring RSERIAL values. </td></tr>
+
+<tr><td>ITEMBASE</td>    <td>RELBASE</td>
+<td>This is one of the two tables representing the types 
+of objects to be connected. All field-names beginnning 
+with ITEM- refer to fields in this table.</td></tr>
+
+<tr><td>RELBASE</td>     <td>ITEMBASE</td>
+<td>This is the other of the two tables representing the 
+types of objects to be connected. All field-names beginning
+with REL- refer to fields in this table.</td></tr>
+
+<tr><td>CONBASE</td>     <td>CONBASE</td>
+<td>This is the table in which each record represents
+a connection between the tables given in the fields ITEMBASE 
+and RELBASE.  Field-names from CONITEMFLD onwards beginning
+with CON- refer to fields in this table.  (CON11 and CONTEXT 
+do not refer to fields in this table.)</td></tr>
+
+<tr><td>CON11</td>       <td>&nbsp;</td>           <td>Indicates whether one or many RELBASE objects may be connected 
+to any ITEMBASE objects. Value 0 means any number is allowed, Value 1 means only one is allowed. In general,
+this is set to 0 in at least one record, and to 1 only where the ITEMBASE only wants one RELBASE object connected,
+in a one-to-many arrangement. <br/> Examples are tags to subsystems: an equipment tag is only supposed to be connected to one subsystem, so the record where the subsystem table is the RELBASE and the equipment tag table is the ITEMBASE will have
+the CON11 set to 1. The opposite record will have CON11 set to 0, as a subsystem may contain any number of equipment tags. 
+</td></tr>
+
+<tr><td>CONTEXT</td>     <td>&nbsp;</td>           <td>Indicates visibility in VCONN lists, when looking at the
+possible connections. The object in the VIEW is the one in the ITEMBASE. The meaningful values are 
+<b>0</b>, <b>1</b>, and <b>4</b>. 
+<br/><b>0</b> means that there is a selection pushbutton in VCONN, and this is initially off. 
+<br/><b>1</b> means that this conneciton is disabled, and there is no pushbutton for it in VCONN at all.
+<br/><b>4</b> means that there is a selection pushbutton in VCONN, and this is initially on. 
+<br/>The two records may have different values of CONTEXT, it all depends on what we want to see in VCONN lists
+when Viewing the ITEMBASE. However, if the connection is not shown in one direction, chances are we do not want
+to show it in the other direction either. Showing it in only one direction tends to confuse the users. 
+</td></tr>
+
+<tr><td>CAPABILITY</td>  <td>&nbsp;</td>           <td>Not used, this is a leftover from 16-bit days.</td></tr>
+
+<tr><td>ITEMFLD</td>     <td>RELFLD</td>      <td>This is the main identity field in the ITEMBASE table. 
+This is generally the same as the 
+<a href="cxdict.html">CXDICT</a>
+ITEMFLD field for this table. It may be that this field can be removed in the future, since the information is in CXDICT.
+</td></tr>
+<tr><td>ITEMDESFLD</td>  <td>RELDESFLD</td>   <td>This is the main description-field in the ITEMBASE table.
+This is generally the same as the
+<a href="cxdict.html">CXDICT</a>
+ITEMDESFLD for this table. It may also be removed in the future, since the information is in CXDICT.
+</td></tr>
+<tr><td>ITEMICON</td>    <td>RELICON</td>     <td>This is the field containing the name of the object icon 
+in the ITEMBASE table.</td></tr>
+<tr><td>ITEMRELFLD</td>  <td>RELITEMFLD</td>  
+								<td>Not used, this is a leftover from 16-bit days. It should be left blank.<td></tr>
+<tr><td>ITEMCONFLD</td>  <td>RELFIELD</td>    <td>
+This is the field that contains the system-defined record number for the ITEMBASE.
+Most of the time this will be RSERIAL.
+This value together with the ITEMBASE table-name will identify the
+record, even if its public identity (the ITEMFLD) changes.
+</td></tr>
+
+<tr><td>RELFLD</td>      <td>ITEMFLD</td>     <td>This is the main identity field in the RELBASE table.
+This is generally the same as the <a href="cxdict.html">CXDICT</a>
+ITEMFLD field for that table. It may be that this field can be removed in the future, since the 
+information is also in CXDICT.
+</td></tr>
+
+<tr><td>RELDESFLD</td>   <td>ITEMDESFLD</td>  <td>This is the main description-field in the RELBASE table.
+This is generally the same as the
+<a href="cxdict.html">CXDICT</a>
+ITEMDESFLD for this table. It may also be removed in the future, since the information is also in CXDICT.
+</td></tr>
+
+<tr><td>RELICON</td>     <td>ITEMICON</td>    <td>This is the field containing the name of the object icon 
+in the RELBASE table  </td></tr>
+<tr><td>RELITEMFLD</td>  <td>ITEMRELFLD</td>  
+								<td>Not used, this is a leftover from 16-bit days. It should be left blank.<td></tr>
+<tr><td>RELCONFLD</td>   <td>ITEMCONFLD</td>  <td>
+This is the field that contains the system-defined identity for the RELBASE.
+Most of the time this will be the record number, the field RSERIAL. 
+This value together with the RELBASE table-name will identify the
+record, even if its public identity (the RELFIELD) changes.
+</td></tr>
+
+<tr><td>CONITEMFLD</td>  <td>CONRELFLD</td>   
+<td>This is the name of the field in the connection-table
+where the identity for the ITEMBASE object is stored. This should be the first of two fields forming 
+a two-segment key field, and the first segment will receive the name of the ITEMBASE, and the second segment 
+will receive the value of the ITEMCONFLD of the relevant record in ITEMBASE. In most connection-tables,
+the two-part key-fields are called LEFT and RIGHT, with their second segment being named LEFT_RSERIAL and 
+RIGHT_RSERIAL. With the BTRS storage, the second segment's name is automatically detected, so it doesn't need
+to be specified, nor does it have to have any particular name. The SQL-type storages will require the fields
+to be named WLEFT and WRIGHT, and also there will be a need for specifying the second segment separately. 
+</td></tr>
+
+<tr><td>CONRELFLD</td>   <td>CONITEMFLD</td>  <td>This is the name of the field in the connection-table
+where the identity of the RELBASE object is stored. This will be the opposite of the CONITEMFLD above -- the
+idea is that one of the two tables in ITEMBASE and RELBASE is indicated as being on the LEFT, and the other
+of them indicated as being on the RIGHT, and both records in the pair have to be in agreement. There are 
+some further guidelines as to what should be on the LEFT and what should be on the RIGHT: In general, if the
+same connection-table is used for many different connections to some table, this table is preferrably always
+the LEFT or the RIGHT side in the connection-records. 
+</td></tr>
+
+<tr><td>CONRSERFLD</td>  <td>CONRSERFLD</td>  <td>When connection-records themselves form interesting instances, the 
+autoincrement record-number field should be specified here. This will be the same for both records in the pair. 
+If this is not of interest, leave this field blank.  </td></tr>
+<tr><td>CONFLD</td>      <td>CONFLD</td>      <td>This is meant to indicate a field containing public identities 
+for the connection-records, the CONBASEs equivalent of ITEMFLD or RELFLD. 
+If defined, this field will be blanked out on making connections, and if it is unique,
+and unless the <a href="call3204.html">OnMake( )</a> 
+function sets it to something useful, the system will not make any further connections.
+In most cases, this field-name should be left blank.</td></tr>
+
+<tr><td>CONDESFLD</td>   <td>CONDESFLD</td>   <td>This is an optional field for 
+the description (the CONBASEs equivalent of the ITEMDESFLD or RELDESFLD). If defined it will be blanked
+out on making a connection, and the 
+<a href="call3204.html">OnMake( )</a> 
+function will have to set it.  
+In most cases, this field-name should also be left blank.
+Like ITEMDESFLD and RELDESFLD, this is somewhat redundant, and might be removed in the future.
+</td></tr>
+
+<tr><td>CONICON</td>     <td>&nbsp;</td>           
+<td>This field in the CONBASE refers to an alternate icon 
+to be displayed for the RELBASE objects when seen from the ITEMBASE side, in VCONN lists or Hierarchies. 
+If this is blank, or the value in this field in the CONBASE is blank, the RELICON is used, but
+if there is some value in the CONBASE field CONICON, this will be used instead. 
+If the connection-table holds status on proformas, this field can be used to override the default icon appearance
+of the proformas. This field is usually either blank in both records in the pair, or it is set to some fieldname
+in only one record of the pair; only in the record, where the RELBASE refers to the objects that may have their symbol
+overridden. </td></tr>
+
+<tr><td>CONUSERFLD</td>  <td>CONUSERFLD</td>  <td>If this field exists in the CONBASE, it will be filled in with
+the name of the user making the connection. </td></tr>
+
+<tr><td>CONFLAGFLD</td>  <td>CONFLAGFLD</td>  <td>Not used, was a 16-bit leftover.</td></tr>
+
+<tr><td>CONTSTAMPFLD</td><td>CONTSTAMPFLD</td>  <td>Indicates any field in the CONBASE to receive the 
+time, week, or date when the connection was made.  </td></tr>
+<tr><td>CONTSTAMPMODE</td><td>CONTSTAMPMODE</td> <td>This indicates which kind of format the time-stamp is to have: 
+<b>D</b> for the date only, <b>T</b> for both date and time, and <b>W</b> for week-number, 
+in the format YYYYWW. Other values are reserved. Don't depend on them defaulting to the week-number.</td></tr>
+
+<tr><td>TITLE_TEXT</td>  <td>&nbsp;</td>           <td>Not used by the system. It has sometimes been used to document 
+the kind of connection referenced, but that is redundantly repeating information from CXDICT, and it tends to become
+unmaintained and confusing here. This field should really be removed at some point. Please either leave it blank 
+or do spend the considerable effort to maintain accurate information here.</td></tr>
+
+<tr><td>OPERATION</td>   <td>COOPERATION</td><td>This is an overlaid field matching RELBASE, 
+in the sense of the "operations" that can be performed on the ITEMBASE table. </td></tr>
+<tr><td>COOPERATION</td> <td>OPERATION</td>  <td>This is an overlaid field matching ITEMBASE,
+in the sense of the "cooperations" that can be performed on the RELBASE table, equivalent to 
+the OPERATION in the other record. </td></tr>
+
+<tr><td>UNIOP</td>       <td>UNIOP</td>       <td>Together with UNIOP_BASE, this forms a 2-segment unique key, 
+that enforces the uniqueness of the connection-information; for any pair of tables, only one connection between
+them can be defined, and thus only one pair of records may exist in RCONN. UNIOP aliases RELBASE and UNIOP_BASE 
+aliases the ITEMBASE, and this two-part key UNIOP-UNIOP_BASE enforces the uniqueness of one of the pair of 
+records in RCONN that defines this connection.</td></tr>
+
+<tr><td>UNICOOP</td>     <td>UNICOOP</td>     <td>Together with UNICOOP_BASE, this forms another
+2-segment unique key, that enforces the uniqueness of the other record in RCONN of the pair defining the 
+connection-information. UNICOOP aliases ITEMBASE and UNICOOP_BASE aliases the RELBASE.</td></tr>
+<tr><td>UNIOP_BASE</td>  <td>UNICOOP_BASE</td><td>Part of UNIOP aliases ITEMBASE, see above.  </td></tr>
+<tr><td>UNICOOP_BASE</td><td>UNIOP_BASE</td>  <td>Part of UNICOOP aliases RELBASE, see above.  </td></tr>
+
+<tr><td>ONMAKE</td>      <td>ONMAKE</td>      <td>When a connection is made, there may be a need for additional
+information to be put into the connection-table, as well as checks for whether the connection may be made at all.
+All of these details are handled by an LCX function, that will be be called in the process. See 
+<a href="call3204.html">OnMake( ) documentation</a> for more details on this function. In general, this 
+function should be the same in both records in the pair. If no such function is required, leave the field blank.</td></tr>
+
+<tr><td>ONMAKEMODE</td>  <td>ONMAKEMODE</td>  <td>This should indicate whether the OnMake function 
+is to be called on the server or on the client.  Value of <b>C</b> means client, <b>S</b> means server. Client-side functions
+allow for more user-interaction, but slows down mass-connecting jobs quite a lot, so should be used
+with care. Server-side functions do not allow for much in the way of interactions, but will be a lot faster
+and easier on the network. </td></tr>
+
+<tr><td>ONBREAK</td>     <td>ONBREAK</td>     <td>Similar to the OnMake function, there is an option for
+checking if a connection may be broken, and if so, this field refers to a function that checks that. </td></tr>
+
+<tr><td>ONBREAKMODE</td> <td>ONBREAKMODE</td> <td>Indicates if the OnBreak function is to run on the client
+or on the server, with <b>C</b> or <b>S</b>. The same efficiency and user-interface considerations as 
+for the ONMAKEMODE and the OnMake function apply for ONBREAK and ONBREAKMODE, but as mass-breaking is a 
+lot less common activity, it is likely less trouble having this on the client side.</td></tr>
+
+</tbody> </table>
+
+<h2>Minimal required fields in a connection table</h2> 
+
+<p>There are generally two kinds of connection-tables. Some just indicate a relationship between two
+objects, a connection in WinPCS parlance, and the only information of interest is whether they are connected
+or not. Other kinds of connections form interesting objects themselves, for example, status-carrying
+records for proformas, or </p>
+
+
+
+
+<h2>Functions using the RCONN and connection-tables.</h2> 
+
+<a href="lcxh.html#ConSelect">ConSelect( )</a> , 
+<a href="lcxh.html#connect">connect( )</a> , 
+<a href="lcxh.html#disconnect">disconnect( )</a> , 
+<a href="lcxh.html#connset">connset( )</a> , 
+<a href="lcxh.html#traceconn">traceconn( )</a> , 
+<a href="lcxh.html#statusindex">statusindex( )</a> 
+
+</body>
+</html>
+
+
+

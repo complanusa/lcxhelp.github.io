@@ -1,0 +1,535 @@
+
+<html lang="en">
+<head>
+<title>WinPCS on Tablets</title>
+
+</head><body>
+
+<h1>WinPCS on Tablets</h1>
+
+This document describes how WinPCS on Tablets operates. There are 3 
+processes involved beside the usual WinPCS server and regular client, and 
+these cooperate thru files and RPC.  On the Tablet, the Tablet-interface 
+server program, TABIFCSV, runs in the background, and reacts to 
+requests initiated by the tablet-handling Client, TABHCLI, which 
+runs on a server, and is in turn a client of WinPCS, and has access to 
+the data and the tables within.  TABHCLI continually checks for tablets
+present and when it finds one, it will interrogate that tablet's TABIFCSV
+for the need of any status downloads and data uploads. At certain times,
+the TABHCLI starts a special status-index report the output of which
+is to be uploaded to the tablets, so the users there can run the offline
+version of WinPCS, TWLITE, there.  Working within TWLITE, the user sets 
+status on check-sheets, punchitems, and notes, and may also add more 
+punchitems or notes.   These status changes are saved and will be 
+downloaded by TABHCLI the next time the tablet is accessible on the network. 
+
+
+<h2>TWLITE: The WinPCS Tablet version</h2>
+This is called TWLITE, and it runs much like the usual WinPCS Client, 
+as an MDI-window with children inside, but since it does not access the
+server, its functionality is limited to browsing one or more uploaded 
+files through a hierarchy-view, and viewing and changing status on 
+selected status-carrying objects.   
+
+<p>Directories: TSYSTEM TDATA
+
+<p>Files: <br>
+<li>TWLITE.EXE and other WinPCS client DLL files - 
+	The tablet WinPCS executable</li>
+<li>TDATA\hierdata.csv - One of several hierarchy data files</li>
+<li>TDATA\hierdata.ini - Mapping INI file for each of the 
+	hierarchy data files</li>
+<li>TDATA\STATUS.CSV - The status-log file generated on the tablet</li>
+<li>TSYSTEM\PCSD.INI - Menu specification</li>
+<li>TSYSTEM\PCSD.LCX - Menu LCX file actions </li>
+<li>TSYSTEM\DDMATRIX.INI - DDMATRIX replacement data file</li>
+<li>TSYSTEM\CXDICT.CSV - CXDICT replacement data file</li>
+
+<p>Other reference data-files replacing tables of similar 
+names and purposes.  These are mostly used for validating 
+the status-dialogs:
+
+<li>TSYSTEM\PLDISP.CSV - Punch List and Note disciplines</li>
+<li>TSYSTEM\REFINSP.CSV - Inspector IDs</li>
+<li>TSYSTEM\PLCONTRACT.CSV - Punch List Contract numbers</li>
+<li>TSYSTEM\REFSITE.CSV - Site-codes</li>
+
+<p>Referenced files from the hierdata.ini and DDMATRIX.INI:
+<li>TSYSTEM\THAND.LCX - Handles the creation of notes and punchitems.</li>
+<li>TDATA\CLISTS.LCX - Handles status-setting on existing objects. </li>
+<li>TDATA\TWORD.LCX - Handles opening of Word in check-sheets. </li>
+
+<h3>Replacements of DDMATRIX and CXDICT</h3>
+Since DDMATRIX lookups for hierarchies and the CXDICT general table 
+information are handled by the WinPCS server, there are non-server 
+replacements for these. The ways the two tables are searched and
+read indicated that DDMATRIX was best implemented as an INI file, 
+and CXDICT as a CSV file. The contents of the CXDICT CSV file is
+simply a CSV-format copy of the main systems' CXDICT table, and it
+contains all the same fields and the same data. The column legends
+correspond to CXDICT fieldnames, and this file is easiest produced
+reading CXDICT using SYNFARE and then saving the contents of that as
+the CSV file. 
+
+<p>DDMATRIX.INI is a bit more reduced. It contains a number of sections
+corresponding to source tables. Within each is a number of entries where
+the key-names are the origin-field-name, target-table-name, and 
+target-field-name, and the right-hand sides are the menu-text in a pair
+of parentheses, then the relevant LCX files in another pair of parentheses
+and finally the LCX-function to be called.  This is produced by heavily
+editing a CSV-format dump of DDMATRIX, throwing out a lot of the records
+that make no sense on the server-less tablet environment. For the most
+part, only the entries having to do with creating notes and punchitems 
+need remain. 
+
+<h2>TABIFCSV: Tablet interface server</h2>
+This program is an RPC server, which runs in the background on 
+each tablet, and is responsible
+for replying to requests from TABHCLI for data movements.  It knows how
+to send out the STATUS.CSV status-information file, and how to receive the
+status-index data files. As these files can be huge, the PKZIP and PKUNZIP
+utilities have been harnessed to allow a smaller amount of data to be 
+moved across. 
+
+<p>Directories: 
+
+<p>Files: 
+<li>TABIFCSV.EXE, and other WinPCS general DLL 
+files - These are the executable files for the server.  </li>
+<li>PKUNZIP.EXE - the PK-unzip program that the server uses for unpacking
+the large status-index CSV files. 
+<li>TABIFCSV.INI - configuration file for TABIFCSV.EXE. This has one
+entry in it which tells TABIFCSV where to find the data-files of interest:
+
+<p><hr><pre>
+[tabifcsv]
+data=c:\winpcs\tdata
+</pre><hr>
+
+<h2>TABHCLI: The Tablet-handling client</h2>
+This program runs in close proximity to the main WinPCS server, and operates
+as a client to that, as well as an RPC client to the various tablet's 
+TABIFCSV servers.  It contains a main loop, where it checks for tablets,
+downloads any data from them, and puts this data into WinPCS.  It also 
+will run certain status-indexes at predefined times, and store these for 
+uploads to the tablets.  To do this, it runs its jobs in several phases: 
+PULL, which gets data from the tablets and stores them on an internal queue;
+STUFF, which takes the data from the queue and makes the updates in WinPCS;
+SI, which runs the status index reports and stores these as CSV and ZIP 
+files on the server, and finally there is PUSH which sends the zipped status 
+index data files out to the tablets when this is deemed necessary. 
+
+<p>WinPCS Tables: 
+<li>TABLETC - where the details of status indexes and tablets are stored.</li>
+<p>Directories: 
+<p>TDATA - where the data files are
+<p>Files: 
+<li>TABHCLI.EXE, TABIFCCL.DLL, other WinPCS client DLL files
+<li>PKZIP.EXE - used by TABHCLI to pack the status-index data-files
+prior to transmission to tablets</li>
+<li>TABHCLI.INI - where it is told where to go look for the ANCHORC.DLL
+of WinPCS, and where it is to place the files it exports </li>
+
+<p><hr><pre>
+[WINPCS]
+system=e:\winpcs\sites\united\system32
+[tabhcli]
+export=e:\winpcs\sites\united\tdata
+; Loading info. Each SI-report has an INI file
+; where the details of its output is found. 
+; Here, we need to handle the general data-loading going back in,
+; for those things not readily put into STADLG.INI or STATREES.INI
+</pre><hr>
+
+
+
+<h2>Configuration-tables and data in WinPCS</h2>
+The TABLETC table serves as both a table of configuration and a 
+form of history.  Records here describe tablets or status-indexes 
+to run, and stored the dates and times when these last were 
+performed, updated and file downloads occurred.
+
+<p>Beyond this, there is the actual status index definition itself, which
+is located in STATREES.INI and STAREP.INI, defined here in the same way
+as any other status index.  The difference is that a companion mapping
+file for this status index also must be maintained, where the information
+about the fields in the report is stored and the specific information for
+status up- and down-loading is.
+
+<h3>TABLETC table</h3>
+Each record in TABLETC describes a Tablet or a Status-index.
+The field SECTION therefore contains one of the two keywords 
+TABLETS or TREELINE. Some other keywords may be added, so only
+these reserved words should appear. 
+
+<p>The values in the TEXT field give more details. For the TABLETS, this
+is simply the machine name of the tablet-PC, so that the TABHCLI may know
+to look for it. 
+
+<p>The values in TEXT for status-indexes include a series of name=value 
+pairs, on the form:
+
+<pre><b>siname=</b><em>SI-name</em> <b>table=</b><em>start-table</em> <b>store=</b><em>datafilename</em> <b>times=</b><em>time</em>[,<em>time</em>...]</pre>
+
+<p>Here, the meaning of the various elements are:<br>
+
+<tt><b>siname=</b><em>SI-name</em></tt>
+refers to a status index report in STATREES.INI. <br>
+
+<tt><b>table=</b><em>start-table</em></tt>
+refers to the table to run this status-index report on<br>
+
+<tt><b>store=</b><em>datafilename</em></tt>
+identifies the root name of the CSV, INI, and ZIP files used for
+the report output data, which is to be transferred to the tablet in 
+the Push phase.  <br>
+
+<tt><b>times=</b><em>time</em>[,<em>time</em>...]</tt>
+identifies one or more times on the clock when the
+SI-report is to be run. 
+
+<p>For example:
+<pre><b>siname=TABLETX table=CERTSITE store=TABXREP times=1330,2300</b></pre>
+
+Here, the status-index called TABLETX is run at 
+1330 (1.30 PM) and 2300 (11.00 PM) every day, and
+the output of this is stored in the file TABXREP.CSV. The zipped
+file TABXREP.ZIP will be transferred to tablets in the Push phase.  The
+TWLITE on the tablet also must be able to find the the file TABXREP.INI to 
+describe the data-file so it can open a Hierarchy on it. 
+
+<p>The other fields indicate the dates and times of some of the activities.
+For the SI-report records (where SECTION is TREELINE), the fields UPDATEOKD 
+and UPDATEOKT indicate when the status-index was last run successfully. 
+
+<p>For Tablets (where SECTION is TABLETS), the UPDATEOK fields indicate when
+the SI-report data last was successfully transferred to that Tablet.  The
+DOWNLDOK fields indicate when the status-info file was last read 
+successfully off a Tablet, and the LASTATTEMPT indicates when the last 
+attempt at communicating with the Tablet was done, whether it was 
+successful or not.  UPDATE and DOWNLD are only written on success.
+
+<h2>How Status on objects is done</h2>
+
+There are 2 basic ways of setting and changing status defined: Changing 
+status on existing objects and adding new objects such as punchitems and
+notes to the system.  There are several similarities between these but also
+some basic differences.  In all cases, all changes are recorded in the 
+STATUS.CSV file in a format that the TABHCLI can process in its Stuffing 
+phase. Both kinds of activities are handled by the Stuff phase where it
+calls on help from the macrofunctions referenced in the 
+auto= entries in STADLG.INI which are currently found in the file
+TDATA\TABLETS.LCX file referred to in winpcs.ini [ ] autofile=
+
+<p>These macro-files makes it possible to move the data into the various
+status-carrying tables without having to hard-code any details. This 
+Stuff phase of TABHCLI uses many of the non-GUI parts of the WinPCS client
+as found in the CWUDLL.DLL, NCONN.DLL, ODOCTL.DLL, LCX97.DLL and LCXCLI.DLL 
+libraries, and of course the two DLLS interfacing to the WinPCS server
+and the tablets,  NEXUS31.DLL  and TABIFCCL.DLL 
+
+<h3>Changing existing items</h3>
+
+<p>The status-setting of existing items are initiated by double-clicking on 
+objects identified as <b>statustables</b> in section <b>[status]</b> in the
+data-spec INI file. Another entry in this section describes the general
+model of status-setting for this table, and then there are sections defining
+the actions for each of these models.  This allows several kinds of 
+similarly treated status carriers to be handled the same way and cuts down 
+the amount of information required. 
+
+<p>At the moment, there are 3 status-models defined for existing items:
+CHSMODEL for Checksheets, PLMODEL for Punchitems, and NOTEMODEL for Notes. 
+There is nothing magic or hardcoded about these model names, these are 
+referenced only from the entries in the <b>[status]</b> section.
+
+<p>Each model defines a status-dialog, with a number of state-buttons,
+status values, and optional additional fields for entering inspector
+identities, due dates and suchlike. 
+
+<p>This is reminiscent of the way STADLG.INI operates, with a 
+DIALOG= entry for the controls, the numerical status values, and
+action functions for get=.  But where STADLG has a SET-function, these
+dialogs have a COLLECT= and ACCEPT= function instead. There is also a
+reference to macro-files directly here in these dialogs, not in any global 
+.INI file. The purpose of the get-function is to prime global variables
+prior to displaying the dialog, then the  dialog is displayed and the
+initializing function for the controls are run; these may read the globals
+that the get= function configured. 
+
+<p>When the OK button on the dialog is clicked, the accept= function is
+called, and it determines whether the dialog is completed. If accept= says
+something is missing, the OK button will not close the dialog.  To abort
+the action, the Cancel button always closes the dialog and clears any 
+partial results.
+
+<p>When accept= indicates that the information about dates etc. is complete,
+the dialog closes, and the collect= function is called to gather all the 
+contents of the status-information for the system to store it into the
+status-log file, STATUS.CSV.  The data is stored in a large field formatted
+as a LCX set with elements on the form NAME=value, and these are later 
+interpreted by the Autoset-functions run by the Stuff phase. 
+
+<h3>Adding new items</h3>
+The addition of another punchitem or note is initiated by a right-click 
+on the object in the hierarchy which is to receive the punchitem 
+or note, and selecting the menu-choice for adding punchitem or note.
+
+<p>A function in the file specified in the relevant part of DDMATRIX.INI
+will be called to perform the status creation. Typically, this will make 
+a call to the wildstatus() system function, which opens a status-dialog,
+similar in design to the ones seen on double-clicks. Like the status-
+changing dialogs, this dialog features a number of state-buttons, a
+number of additional controls, and the get=, accept=, and collect= functions,
+which are all orchestrated to receive the required information from the 
+user.  Once this has been received, the function will pass the returned
+values into the system-provided FHStatus() function to have it 
+record the data in the STATUS.CSV logfile, in a manner similar to the
+status-setting information.
+
+<h2>TABHCLI Pull phase: Detecting tablets and obtaining data from them</h2>
+
+One thread in the TABHCLI sits and waits for tablets to appear. When one 
+is discovered, it is interrogated about whether it has any data in its
+STATUS.CSV. If so, the contents of this file is read off the tablet and
+into TABHCLI, where it first is stored in memory in its entirety. 
+
+<p>Should the connection to the tablet drop out at any time 
+before the reading is completed, the 
+partially received data is forgotten by TABHCLI and remains on the tablet 
+to be read the next time. Only when the tablet has been properly dismissed
+from TABHCLI, will the TABIFCSV on the tablet erase the tablet's STATUS.CSV
+file, while on TABHCLI, the Pull phase puts the items received on an 
+internal queue in the order received.  
+
+<h2>TABHCLI Stuff phase: Updating WinPCS</h2>
+
+While Pull services the tablets and fills the queue, the Stuff 
+phase reads items off the queue and places them into WinPCS. 
+The access to the queue is controlled by a mutex, so Push writing to
+the queue and Stuff reading off the queue do not get in the way of 
+each others.
+
+<p>Each record is a CSV-format data set with a number of standard elements 
+up front and a tail of variying length and contents, which
+came from the collection-functions. 
+
+<p>To perform its job, Stuff relies on information in
+STATREES.INI and details in macro-files and system tables to perform 
+the actual insertions and updates, as well as renumbering provisional 
+punch-lists and notes when they are created and connected. This is probably 
+the most complicated and error-prone part of the whole loop. Anything that 
+Stuff cannot dispose of correctly must be recorded in an error-log table,
+and someone may have to take a look at this error-log table 
+occasionally.
+
+<p>The macro-files run by Stuff are referenced in STADLG.INI entries, as
+the auto= functions there, and the file is referenced in WinPCS.INI.
+
+<h2>TABHCLI SI phase: Running SI reports</h2>
+SI-reports are run in the same time-line as Stuff, so that the system 
+is either running SI-reports or processing data from the queue. 
+While SI-reports are running there are no updates taking place, and 
+anything collected by the Pull phase in the meantime will be stored 
+on the queue for later processing. The SI reporting also stops the 
+Push phase from updating data on the tablets.
+
+<h2>TABHCLI Push phase: Updating Tablets</h2>
+Similar to Pull, but operating in the other direction, this phase is
+initiated by Pull, after Pull has emptied out the data from the tablet, 
+and the tablet is still present, and it has not recently been updated, 
+and the SI phase is not active and producing a status-index.  
+
+<p>This phase checks for the need for any updates and does them only
+if a need is detected. 
+
+<p>To this end, the detection mechanism uses the times of the 
+last recorded successful
+Push-action or tablet-update and compares this to the last successful 
+SI, status-index run and stored.  If the latest SI is more recent, 
+than the latest Push action, the file for that status index will be updated. 
+
+<p>An alternative would be to check the ZIP-files, however, this is
+susceptible to errors when the clock on the tablet runs different
+from the clock on the main machine, so this option has not been taken. 
+
+<p>Push shares a thread with Pull, since both of them deal with tablets 
+and Push is independent of the Stuff phase, much like Pull and SI are 
+independent of each other as well. 
+
+<p><hr>
+<h2>Example of a CSV-file layout map file</h2>
+<pre>
+[columnmap]
+
+; Column where the tree-line information is:
+treeline=0
+
+; Columns where any of the Item,Icon,Description  exist for each
+; level, 0 ... N, Penult, Leaf, Carrier. Spec. -1 for those items not 
+; available (which will get the Miranda-treatment, that is, useful values
+; will be inserted)
+
+Branch0=1,  3, 2
+Branch1=4,  6, 5
+Branch2=7,  9, 8
+Branch3=10,12,11
+Branch4=13,15,14
+Branch5=16,18,17
+Branch6=19,21,20
+
+Branch7=33,-1,-1
+Branch8=32,-1,-1
+Branch9=31,-1,-1
+
+Penult=22, 24, 23
+Carrier=28, 29, -1
+Leaf=25, 27, 26
+
+status=30
+
+; 0 "TreeLine";
+; 1-3 "L0 Name";"L0 Description";"L0 Icon";
+; 4-6 "L1 Name";"L1 Description";"L1 Icon";
+; 7-9 "L2 Name";"L2 Description";"L2 Icon";
+; 10-12 "L3 Name";"L3 Description";"L3 Icon";
+; 13-15 "L4 Name";"L4 Description";"L4 Icon";
+; 16-18 "L5 Name";"L5 Description";"L5 Icon";
+; 19-21 "L5 Name";"L5 Description";"L5 Icon";
+; 22-24 "Penult Name";"Penult Description";"Penult Icon";
+; 25-27 "Leaf Name";"Leaf Description";"Leaf Icon";
+; 28-29 "Carrier Icon";"Carrier Status";
+; 30-35 "LF 9";"Level 8";"Level 7";"Level 6";"Level 5";"Level 4";
+; 36-39 "Level 3";"Level 2";"Level 1";"Trunk"
+
+; Status-setting information. We want to run status-inspections
+; whenever encountering one of these tables. 
+
+[status]
+statustables=REFITR1 REFFTC1 REFFTC2 AUTOPL REFITRV AUTONOTE
+
+; Collect these to status-models, check-sheet or New object
+REFITR1=CHSMODEL
+REFFTC1=CHSMODEL
+REFFTC2=CHSMODEL
+REFITRV=CHSMODEL
+AUTOPL=PLMODEL
+AUTONOTE=NOTEMODEL
+
+; STADLG-style dialog specs here
+; STADLG and STATREES are on the server and not available
+
+[CHSMODEL]
+; Needed info:  Penultimate table and identity, which should be same as
+;               the higher object, check-sheet item and identity
+;               the old status value, new status value, user identity
+;               possible status values, new icon 
+
+type=CS
+dialog=2 WW select:INinsp+Stext+PBinsp edit:INdate 
+; Inspector and date 
+
+states=0 3
+0=Not started
+3=Complete
+get=OnGetClist
+collect=OnCollectClist
+accept=OnAcceptClist
+files=7:\clists.lcx
+
+[PLMODEL]
+; Needed info:  Penultimate table and identity, which should be same as
+;               the higher object, new Punch-item / Note data record
+type=PC
+dialog=3 WWW select:INclear+Stext+PBinsp edit:INcdate big:DetailsText
+states=0 3 6
+0=Active
+3=Cleared
+6=Cleared and Verified
+get=OnGetPL
+collect=OnCollectPL
+accept=OnAcceptPL
+files=7:\clists.lcx
+
+[NOTEMODEL]
+type=PC
+dialog=2 WW
+states= 0 3  
+0=Active
+3=Cleared
+get=NOOP
+set=NOOP
+accept=NOOP
+files=7:\clists.lcx
+</pre> <hr>
+
+<!--
+<a name="section.20name"></a>
+<a href="lcxh.html#ExpandPath">ExpandPath( )</a>
+-->
+
+<h2>Installation</h2>
+The various components are files copied into two directories, one
+is the "system" directory for the standalone tablet program, conventionally
+called TSYSTEM; the other is the "data" directory, typically called TDATA,  
+where the status.csv and the other data-files are located.  These names are 
+not hardcoded in any executable files, but they must be referenced in the
+INI files for the four programs: TWLITE, TABHCLI, TABIFCSV, and W31SVR.
+
+<p>The relevant places are:
+TABHCLI.INI
+TABIFCSV.INI
+TSYSTEM\CLIENT.INI
+SYSTEM31\WINPCS.INI
+
+<h3>TWLITE</h3>
+This consists of a set of WinPCS client files where the starting
+executable is TWLITE.EXE instead of WINPCS.EXE, and this is set to use the
+TSYSTEM directory. The files here are to some extent a subset of the
+standard SYSTEM32 directory, where the ANCHORC.DLL, PCSD.INI, 
+WINPCS.INI, and CLIENT.INI all have the same functions and meaning 
+as in the regular WinPCS client. 
+
+<p>To install, the files of TDATA and TSYSTEM are to be copied to a
+suitable place on the tablet, including the ANCHORC.DLL.  The WinPCS
+files are to go into another directory. 
+
+<h3>TABIFCSV</h3>
+This is a command-line program that may be installed as a service 
+or run in a console window.  TABIFCSV -cmdline does this. 
+
+<p>If desiring to run it as a service, you must be an administrator,
+and use TABIFCSV -install to install and TABIFCSV -start
+to start it. TABIFCSV -instart does both.
+
+The "WinPCS Tablet handling Server" will now appear in the Windows 
+list of services, and once installed and started, it may be set 
+to Automatic startup there  
+
+<p>To remove it, use TABIFCSV -remove, again you must be administrator
+to do this. 
+
+<p>To know where to look for its data files, it needs an INI file,
+named TABIFCSV.INI, in the same directory, with a section [tabifcsv]
+and the entry data= referring to the directory where it is to put its 
+files, for example:
+
+<p><hr><pre>
+[tabifcsv]
+data=c:\winpcs\tdata
+</pre><hr>
+
+<h2>Outstanding issues</h2>
+<li>User feedback: when a punchitem or note is created or the status
+of some object is set, the change ought to appear in the hierarchy.
+This is probably the most important oustanding item, since it breaks
+with the way people are used to seeing things happen. 
+
+<li>Looking at sheet-proformas in the form of Word-documents and entering
+changes to them.  Finding and showing them isn't too hard, and Word manages
+the actual data. Some additional data-items can be 
+
+</body>
+</html>
+
+

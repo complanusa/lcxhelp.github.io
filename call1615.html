@@ -1,0 +1,85 @@
+
+
+<html lang="en">
+<head>
+<title>Quick Reports Forall-functions -- Category 15</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name=description content="Quick Reports Forall-functions -- Category 15">
+</head><body>
+<a name="Top"></a>
+
+<h1>Quick Reports Forall-functions -- Category 15</h1> <p> 
+
+<h3>Description:</h3>
+<p>The Standard Report Generator allows a function to be run once for all records in the 
+table being reported on. The return value from this function is used to determine 
+whether the report is to continue or not. </p>
+
+<h3>Enabling control in WinPCS:</h3>
+<p>The file and function are selected in the Report Generator dialog. When the Report is 
+saved, these names end up in the appropriate record in the STDREP table.</p>
+
+<h3>Disallowed functions:</h3>
+<p>DDE callback and document-drawing functions are only available inside the DDE 
+callback and Printing callback environments.  The large number of calls normally 
+expected makes it less sensible to initiate these. </p>
+
+<h3>Callback Function:</h3>
+<p>The function is called with the following 8 arguments</p>
+
+<pre>
+<em>macro</em><b>(</b><em>base</em><b>,</b> <em>keyfield</em><b>,</b> <em>type</em><b>,</b> <em>keylow</em><b>,</b> <em>keyhigh</em><b>,</b> <em>mask</em><b>,</b> <em>filter</em><b>,</b> <em>fmask</em><b>);</b>
+</pre>
+
+where<br>
+
+<em>base</em>            is the Table being looked at<br>
+<em>keyfield</em>        is the Key field of table being looked at<br>
+<em>type</em>            is a dummy<br>
+<em>keylow</em>          is the Low key value<br>
+<em>keyhigh</em>         is the high key value<br>
+<em>mask</em>            is the Mask value<br>
+<em>filter</em>          is the Filter (restriction) field<br>
+<em>fmask</em>           is the Restriction value<br>
+
+<h3>Return Value:</h3>
+
+The function should return a value <b>&gt;=0</b> to use a record, and a value <b>&lt; 0</b> to skip a 
+record.
+
+<h3>Execution context:</h3>
+Not shared.  Re-entered, which means that global variables set in an early call can be read later.
+The function is called once per selected record in the Report.
+
+<h3>Example:</h3>
+
+This function passes only equipment of type MAST:
+<pre>
+HEI(string base)
+{
+    string a;
+
+    a = get (base, "EQUIP_TYPE");
+
+    if("MAST" == a)
+    {
+        return(1);
+    }
+    else
+    {
+        return(-1);
+    }
+}
+</pre>
+
+<h3>See Also:</h3>
+<p>For the for-all record functions in TRANS see <a href="call0007.html"> category 7</a>.
+<p>For the for-all record functions in SI Reports see <a href="call0013.html">category 13</a>.
+<p>For the for-all record functions in INSPECT and SYNFARE see <a href="call0016.html"> category 16</a>.
+<p>For the print all records functions in Quick Reports see <a href="call3217.html">category 17</a>.
+
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> </p>
+</body>
+</html>
+
+

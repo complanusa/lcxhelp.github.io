@@ -1,0 +1,259 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>WinPCS as a DDE Server</title>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<meta name="description" content="WinPCS as a DDE server"/>
+</head><body>
+
+<a name="Top"></a>
+<a name="WinPCS.20as.20a.20DDE.20server"></a> 
+
+<h1>WinPCS as a DDE Server</h1>
+
+<p>WinPCS has the capabilities to run as a DDE server. </p>
+
+<p> Like other DDE servers, WinPCS has a name, a number of topics, and 
+items within each topic. There is always a System Topic.</p>
+
+<p> The System Topics item will reflect whatever Topics are present at any 
+one time, and every topic (including System) will contain the 
+TopicItemList and CommandList items 
+likewise showing the currently  available Items and Commands in that Topic.</p>
+
+<p> The name is <b>WINPCS</b>, and DDE is case-insensitive, so any 
+combinations of uppercase and lowercase will do. </p>
+
+<p> Items may be Requested or Poked. If no Poke option is shown, the 
+item does not require any Poked values.</p>
+
+<p> Commands are executed. The syntax is in general: </p>
+<pre><b>[</b><em>command</em><b>(</b><em>argument</em><b>, </b><em>argument</em><b>, ... )]</b></pre>
+
+<p>where the number of arguments required or allowed depends on the particular 
+command as documented below. </p>
+
+<p> Several commands in a row may be executed in one go by enclosing each command in 
+its own pair of square brackets. They will then be executed left-to-right.</p>
+
+<p> WinPCS provides the <a href="#The.20System.20Topic">System Topic</a> and the 
+<a href="#The.20Macros.20Topic">Macros Topic</a>. </p>
+
+<hr/><a name="The.20System.20Topic"></a> <h2>The System Topic</h2> 
+
+<p>The following Items appear in the System Topic:</p>
+<pre><b> Formats, TopicItemList, Sysitems, CommandList, Protocols, Topics.  </b></pre>
+
+<p> The following Command is defined:</p>
+<pre><b>View</b></pre>
+
+<h3>Item: Formats</h3>
+<p>On Request, returns the supported formats in the WinPCS Macros topic. </p>
+
+<h3>Items: TopicItemList, SysItems</h3>
+<p>On Request, returns a tab-separated list of items defined in the System Topic. </p>
+
+<h3>Item: CommandList</h3>
+<p>On Request, returns the tab-separated list of commands defined in the Macro Topic. </p>
+
+<h3>Item: Protocols</h3>
+<p>On Request, returns the supported execute protocols of the WinPCS server.</p>
+
+<h3>Item: Topics</h3>
+<p>On Request, returns the tab-separated list of Topics defined in the Server WinPCS. At 
+present, only the two topics <b>System</b> and <b>Macros</b> are defined. </p>
+
+<h3>Command: View</h3>
+<p>Synopsis:</p> <pre><b> [View("</b><em>id</em><b>")]</b></pre>
+
+<p>Executing this command will cause WinPCS to open a view on the object with the 
+identity <em>id</em>. If the <em>id</em> contains spaces it must be enclosed in double quotes. 
+WinPCS uses CORE to find this record, CXDICT to find the identifier field in the table and the menu 
+setup in PCSD.INI to determine the INI file. For this command to work without any error 
+messages, the CXDICT table must  contain the correct information.</p>
+
+<h3>See also:</h3>
+<a href="#DDE.20server.20example">DDE server example</a> 
+
+<!-- ================================= -->
+
+<hr/><a name="The.20Macros.20Topic"></a> <h2>The Macros Topic</h2> 
+
+<p>This topic contains the following Items:</p>
+<pre><b>Formats, TopicItemList, CommandList, Value </b></pre>
+<p>and the following Commands:</p>
+<pre><b> LoadMacro, Result, ClearMacro, Deletename, DoMacro </b></pre>
+
+<h3>Item: Formats</h3>
+<p>On Request, returns the supported formats in the WinPCS Macros topic. </p>
+
+<h3>Item: TopicItemList</h3>
+<p>On Request, returns the tab-separated list of items defined in the Macro Topic. </p>
+
+<h3>Item: CommandList</h3>
+<p>On Request, returns the tab-separated list of commands defined in the Macro Topic. </p>
+
+<h3>Item: Value</h3>
+<p>This is a test rabbit, no deposit no return. <br/>
+On Request, a fixed Hello value <br/>
+On Poke, a value to be shown on the debug terminal. <br/></p>
+
+<h3>Command: [LoadMacro( )]</h3>
+<p>Synopsis: </p><pre><b>[LoadMacro(</b><em>macrofile macrofile </em><b>... )]</b></pre>
+<p>Will read and prescan one or more macro (LCX) files. The functions in these files may be 
+referenced in subsequent calls to the <b>[DoMacro( )]</b> command. </p>
+
+<p> Executing <b>[LoadMacro( )]</b> on already loaded macros will replace them, as if 
+<b>[ClearMacro( )]</b> had been issued prior to the second <b>[LoadMacro( )]</b>.
+Loaded macros will remain in place until they are replaced by another macro, removed 
+with <b>[DeleteMacro( )]</b>, or WinPCS is terminated.</p>
+
+<p> The macro files are to be given as full paths or with WinPCS's drive numbers, as per the 
+<a href="#ExpandPath">ExpandPath( )</a> 
+documentation. The 
+backslashes (\) must be doubled up or they may be replaced by forward slashes (/). </p>
+
+<h3>Command: [Result( )]</h3>
+<p>Synopsis </p> <pre><b>[Result(</b><em>tempitemname</em><b>)]</b></pre>
+
+<p>Creates an item named tempitemname, and places the DDE command execution result 
+code of the next following DDE commands into it.  
+Note that this is not the return value from the macro function, but status information 
+indicating the success or failure to perform the command.
+When this item is read through a DDE-request, the item's contents will be cleared and 
+the next command's execution result will be placed into it.</p>
+
+<h3>Command: [ClearMacro( )]</h3>
+<p>Synopsis</p> <pre><b>[ClearMacro( )]</b></pre>
+<p>Unload loaded macros, and deallocate the memory used. </p>
+
+<h3>Command: [Deletename( )]</h3>
+<p>Synopsis</p> <pre><b>[Deletename(</b><em>name</em><b>)]</b></pre>
+<p>Removes the named item, created for a return value. </p>
+
+<h3>Command: [DoMacro( )]</h3>
+<p>Synopsis</p> <pre><b>[DoMacro(</b><em>retname, function, arg, arg, arg, ... </em><b>)]</b></pre>
+<p>Execute a macro function with arguments specified, and add a DDE Item named 
+after the string <em>retname</em>, which will contain the returned value from the macro function. </p>
+
+<p> The system calls this macro function as</p>
+<pre> function(arg, arg, arg, ... ) </pre>
+<p>with as many arguments as passed into the execution of [DoMacro( )].</p>
+
+<p> When the function (whose execution can take a while) returns, the returned value is 
+made available through a Request on the <em>retname</em> item. </p>
+
+<p> A second <b>DoMacro</b> to the same <em>retname</em> item will replace its contents, a <b>DoMacro</b> to a 
+different <em>retname</em> item will create it and leave the previous <em>retname</em> item in place. To get 
+rid of these generated items, the DDE command <b>[DeleteName(</b><em>name-to-be-deleted</em><b>)]</b>
+should be used. </p>
+
+
+<!-- ================================= -->
+<hr/><a name="DDE.20server.20example"></a> <h2>DDE server example</h2> 
+
+<p>This uses the LCX standalone execution unit and the DDE client functions to interface to 
+a WinPCS instance running as the server. </p>
+
+<p> The function <b>main( )</b> below is the client function. The function <b>ddeset( )</b> is loaded and 
+executed by the server. </p>
+
+<pre>
+
+/* DDE client side conversation. 
+	Run this using the standalone LCX execution program, as
+	WinPCS doesn't seem too good at being both a DDE client and DDE 
+	server to itself.  
+
+	Equivalent code would be in Excel or other programs that are able to run as DDE clients.
+*/
+
+main( )
+{
+    string hdde, t0, x;
+
+    hdde = DDEconnect("WinPCS", "Macros");
+    if(hdde == "0x0" )
+    {
+        message("WinPCS", "WinPCS could not be connected to ");
+        return(0);
+    }
+
+    /* Load this macro file and prepare for running it. */
+    x = DDEexecute(hdde, 
+        "[LoadMacro(\x22 D:/winpcs/source/LCX97/TEST/DDE/DDE13.LCX\x22 )]");   
+
+    /* Notice the x22s and the forward slashes to separate the path elements */
+
+    /* Call a function named ddeset( ) with one argument, CWS, which presumably
+	 is a system, and place the result in the DDE location SSS, as in SSS = ddeset("CWS") */
+
+    x = DDEexecute(hdde, "[DoMacro(SSS, ddeset, \x22 CWS\x22 )]");
+
+    /* Having run the macro, look at the return value that was put into SSS, and display it. */
+    t0 = DDErequest(hdde, "SSS", 1);
+    message("WinPCS DDE Server", "Value: ", t0);
+
+    /* More functions may be run here, putting values into the same or different request locations. */
+
+    /* After use, deallocate the data used for the macro and close the conversation. */ 
+    
+    x = DDEexecute(hdde, "[ClearMacro()]");
+
+    DDEdisconnect(hdde);
+
+    return(0);
+}
+
+</pre>
+
+<p>The function <b>ddeset()</b> referred to in the file <b>DDE13.LCX</b> mentioned above is as follows:</p>
+
+<p>This function runs on the WinPCS client side as the user who has logged into the running WinPCS instance,
+so it looks like any other client-side job at that point.</p>
+
+<pre>
+
+ddeset(string system)
+{
+    string sz, j, count, ac1, sd, out;
+	string ac1field, desfield;
+
+	ac1field = StdField("CERTAC1", "ITEMFIELD");
+	desfield = StdField("CERTAC1", "ITEMDESFIELD");
+
+    sz = sortset(connset("CERTAC1", "CERTSYS", system), 0); 
+    count = setlen(sz);
+    out = "";
+    for(j = 0; j &lt; count; j+=1)
+    {
+        ac1 = setitem(sz, j);
+        findexact("CERTAC1", ac1field, ac1);
+        sd = get("CERTAC1", desfield);
+        out = concat(out, makeset(ac1, sd));  
+    }
+    return(out);
+}
+
+</pre>
+
+<!-- ================================= -->
+<!-- <hr/><a name="Endpoint"></a> <h2> Endnotes </h2> -->
+
+<hr/><a name="Endpoint"></a>
+<p>WinPCS Documentation File (KRL 2012-02-28)</p>
+
+
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+</body>
+</html>
+
+

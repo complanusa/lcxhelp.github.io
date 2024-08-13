@@ -1,0 +1,1057 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>Entry and View INI files</title>
+</head>
+<body>
+
+<hr/><a name="Introduction"></a>
+<h1>Entry and View INI Files</h1>
+<p>This file documents the various operations and actions defined for 
+Entry and View files. Each file have the customary INI-format with 
+sections and entries. These sections contain references to pushbuttons 
+and field-actions. </p>
+
+<p>The following sections are defined:<br/>
+<a href="#DATABASE.20Section"><b>[database]</b></a><br/>
+<a href="#PUSH.20Sections"> <b>[extended]</b></a> which defines the top-side pushbuttons<br/>
+<a href="#PUSH.20Sections"> <b>[standard]</b></a> which defines the bottom-side pushbuttons<br/>
+<a href="#treelines"> <b>[treelines]</b></a> which defines Hierarchy lookup actions<br/>
+<a href="#tablename.20Section"> <b>[</b><em>tablename</em><b>]</b></a> where the fields of the 
+table that are to be shown are listed<br/>
+</p>
+
+<p>In addition to the individual INI files for Views and Entries, as
+referenced in PCSD.INI, there is the 
+<a href="#VIEWINIFILE"> 0:\VIEW.INI </a>
+where default pushbuttons
+for Views, Entries, Inspect, Reports, and SYNFARE views are set.  
+This file is also documented here. 
+</p>
+
+<!-- _____________________________ -->
+<hr/><a name="DATABASE.20Section"></a>
+<h2>The [DATABASE] section</h2>
+
+<p>At the top of the file is a section with general information about the
+View or Entry. This section is titled [DATABASE] and has the defined
+entries:<br/>
+<b>USE=</b><em>tablename</em><br/>
+<b>DESCRIPTION=</b><em>Title text to appear in the window</em><br/>
+<b>omitextended=</b><em>name name ... </em>List pushbuttons to omit from the top bar (the "extended" bar)<br/>
+<b>omitstandard=</b><em>name name ... </em>List pushbuttons to omit from the bottom bar (the "standard" bar)<br/>
+</p>
+
+<p>The <b>USE=</b> entry simply identifies the main table. 
+The <b>DESCRIPTION=</b> entry has the text to go into the title 
+part of the window. 
+</p>
+
+<p>The optional entries <b>omitextended=</b> and <b>omitstandard=</b> list 
+names of standard pushbuttons that are not to be included in this particular
+instance. Some of the data-entry forms use UPDATEEXIT and CANCEL buttons 
+rather than EXIT for example, and they probably should not allow Insert, 
+Delete and any of the repositioning commands either.  This allows any such 
+unwanted command-buttons to be removed.  This also overrides and 
+removes any buttons listed in [EXTENDED] and [STANDARD].
+</p>
+
+<!-- _____________________________ -->
+<hr/><a name="PUSH.20Sections"></a>
+<h2>The [STANDARD] and [EXTENDED] sections</h2>
+
+<p>The [STANDARD] section identifies the pushbuttons at the bottom of
+the screen, the [EXTENDED] section identifies the ones at the top of the
+screen. Definitions are the same in both sections; there is no hard-coded
+requirements as to which buttons go where. However, it is generally desirable
+not to have the different buttons in different places, so as to avoid
+surprising the users. To this end, the definitions in the 
+<a href="#VIEWINIFILE"> 0:\VIEW.INI </a> file
+are used for all the common buttons, and these two sections need only specify
+additional pushbuttons for this particular View or Entry.  
+</p>
+
+<p>The entries in sections [extended] and [standard] represent
+pushbuttons to be included, as indicated by one of the variants:</p>
+
+<pre><em>text</em><b>=</b><em>Action</em><b> 0 (</b><em>Explanation</em><b>) </b><em>parameters</em></pre>
+<pre><em>icon</em><b>=</b><em>Action</em><b> 1 (</b><em>Explanation</em><b>) </b><em>parameters</em></pre>
+
+<p>where <br/>
+<em>text</em> or <em>icon</em> defines the appearance of the button, <br/>
+<em>Action</em> is what the button does, <br/>
+<em>Explanation</em> is for the user to be told what happens, and the <br/>
+<em>parameters</em> are any arguments that the Action may require. 
+</p>
+
+<p>Texts appear as spelled out on the button, 
+icon references are to bitmaps in REFBMP. Note that there is not much room
+on the standard buttons, so only a few characters of text will fit. Except for
+STATUS-buttons, the icon-reference in REFBMP is identical to the left side
+in these definitions.  Status may have any of 10 different colors, 
+identified as STATUS0 thru STATUS9, although only 3 of these 
+(STATUS6 Blue, STATUS5 Green, STATUS2 Red) are commonly seen.
+</p>
+
+<p>This way of specifying pushbuttons also applies to 
+the [EXTENDED], [STANDARD], and the [REPORT] sections in the 
+<a href="#VIEWINIFILE"> 0:\VIEW.INI </a> file.
+</p>
+
+<!-- _____________________________ -->
+<hr/><a name="VIEWINIFILE"></a>
+<h2>Sections in the VIEW.INI file</h2>
+
+<p>Pushbutton definitions in 
+<b>0:\VIEW.INI </b>
+follow the same general layout as for Entry and View individual .INI files.
+These define standardized button functions and sequence, to appear in all
+View Entry Inspect and Report Views. 
+</p>
+
+<p>The basic defaults are in the sections [EXTENDED] and [STANDARD].  These
+will apply as relevant to Entry, View, and Inspect.  The section [LIST]
+similarly applies to list-modes of views which are currently under 
+construction.  The section [REPORT] applies to common pushbuttons in 
+Reports and SYNFARE views.
+</p>
+
+<p>Then the section [OMIT] indicates which modes and sides have certain
+pushbutton ignored. For example, Views do not handle Insert, Update, or Delete,
+and generally do not need Validate either, so these may be defined away.
+</p>
+
+<p>The entries here are list of button-names (names of the entries, 
+or left sides, in the other sections). These entries are the following:</p>
+
+<p>
+<em>inspect_extended</em><br/>
+<em>inspect_standard</em><br/>
+<em>view_extended</em><br/>
+<em>view_standard</em><br/>
+<em>entry_extended</em><br/>
+<em>entry_standard</em><br/>
+<em>report_report</em><br/>
+</p>
+
+<p>The first part of the name indicates the application, the second part
+indicates the set of pushbuttons (extended/standard) if there is any 
+choice. 
+</p>
+
+<!-- _____________________________ -->
+<hr/><a name="PushCommand"></a>
+<h2>Overview of the Pushbutton commands</h2>
+
+<p>The following Pushbuttons actions are defined. The ones shown for 
+Reports may also be issued through 
+<a href="lcxh.html#RepControl"> RepControl( ) </a>
+programmed commands.
+</p>
+
+<table border="1" cellspacing="5" cellpadding="2">
+<tbody>
+<tr valign="top" > 
+<td> Command </td> 
+<td> Location<br/>View Entry Report</td>
+<td> Implemented<br/>16-bit 32-bit </td>
+<td> Synopsis or Example </td>
+<td> Description</td>
+</tr>
+
+<tr valign="top" > 
+<td> EXIT </td> 
+<td> V, E, R </td>
+<td> 16, 32 </td>
+<td> Exit=EXIT 1 (Stop the Application)</td>
+<td> Stops and closes the window</td>
+</tr>
+
+<tr valign="top" > 
+<td> LCXCALLA </td> 
+<td> V, E </td>
+<td> 16, 32 </td>
+<td> View=LCXCALL 1 (Status on Tag) tagstat.lcx StatItem </td>
+
+<td> Run some Macro function from a pushbutton but only if the
+user has the A permission for that View or Entry. 
+See <a href="call3206.html"> 
+Pushbutton Operations</a> for more details on this function</td>
+</tr>
+
+<tr valign="top" > 
+<td> LCXCALL </td> 
+<td> R </td>
+<td> 16, 32 </td>
+<td> BookOff=LCXCALL 1 (Book Off Items) 0:\pmrgen.lcx BookOffList </td>
+<td> Run some Macro function from a pushbutton in a Report.
+See <a href="call3206.html"> 
+Pushbutton Operations</a> for more details on this function </td>
+</tr>
+
+<tr valign="top" > 
+<td> LCXCALL </td> 
+<td> V, E </td>
+<td> 16, 32 </td>
+<td> View=LCXCALL 1 (Open some View) ocomd.lcx ViewItem </td>
+<td> Run some Macro function from a pushbutton 
+See <a href="call3206.html"> 
+Pushbutton Operations</a> for more details on this function </td>
+</tr>
+
+<tr valign="top" > 
+<td>HELP</td>
+<td> V, E, R </td>
+<td> 16 </td>
+<td> help=HELP 1 (Help on this View)</td>
+<td> This starts the Help file for the form. </td>
+</tr>
+
+<tr valign="top" > 
+<td>STATUS</td>
+<td> V, E, R </td>
+<td> 16, 32 </td>
+<td> Status=STATUS  1 (Show the status of the last operation)</td>
+<td> This command opens a list of all the most recent performed
+actions, and tells whiche one went OK and which ones did not. 
+This button changes color accordingly.  </td>
+</tr>
+
+<tr valign="top" > 
+<td>INSERT</td>
+<td> E </td>
+<td> 16, 32 </td>
+<td> insert=INSERT 1 (Add a new record)</td>
+<td> This causes an insertion of data into a table in Entry-forms 
+The new record will get a record number (usually the field named
+RSERIAL) one higher than the last record number in the table.  </td>
+</tr>
+
+<tr valign="top" > 
+<td>DELETE</td>
+<td> E,R </td>
+<td> 16, 32 </td>
+<td> Delete=DELETE 1 (Remove the current record)</td>
+<td> This command removes the current record from an Entry, provided there
+are no connections to the object represented by the record.  In Reports, it 
+removes the selected row. 
+</td>
+</tr>
+
+<tr valign="top" > 
+<td>UPDATE</td>
+<td> E </td>
+<td> 16, 32 </td>
+<td> Update=UPDATE  1 (Change the current record)</td>
+<td> This command updates a record with new values. On 32-bit systems, the
+record number may also be changed on Update, thus allowing easier repair of
+certain system tables that require contiguous record numbering, 
+notably USYM. </td>
+</tr>
+
+<tr valign="top" > 
+<td>CANCEL</td>
+<td> E </td>
+<td> 16, 32 </td>
+<td> Cancel=CANCEL  1 (Exit this entry form, discard the record)</td>
+<td> This command is functionally the same as EXIT. </td>
+</tr>
+
+<tr valign="top" > 
+<td>UPDATEEXIT</td>
+<td> E </td>
+<td> 16, 32 </td>
+<td> OK=UPDATEEXIT  1 (Save changes and exit) <em>return-code</em></td>
+<td> This does an Update and if the update is successful and
+all fields requiring data are satisfied, the View will close.
+An optional return value may be specified, so several buttons
+with the UPDATEEXIT function may be used to decide on what to do next. </td>
+</tr>
+
+<tr valign="top" > 
+<td>LCXMACRO</td>
+<td> V, E, R </td>
+<td> 16, 32 </td>
+<td> LCXMACRO 1 (Run a macro function for all objects) </td>
+<td> This is mostly used in Inspect, as it is somewhat cumbersome
+yet powerful. The command opens a selection dialog, where a macrofile,
+and a macrofunction from this file may be selected. This macro-function 
+may use <a href="lcxh.html#InValue">InValue( ) </a>
+and <a href="lcxh.html#OutValue">OutValue( ) </a>
+to access the record in the table or 
+the data in the Report.  </td>
+</tr>
+
+<tr valign="top" > 
+<td>CLEAR</td>
+<td> E </td>
+<td> 16, 32 </td>
+<td> New=CLEAR 1 (Clear fields for a new record)</td>
+<td> This wipes out all the data-fields, in preparation for typing in 
+new values. It is not really that useful, since most data-entry consists
+of modifying a copy of some other record's values </td>
+</tr>
+
+<tr valign="top" > 
+<td>FORCEVALID</td>
+<td> E </td>
+<td> 16, 32 </td>
+<td> Validate=FORCEVALID  1 (Force validation)</td>
+<td> This forces validation-actions to take place on the field where the
+focus is,  even if the values in this field are OK as they are. This 
+typically opens a list of required values and lets the user choose a 
+new one. See the $PRESENT() and $LCXMACRO() field-commands.  </td>
+</tr>
+
+<tr valign="top" > 
+<td>GET_FIRST</td>
+<td> V, E </td>
+<td> 16, 32 </td>
+<td> First=GET_FIRST 1 (Get First Record)</td>
+<td> This command positions to the first record on the now-active key </td>
+</tr>
+
+<tr valign="top" > 
+<td>GET_PREV</td>
+<td> V, E </td>
+<td> 16, 32 </td>
+<td> Prev=GET_PREV 1 (Get Previous Record)</td>
+<td> This command positions to the previous record on the now-active key.
+If there is no lower value, the command fails and turns the status-button 
+red, with an "end of file" status. </td>
+</tr>
+
+<tr valign="top" > 
+<td>GET_NEXT</td>
+<td> V, E </td>
+<td> 16, 32 </td>
+<td> Next=GET_NEXT 1 (Get Next Record)</td>
+<td> This command positions to the next record on the now-active key.
+If there is no higher value, the command fails and turns the 
+status-button red, with an "end of file" status. </td>
+</tr>
+
+<tr valign="top" > 
+<td>GET_LAST</td>
+<td> V, E </td>
+<td> 16, 32 </td>
+<td> Last=GET_LAST 1 (Get Last Record)</td>
+<td> This command positions to the last record on the now-active key </td>
+</tr>
+
+<tr valign="top" > 
+<td>FIND</td>
+<td> V, E </td>
+<td> 16, 32 </td>
+<td> FIND=FIND 1 (Get a Record equal or higher value for current key field)</td>
+<td> This commands attempts to find a record with a matching or 
+closely matching value </td>
+</tr>
+
+<tr valign="top" > 
+<td>GET_EQ</td>
+<td> V, E </td>
+<td> 16, 32 </td>
+<td> Match=GET_EQ 1 (Find a matching value for current key field)</td>
+<td> This commands attempts to find a record with an exact 
+matching value </td>
+</tr>
+
+<tr valign="top" > 
+<td>REPORT</td>
+<td> V </td>
+<td> 16, 32 </td>
+<td> Report=REPORT   1 (Select records and save as a report)</td>
+<td> This command opens the Quick Reports window. On 16-bit systems,
+this window shares resources with the View Connections window so the two
+may not be open simultaneously. On 32-bit systems both windows may be 
+open.  </td>
+</tr>
+
+<tr valign="top" > 
+<td>VCONN</td>
+<td> V </td>
+<td> 16, 32 </td>
+<td> Vconn=VCONN     1 (View connections) TAG_NO</td>
+<td> This command opens and closes the View Connections Window.
+On 16-bit systems,
+this window shares resources with the Quick Reports window so the two
+may not be open simultaneously. On 32-bit systems both windows may be 
+open.  </td>
+</tr>
+
+<tr valign="top" > 
+<td>CCONN</td>
+<td> V </td>
+<td> 16 </td>
+<td> Cconn=CCONN     1 (Connect an object to the current Tag No.) TAG_NO</td>
+<td> This opens the View Connections Window and the Create 
+Connections satellite window. </td>
+</tr>
+
+<tr valign="top" > 
+<td>FAMILY</td>     
+<td> V </td>
+<td> 16 (32 TBD) </td>
+<td> Relate=FAMILY 1 (List all Items with Common Property as per Selected Key) #ITEMFLD #ITEMDESFLDS</td>
+<td> This command opens a list of all records where there is a match for
+some typed-in key value, and allows the user to move to any of these. </td>
+</tr>
+
+<tr valign="top" > 
+<td>LISTVIEW</td>
+<td> V </td>
+<td> 16 </td>
+<td> List=LISTVIEW     1 (Open the List View)</td>
+<td> This opens a list-mode view </td>
+</tr>
+
+<tr valign="top" > 
+<td>LISTEXIT</td>
+<td> V </td>
+<td> 32 </td>
+<td> ListExit=LISTEXIT 1 (Go back to the Form View)</td>
+<td> This closes a list-mode view </td>
+</tr>
+
+<tr valign="top" > 
+<td>SAVEDATA</td> 
+<td> R </td>
+<td> 16, 32 </td>
+<td> Store=SAVEDATA    1 (Save data)</td>
+<td> This allows the contents of a Report to be saved into a 
+CSV-file for later processing. If some fields are selected, only
+these fields will be saved, and in the order of selection. </td>
+</tr>
+
+<tr valign="top" > 
+<td>SORTD</td> 
+<td> R </td>
+<td> 16, 32 </td>
+<td> Sortd=SORTD       1 (Sort in descending order)</td>
+<td> This causes a Report to be sorted in descending order by 
+all the selected fields. </td>
+</tr>
+
+<tr valign="top" > 
+<td>SORTA</td> 
+<td> R </td>
+<td> 16, 32 </td>
+<td> Sortu=SORTA       1 (Sort in ascending order)</td>
+<td> This causes a Report to be sorted in ascending order by all 
+the selected fields. </td>
+</tr>
+
+<tr valign="top" > 
+<td>PREVIEW</td>
+<td> R </td>
+<td> 16, 32 </td>
+<td> Preview=PREVIEW   1 (Print preview of the report)</td>
+<td> This allows a Print Preview of a Report to be shown. The user may 
+proceed to print the report from the preview if this showed the right 
+layout and data. </td>
+</tr>
+
+<tr valign="top" > 
+<td>PRTVERT</td>
+<td> R </td>
+<td> 16, 32 </td>
+<td> Print=PRTVERT     1 (Print the report)</td>
+<td> This allows an immediate printing of the report. 
+This is mostly used with 
+<a href="lcxh.html#RepControl"> RepControl( ) </a>
+programmed commands.
+</td>
+</tr>
+
+<tr valign="top" > 
+<td>PDFTVERT</td>
+<td> R </td>
+<td> 16, 32 </td>
+<td> Pdf=PDFTVERT     1 (Save report into a PDF file)</td>
+<td> This allows an immediate saving of the report into a pdf file, similar to the 
+immediate printing of the report.  This can be used with 
+<a href="lcxh.html#RepControl"> RepControl( ) </a>
+programmed commands. The files are stored in the <tt>9:\reportpdfs</tt> or in another 
+directory specified 
+by <a href="winpcsini.html#reportpdfoutput">WinPCS.ini section [REPORT] entry PDFOUTPUT=</a>
+</td>
+</tr>
+
+<tr valign="top" > 
+<td>EXCEL</td> 
+<td> R </td>
+<td> 16, 32 </td>
+<td> Excel=EXCEL       1 (Transfer data to Microsoft Excel)</td>
+<td> This causes the contents of the report to be saved as a CSV-file
+and then Microsoft Excel is allowed to open it. </td>
+</tr>
+
+<tr valign="top" > 
+<td>GANGCON</td>
+<td> R </td>
+<td> 32 </td>
+<td> Cconn=GANGCON     1 (Connect objects from two columns in the Report)</td>
+<td> This allows two fields with data in them, to be selected and  
+used as input for a number of connections. A report indicating if
+or how the various connection attempts were completed is produced. 
+</td>
+</tr>
+
+<tr valign="top" > 
+<td>DUPHIST</td>
+<td> R </td>
+<td> (32) </td>
+<td> Dup=DUPHIST     0 (Report on duplicates) </td>
+<td> Generates a summary report on the number of different values 
+appearing in the selected fields.  </td>
+</tr>
+
+<tr valign="top" > 
+<td>GANG1CO</td>
+<td> R </td>
+<td> 32 </td>
+<td> Ccon2=GANG1CO     1 (Connect objects to objects listed in the Report)</td>
+<td> This allows some single object to be connected to everything listed
+in some column in the report. This is the same as the old 16-bit Gang Connect was.
+A report indicating if or how the various connection attempts were completed is produced. 
+</td>
+</tr>
+
+<tr valign="top" > 
+<td>GANGBRK</td>
+<td> R </td>
+<td> 32 </td>
+<td> BREAK2=GANGBRK     1 (Disconnect objects from two columns in the Report)</td>
+<td> This allows the disconnection of objects listed in two columns in the report. 
+A report indicating how the various disconnection attempts went will be produced.
+</td>
+</tr>
+
+
+</tbody></table>
+</p>
+
+<!-- _____________________________ -->
+<hr><a name="tablename.20Section"></a>
+<h2>The [<em>tablename</em>] section</h2>
+
+<p>The entries here simply list the fields from the table to be shown, in
+the desired order to be shown, which is completely decoupled from the 
+order of offset or SYMT prioritization or any other physical order. 
+</p>
+
+<p>The definitions are on the following forms:
+
+<pre><em>fieldname</em><b>=0 </b><em>width</em><b> 0 </b><em>case</em><b> (</b><em>legend</em><b> )</b></pre>
+<pre><em>fieldname</em><b>=0 </b><em>width</em><b> 0 </b><em>case</em><b> (</b><em>legend</em><b>) $</b><em>command</em><b>(</b><em>arguments ...</em><b> )</b></pre>
+</p>
+
+<p>Here, <em>case</em> is <b>U</b> for force upper-case, and <b>L</b> for
+allow lower case as well. The <em>Fieldname</em> must be a fieldname from the
+main table being handled,  and the <b>0</b>s are placeholders and should 
+remain zeros. The <em>width</em> is the desired size to show the field,
+and <em>legend</em> is the commonly known name of the fields as the users
+want to see them.  
+</p>
+
+<p>For 32-bit systems, the 
+<a href="#KEEP"> $KEEP </a> command should be used on all 
+fields that need to be read-only.  Overlaying and Autozero key-fields 
+are not made automatically read-only in 32-bit Entry screens! 
+</p>
+
+<h3>Example:</h3>
+<pre><b>ITEM=0 10 0 L (Item Register) $EVLOOKUP(REFDISP, DISCIPLINE, DESCRIPTION)</b></pre>
+
+<!-- _____________________________ -->
+<hr><a name="FieldCommand"></a>
+<h2>Overview of the Field commands</h2>
+
+<p>On 32-bit systems, the code for View and Entry are shared, so most 
+of these function will work in either mode, even if some turn out to 
+be less than useful. 
+</p>
+
+<p>The following commands are defined in 16-bit systems. It is 
+indicated whether these apply to 32-bit systems as 
+well, whether they are View or Entry, and a short description. 
+More details on each follows below.
+</p>
+
+<table border="1" cellspacing="5" cellpadding="2" columns="5">
+<tbody>
+
+<tr valign="top" > 
+<td> Command </td> 
+<td> Location </td>
+<td> Implemented </td>
+<td> Synopsis </td>
+<td> Description</td>
+</tr>
+
+
+<tr valign="top" > 
+<td> <a href="#CONNECTED"> $CONNECTED </a> </td> 
+<td> View </td>
+<td> - </td>
+<td> - </td>
+<td> Look up connection references through RCONN.</td>
+</tr>
+
+<tr valign="top" > 
+<td> <a href="#CONNITEM"> $CONNITEM </a> </td>
+<td> View </td>
+<td> - </td>
+<td> - </td>
+<td> Look up connection references through RCONN.</td>
+</tr>
+
+<tr valign="top" > 
+<td> <a href="#CORELOOKUP"> $CORELOOKUP </a> </td>
+<td> View </td>
+<td> 32-bit </td>
+<td> $CORELOOKUP(fieldname, width, legend2) </td>
+<td> Look up references in CORE </td>
+</tr>
+
+<tr valign="top" > 
+<td> <a href="#COUNT"> $COUNT </a> </td>
+<td> View </td>
+<td> Defunct </td>
+<td> - </td>
+<td> - </td>
+</tr>
+
+<tr valign="top" > 
+<td> <a href="#DDSERV"> $DDSERV </a> </td> 
+<td> View </td>
+<td> 32-bit </td>
+<td> $DDSERV(iconfield, itemfield) </td>
+<td> Open a Drag-Drop field on a View.</td>
+</tr>
+
+<tr valign="top" > 
+<td> <a href="#DEFAULT"> $DEFAULT </a> </td>
+<td> Entry </td>
+<td> Defunct </td>
+<td> - </td>
+<td> - </td>
+</tr>
+
+<tr valign="top" > 
+<td> <a href="#EVINISEARCH"> $EVINISEARCH </a> </td> 
+<td> View </td>
+<td> Defunct </td>
+<td> - </td>
+<td> Look up a value in an .INI file. </td>
+</tr>
+
+<tr valign="top" > 
+<td> <a href="#EVLOOKUP"> $EVLOOKUP </a> </td> 
+<td> View </td>
+<td> 32-bit </td>
+<td> $EVLOOKUP(table, field, outfield) </td>
+<td> Look up a description of a field's value.</td>
+</tr>
+
+<tr valign="top" > 
+<td> <a href="#EVLOOKUPD"> $EVLOOKUPD </a> </td> 
+<td> View </td>
+<td> 32-bit </td>
+<td> $EVLOOKUPD(table, field, outfield, defaultvalue) </td>
+<td> Look up a description of a field's value.</td>
+</tr>
+
+<tr valign="top" > 
+<td> <a href="#EVLOOKUPR"> $EVLOOKUPR </a> </td> 
+<td> View </td>
+<td> Defunct </td>
+<td> - </td>
+<td> Look up a description of a field's value.</td>
+</tr>
+
+<tr valign="top" > 
+<td> <a href="#EXPR"> $EXPR </a> </td>
+<td> Entry </td>
+<td> 32-bit </td>
+<td> - </td>
+<td> - </td>
+</tr>
+
+<tr valign="top" > 
+<td> <a href="#FCONN"> $FCONN </a> </td>
+<td> View </td>
+<td> Defunct </td>
+<td> - </td>
+<td> - </td>
+</tr>
+
+<tr valign="top" > 
+<td> <a href="#FOR"> $FOR </a> </td>
+<td> View </td>
+<td> Defunct </td>
+<td> - </td>
+<td> - </td>
+</tr>
+
+<tr valign="top" > 
+<td> <a href="#KEEP"> $KEEP </a> </td>
+<td> Entry </td>
+<td> 32-bit </td>
+<td> $KEEP(integer)- </td>
+<td> Makes a field non-modifyable in Entry </td>
+</tr>
+
+<tr valign="top" > 
+<td> <a href="#LCXMACRO"> $LCXMACRO </a> </td>
+<td> View Entry Report </td>
+<td> 32-bit </td>
+<td> $LCXMACRO(function, param, 0, legend2)</td>
+<td> Allow validation in Entry. <br/> Make custom 
+secondary field values in Views and Reports.<br/>
+Note that Reports will run this function server-side. </td>
+</tr>
+
+<tr valign="top" > 
+<td> <a href="#LEX"> $LEX </a> </td>
+<td> Entry </td>
+<td> 32-bit </td>
+<td> - </td>
+<td> Lexical Check </td>
+</tr>
+
+<tr valign="top" > 
+<td> <a href="#OLDMACRO"> $OLDMACRO </a> </td>
+<td> Entry </td>
+<td> Defunct </td>
+<td> - </td>
+<td> - </td>
+</tr>
+
+
+<tr valign="top" > 
+<td> <a href="#PRESENT"> $PRESENT </a> </td>
+<td> Entry </td>
+<td> 32-bit </td>
+<td> $PRESENT(table, keyfield, controlexpr, secondexpr, lex) </td>
+<td> Data validation </td>
+</tr>
+
+
+<tr valign="top" > 
+<td> <a href="#PRESENTA"> $PRESENTA </a> </td>
+<td> Entry </td>
+<td> Pending </td>
+<td> $PRESENT(table, keyfield, checkfield, checkvalue, secondexpr, lex) </td>
+<td> Data validation </td>
+</tr>
+
+
+<tr valign="top" > 
+<td> <a href="#PRESENTB"> $PRESENTB </a> </td>
+<td> Entry </td>
+<td> Defunct </td>
+<td> - </td>
+<td> - </td>
+</tr>
+
+
+<tr valign="top" > 
+<td> <a href="#PRESENTC"> $PRESENTC </a> </td>
+<td> Entry </td>
+<td> Defunct </td>
+<td> - </td>
+<td> - </td>
+</tr>
+
+
+<tr valign="top" > 
+<td> <a href="#SET"> $SET </a> </td>
+<td> Entry </td>
+<td> - </td>
+<td> $SET(set of values) </td>
+<td> Value validation </td>
+</tr>
+
+
+<tr valign="top" > 
+<td> <a href="#TRACECONN"> $TRACECONN </a> </td>
+<td> View </td>
+<td> Defunct </td>
+<td> - </td>
+<td> - </td>
+</tr>
+
+
+<tr valign="top" > 
+<td> <a href="#TREE"> $TREE </a> </td>
+<td> View </td>
+<td> Defunct </td>
+<td> - </td>
+<td> - </td>
+</tr>
+
+</tbody></table>
+
+
+<!-- _____________________________ -->
+<hr/><a name="CONNECTED"></a>
+<h2>CONNECTED</h2>
+
+<h3>Synopsis:</h3>
+<pre><em>field</em><b>=0 </b><em>width</em><b> 0 </b><em>case</em><b> (</b><em>legend</em><b>) $CONNECTED(</b><em>field1</em><b>, </b><em>field2</em><b>, </b><em>RCONN_field</em><b>, </b><em>RCONN_field</em><b>, </b><em>Length</em><b>, </b><em>Legend</em><b>)</b></pre> 
+
+<h3>Description:</h3>
+<p>Look up connection references through RCONN.</p>
+
+<p>field1 is expected to hold the name of a table, and field2 is an RSERIAL-type
+(or equivalent) pointer to a specific record in this table.  </p>
+
+<p>What happens is 
+that a lookup is done on RCONN, where RCONN:ITEMBASE is expected to match the 
+value of the field referred to as field1. At the same time, the CONBASE
+is matched to the current table (the one being Viewed). From this record,
+one or two fields may be selected from RCONN. These fields are usually
+ITEMFLD and ITEMDESFLD which will provide an identity and description of
+the object in the ITEMBASE.  </p>
+
+<p>The found values of these, if any, is placed
+into a secondary field. The length and legend refer to the size of this
+field when included in a Report. Note that the value of the primary field 
+does not figure in this command, and hence it will work the same when placed 
+on any field.</p>
+
+<h3>Example:</h3>
+<pre><b>ITEM=0 10 0 L (Item Register) $CONNECTED(ITEM, ITEM_RSERIAL, ITEMFLD, ITEMDESFLD, 70, Tag Number)</b></pre>
+
+<!-- _____________________________ -->
+<hr/><a name="EVINISEARCH"></a>
+<h2>EVINISEARCH</h2>
+
+<h3>Synopsis:</h3>
+<pre><em>field</em><b>=0 </b><em>width</em><b> 0 </b><em>case</em><b> (</b><em>legend</em><b>) $EVINISEARCH(</b><em>filename</em><b>, </b><em>section</em><b>, </b><em>Length</em><b>, </b><em>Legend</em><b>)</b></pre> 
+
+<h3>Description:</h3>
+<p>Look up a value in an .INI file. </p>
+
+<p>The .INI file (which is expected to be in the directory where ANCHOR.DLL is)
+is searched in the specified section, for an entry whose left side matches
+the value of the current field, and the right side then gets copied to the
+secondary field in the View or in the Report.  The length and legend control
+appearance in the Reports. </p>
+
+<h3>Example:</h3>
+<pre><b>STATUS=0 10 0 L (Status Code) $EVINISEARCH(STADLG.INI, MC_DLG, 20, Status)</b></pre>
+
+<!-- _____________________________ -->
+<hr/><a name="DDSERV"></a>
+<h2>DDSERV</h2>
+
+<h3>Synopsis:</h3>
+<pre><em>field</em><b>=0 </b><em>width</em><b> 0 </b><em>case</em><b> (</b><em>legend</em><b>) $DDSERV(</b><em>Imagefield</em><b>,</b><em>Uniquefield</em><b>)</b></pre>
+
+<h3>Description:</h3>
+<p>Open a Drag-Drop field on a View.</p>
+
+<p>A Drag-Drop server will appear as a secondary field in a Form View.  
+The imagefield is expected to hold the name of a bitmap identifying the
+object. The uniquefield is used as part of the identity of the item
+when it is dragged to somewhere else. The DDMATRIX entry is determined
+by the actual field that has the DDSERV() attached to it. This field 
+does not produce anything that appears in Reports or List views. </p>
+
+<h3>Example:</h3>
+<pre><b>CABLE_NO=0 18 0 L (Cable No.) $DDSERV(ICON, RSERIAL)</b></pre>
+
+<!-- _____________________________ -->
+<hr/><a name="EVLOOKUP"></a>
+<h2>EVLOOKUP</h2>
+
+<h3>Synopsis:</h3>
+<pre><em>field</em><b>=0 </b><em>width</em><b> 0 </b><em>case</em><b> (</b><em>legend</em><b>) $EVLOOKUP(</b><em>Table</em><b>,</b><em>Kfield</em><b>,</b><em>Dfield</em><b>)</b></pre>
+
+<p>Obsolete variant, 16-bit systems only: 
+<pre><em>field</em><b>=0 </b><em>width</em><b> 0 </b><em>case</em><b> (</b><em>legend</em><b>)</b> <em>Table</em> <em>Kfield</em> <em>Listfield</em></pre>
+
+<h3>Description:</h3>
+<p>This looks up a description of a field's value. </p>
+
+<p>The table is a reference table of some sort, the keyfield is a field in 
+this table which is to match the current field's value; and the listfield is
+the field with the value that is to go to the secondary text on the screen.
+In Reports, the legend becomes the legend of the primary field, though with
+the last word replaced by the word Description. The length is fixed at 50.</p>
+
+<p>You may prefer to use the $EVLOOKUPR(), which is identical in operation
+but allow Report appearance to be adjusted.</p>
+
+<!-- _____________________________ -->
+<hr/><a name="EVLOOKUPR"></a>
+<h2>EVLOOKUPR</h2>
+
+<h3>Synopsis:</h3>
+<pre><em>field</em><b>=0 </b><em>width</em><b> 0 </b><em>case</em><b> (</b><em>legend</em><b>) $EVLOOKUPR(</b><em>Table</em><b>, </b><em>Keyfield</em><b>, </b><em>Listfield</em><b>, </b><em>Length</em><b>, </b><em>Legend</em><b>)</b></pre>
+
+<h3>Description:</h3>
+<p>Look up a description or other datum, and control placement and legend 
+for apperance in the report.</p>
+
+<p>The Table is a reference table of some sort, the Keyfield is a field in 
+this table which is to match the current field's value; and the listfield is
+the field with the value that is to go to the secondary text on the screen.
+In Reports, the given length and legend are used for the secondary field.</p>
+
+<h3>Example:</h3>
+<pre><b>FROM_TAG=0 15 0 L (From Tag) $evlookupR(ENGEQUIP, TAG_NO, SERV_DESCR, 40, From Tag Service)</b></pre>
+
+<!-- _____________________________ -->
+<hr/><a name="CONNITEM"> </a>
+<h2>CONNITEM</h2>
+
+<!-- _____________________________ -->
+<hr/><a name="CORELOOKUP"> </a>
+<h2>CORELOOKUP </h2>
+
+<h3>Synopsis:</h3>
+<pre><em>field</em><b>=0 </b><em>width</em><b> 0 </b><em>case</em><b> (</b><em>legend</em><b>) $CORELOOKUP(</b><em>Cfield</em><b>,</b><em>Rwidth</em><b>,</b><em>Rlegend</em><b>)</b></pre>
+
+<h3>Description:</h3>
+<p>This looks for a match in CORE to the current value of the <em>field</em>,
+finds the record in the proper table, and then reads and 
+returns the value of the CXDICT Cfield for that object.  For Reports,
+the specified <em>Rwidth</em> and <em>Rlegend</em> is used. </p>
+
+<h3>See Also:</h3>
+<a href="lcxh.html#StdField">StdField( )</a> 
+
+<!-- _____________________________ -->
+<hr/><a name="COUNT"> </a>
+<h2>COUNT </h2>
+Used inside Reports only
+
+<!-- _____________________________ -->
+<hr/><a name="DEFAULT"> </a>
+<h2>DEFAULT </h2>
+Used inside Reports only
+
+<!-- _____________________________ -->
+<hr/><a name="EVLOOKUPD"> </a>
+<h2>EVLOOKUPD </h2>
+
+<!-- _____________________________ -->
+<hr/><a name="EXPR"> </a>
+<h2>EXPR </h2>
+
+<!-- _____________________________ -->
+<hr/><a name="FCONN"> </a>
+<h2>FCONN </h2>
+Used inside Reports only
+
+<!-- _____________________________ -->
+<hr/><a name="FOR"> </a>
+<h2>FOR </h2>
+Used inside Reports only
+
+<!-- _____________________________ -->
+<hr/><a name="KEEP"> </a>
+<h2>KEEP </h2>
+
+<h3>Synopsis:</h3>
+<pre><em>field</em><b>=0 </b><em>width</em><b> 0 </b><em>case</em><b> (</b><em>legend</em><b>) $KEEP(</b><em>number</em><b>)</b></pre>
+
+<h3>Description:</h3>
+<p>This allows a field that would otherwise be writeable to be protected
+from writing. In 16-bit systems, all overlaid fields and all auto-zero
+fields are non-writeable, whereas in the 32-bit system, these fields may
+be typed into so as to allow searching. However in Entry-windows, the
+fields may have to be protected from changes, and this is the mechanism
+to do it.  The value in the parentheses may be anything, but should we
+decide to use it for something in the future, the value <b>0</b>
+is recommended. </p>
+
+<!-- _____________________________ -->
+<hr/><a name="LCXMACRO"> </a>
+<h2>LCXMACRO </h2>
+
+<h3>Synopsis:</h3>
+<pre><em>field</em><b>=0 </b><em>width</em><b> 0 </b><em>case</em><b> (</b><em>legend</em><b>) $LCXMACRO(</b><em>function</em><b>, </b><em>param</em><b>)</b></pre>
+<pre><em>field</em><b>=0 </b><em>width</em><b> 0 </b><em>case</em><b> (</b><em>legend</em><b>) $LCXMACRO(</b><em>function</em><b> , </b><em>param</em><b> , </b><em>reserved</em><b> , </b><em>legend2</em><b>)</b></pre>
+
+<h3>Description:</h3>
+<p>
+This is used for validation of fields in Entry. It may also be used 
+for customizing  secondary fields in Views. </p>
+
+<p>In the function is called with a parameter and other arguments as detailed under 
+<a href="call3206.html#Cat6232">
+View, Entry, and Report Pushbuttons and Fields Operations: $LCXMACRO</a>. 
+The optional legend for the secondary field, 
+<em>legend2</em> will be used in Reports instead of the default concatenation of the
+primary field's legend and the word "Description".</p>
+<p>In Views and Entries, the same function will be run on the client, whereas in 
+Reports, the function will be run on the server. Therefore, there may be limitations on what 
+other defined functions can be available.</p>
+
+<h3>See Also: </h3>
+<a href="call3206.html#Cat6232">
+$LCXMACRO callback function reference</a> <br/>
+<a href="call3206.html#">
+View, Entry, and Report Pushbuttons Operations</a>
+
+<!-- _____________________________ -->
+<hr/><a name="LEX"> </a>
+<h2>LEX </h2>
+
+<h3>Synopsis:</h3>
+<pre><em>field</em><b>=0 </b><em>width</em><b> 0 </b><em>case</em><b> (</b><em>legend</em><b>) $LEX(</b><em>code</em><b>)</b></pre>
+
+<h3>Description:</h3>
+<p>This enforces a certain combination of characters into the field. </p>
+
+<!-- _____________________________ -->
+<hr/><a name="OLDMACRO"> </a>
+<h2>OLDMACRO </h2>
+
+<h3>Description:</h3>
+<p>Obsolete... </p>
+
+<!--
+/*D E */{"$OLDMACRO",   10, 1,  0, XCR},//
+
+/*I E */{"$PRESENT",     6, 6, 0, -1},
+// PRESENT(base, keyfield, controlexpr, secondexpr, lex)
+
+/*  E */{"$PRESENTA",    7, 7, 0, -1},
+// PRESENTA(base, keyfield, data-field, listkeyfield, listexpr, secondary, lex)
+
+/*D E */{"$PRESENTB",    6, 6, 0, -1}, //
+
+/*D E */{"$PRESENTC",    7, 7, 0, -1},
+// PRESENTC(baseexpr, keyfieldexpr, data-fieldexpr, listkeyfieldexpr,
+//  listexpr, secondary, lexical)
+
+/*P E */{"$SET",         2, 2, 0, -1}, // SET(set of values)
+/* V  */{"$TRACECONN",   4, 4, 0, -1}, //
+/* V R*/{"$TREE",        7, 5, 1, -1}, //
+-->
+
+<!-- _____________________________ -->
+<hr/><a name="Endpoint"></a>
+
+<p> File Date: 2005/06/22</p>
+
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,683 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>WinPCS.INI Client configuration file reference.</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+
+</head><body>
+
+<h1>WinPCS.INI Client configuration file reference.</h1>
+<p>File Date: 2014-04-02</p>
+
+<p>This references the configuration file for the client. 
+Like other .ini files, this file has a number of sections
+with entries in them, and the sections may appear in any order. </p>
+
+<p>The names of the sections and the keywords within the sections 
+are generally case-insensitive. Values of entries, to the right
+of the equal sign,  may be case-sensitive 
+or not depending on the specific situation.</p>
+
+<p>The sections are: <br/>
+<a href="#section.20WinPCS">[WinPCS]</a><br/>
+<a href="#section.20Menu">[MENU]</a><br/>
+<a href="#section.20Strip">[STRIP]</a><br/>
+<a href="#section.20Paths">[PATHS]</a><br/>
+<a href="#section.20Synfare">[SYNFARE]</a><br/>
+<a href="#section.20Ppview">[PPVIEW]</a><br/>
+<a href="#section.20Hier">[HIER]</a><br/>
+<a href="#section.20View">[VIEW]</a><br/>
+<a href="#section.20Report">[REPORT]</a><br/>
+<a href="#section.20Rconn">[RCONN]</a><br/>
+<a href="#section.20Hiertop">[HIERTOP]</a><br/></p>
+
+<hr/>
+<a name="section.20WinPCS"/>
+<h2>[WinPCS]</h2>
+<p>Several miscellaneous options that do not require their own section 
+are defined here. </p>
+
+<p>The entries in this section are:</p>
+<table><tbody>
+<tr><td><a href="#server"><b>server=</b></a></td>
+	<td>Server address</td></tr>
+<tr><td><a href="#endpoint"><b>endpoint=</b></a></td>
+	<td>TCP Port number to be used</td></tr>
+<tr><td><a href="#defgroup"><b>defgroup=</b></a></td>
+	<td>Database-system to be used</td></tr>
+
+<tr><td><a href="#dynamicserver"><b>dynamicserver=</b></a> </td>
+	<td>TCP dynamic server handling</td></tr>
+<tr><td><a href="#servertxt"><b>servertxt=</b></a> </td>
+	<td>TCP Description of server</td></tr>
+<tr><td><a href="#proxy"><b>proxy=</b></a> </td>
+	<td>TCP Proxy setting</td></tr>
+<tr><td><a href="#heartbeat_ival_proxy"><b>heartbeat_ival_proxy=</b></a> </td>
+	<td>TCP Heartbeat setting for proxy</td></tr>
+<tr><td><a href="#heartbeat_ival_direct"><b>heartbeat_ival_direct=</b></a> </td>
+	<td>TCP Heartbeat setting for direct connection</td></tr>
+
+<tr><td><a href="#auth"><b>auth=</b></a></td>
+	<td>DCE/RPC authenthication setting</td></tr>
+
+<tr><td><a href="#speedtest"><b>speedtest_interval_ms=<br/>
+speedtest_latest=<br/>
+speedtest_logfile=</b></a></td>
+	<td>Check network speed</td></tr>
+
+<tr><td><a href="#iolog"><b>iolog=</b></a></td>
+	<td>Log activity between client and server to a file.</td></tr>
+
+<tr><td><a href="#interval"><b>interval=</b></a></td>
+	<td>Server presence Checking interval</td></tr>
+<tr><td><a href="#periodfiles"><b>periodfiles=</b></a> </td>
+	<td>Client-side periodic activity setting</td></tr>
+<tr><td><a href="#periodcall"><b>periodcall=</b></a> </td>
+	<td>Client-side periodic activity setting</td></tr>
+<tr><td><a href="#rightmenu"><b>rightmenu=</b></a></td>
+	<td>Right-click menus origin</td></tr>
+<tr><td><a href="#lockout"><b>lockout=</b></a></td>
+	<td>Lock the client or turn on a message of the day</td></tr>
+<tr><td><a href="#editor"><b>editor=</b></a></td>
+	<td>Default preferred text editor</td></tr>
+<tr><td><a href="#ddesvc"><b>ddesvc=</b></a></td>
+	<td>List of known dde servers</td></tr>
+<tr><td><a href="#debug"><b>debug=</b></a></td>
+	<td>Trace-printing and Debugging target</td></tr>
+<tr><td><a href="#cdatdebug"><b>cdatdebug=</b></a></td>
+	<td>Trace-printing and Debugging target for CDAT interactions</td></tr>
+<tr><td><a href="#library"><b>library=</b></a></td>
+	<td>Pre-loaded LCX files</td></tr>
+<tr><td><a href="#appearance"><b>appearance=</b></a></td>
+	<td>Variations on the way Views, Entry, and Reports look.</td></tr>
+<tr><td><a href="#transferblock"><b>transferblock=</b></a></td>
+	<td>Number of bytes per turn when transfering files to or from the server.</td></tr>
+<tr><td><a href="#onstart"><b>onstart=</b></a></td>
+	<td>A function to be run when WinPCS starts.</td></tr>
+<tr><td><a href="#startfiles"><b>startfiles=</b></a></td>
+	<td>Files where the onstart= function and any supporting functions are defined.</td></tr>
+</tbody></table>
+
+<a name="server"/>
+<h3>server=</h3>
+<p>This entry indicates the name of the server where the WinPCS server is 
+expected to be found. Alternate servers, numbered 1, 2, etc. can be identified
+as SERVER1=, SERVER2= etc.  These are referred to via the 
+<a href="winpcscmdline.html"> command-line argument </a> -S.  </p>
+
+<a name="endpoint"/>
+<h3>endpoint=</h3>
+<p>For TCP and for DCERPC, the server is set to 
+listen on some TCP port using either the WinPCS protocol or the 
+ncacn_ip_tcp RPC protocol. The client must attempt to connect to the
+server on the same port number.  The default values are set in ANCHORS.DLL
+and ANCHORC.DLL, but if some other port number is used it can be specified 
+here. </p> 
+<p>Different endpoints for internal and external server addresses can be specified
+as endpoint1= endpoint2= etc for the correspondingly numbered server, if
+the default from anchorc.dll or the specified non-numbered endpoint= is not
+the right one. </p>
+
+<p><a href="serverini.html#options.endpoint">
+A matching setting for the endpoint should be present on the server.  </a></p>
+
+<p>The default is the port number as defined as the Endpoint 
+in the ANCHORC.DLL. </p>
+
+<p>The <a href="http://www.iana.org/">IANA</a> has allocated 
+<a href="https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml?search=5166">
+port 5166 as available for WinPCS</a>. 
+This port number is usually what is set as the default in the 
+ANCHORS.DLL and ANCHORC.DLL files.  </p>
+
+<a name="defgroup"/>
+<h3>defgroup= (obsolete)</h3>
+<p>This used to indicate which kind of database system is being used. 
+It used to default to
+RCONN BTRS70, which refers to a server running the Pervasive/Btrieve system. As we are
+developing server versions for other database systems, alternate values can be specified here.</p>
+<p>As of 2013-05-14, it is now obsolete and these entries will be ignored,
+and may be removed from WinPCS.INI. </p>
+
+<p>Like the <a href="#endpoint">endpoint</a> and <a href="#server">server</a> 
+entries, <b>defgroup</b> can take a numerical suffix (defgroup1= defgroup2= etc) to correspond 
+with the server of the same number. </p>
+
+<a name="dynamicserver"/>
+<h3>dynamicserver=</h3>
+<p>There is the arrangement available when the WinPCS server does
+not sit on a fixed IP address. The 
+<a href="dserver.html#reachout">reachout</a> 
+program runs there, and periodically updates the database within a 
+<a href="dserver.html#dserver">dserver</a> 
+process running on a known IP-address, with the information about the
+WinPCS server's IP-address and port number. This entry indicates if this
+utility, named 
+<a href="dserver.html#rqcli ">rqcli</a>, 
+is to be used to determine the server address. <b>dynamicserver=off</b>
+is the usual case where the WinPCS server is at a known IP address, and
+some string along the lines of <b>dynamicserver=proj 1.2.3.4:56789</b> is used
+to specify that the dynamical IP address server is located at the specified
+IP-address (example here is 1.2.3.4) and port number (example 56789). </p>
+
+<a name="servertxt"/>
+<h3>servertxt=</h3>
+<p>For the benefit of users of the Installer, each server identified as
+server= server1= server2= etc., can be named with servertxt= servertxt1= 
+servertxt2= etc., so that the user of the Installer can get a list of 
+understandable descriptions.</p>
+
+<a name="proxy"/>
+<h3>proxy=</h3>
+<p>Some systems may be distributed where there is a proxy server in use.</p>
+<p>This setting determines if a proxy is to be used or not. There are three
+options: </p>
+<p><b>proxy=no</b> Do not use a proxy server, even if one might be present and
+being discovered. </p>
+<p><b>proxy=auto</b>Determine if there is a proxy server available, and use
+it if one is found. This is the default behavior.</p>
+
+<p><b>proxy=ipaddress:port</b>Use the proxy with this IP address and 
+port-number. Don't depend on other proxies that might be present.</p>
+
+<p>Like the <b>auth=</b>, <b>servertxt=</b>, and <b>endpoint=</b> entries, there 
+can be set one <b>proxy1=</b> <b>proxy2=</b> etc., differently for each server. 
+The default will be the unnumbered <b>proxy=</b> 
+entry for the ones that are not specified otherwise.</p>
+
+<a name="heartbeat"/>
+<h3>heartbeat=</h3>
+<a name="heartbeat_ival_proxy"/>
+<h3>heartbeat_ival_proxy=</h3>
+<a name="heartbeat_ival_direct"/>
+<h3>heartbeat_ival_direct=</h3>
+
+<p>On some systems, to have the TCP connection stay open, it may need to be
+refreshed with some period. To turn this mechanism on, set <b>heartbeat=on</b>,
+to leave it off set <b>heartbeat=off</b>. The default is <b>on</b>. Turning it
+off is considered experimental, and does not always work all that well.</p>
+
+<p>The values for the <b>heartbeat_ival_...=</b> entries 
+are period times in seconds here. 
+Depending on whether proxies are found, the period can be set 
+differently. The default for the <b>heartbeat_ival_proxy=</b>
+is 10 seconds, and the default for the <b>heartbeat_ival_direct=</b>
+is 20 seconds. Generally, low values such as 10 or 20 s are useful on 
+on long-haul connections, while <b>heartbeat_ival_direct=</b> periods 
+as long as 3600 seconds may be useful on LANs. </p>
+
+<a name="auth"/>
+<h3>auth=</h3>
+<p>This and its matching entry on the server-side server.INI file there 
+controls authentication of the RPC calls. For Windows XP SP 2 these must
+be turned on for both server and client, for other variants of Windows
+they may be turned off. Set <b>auth=on</b> or <b>auth=off</b> accordingly. </p>
+
+<p>The setting on the server is generally supposed to be the same. 
+It is also possible to have different 
+settings on the various servers, for this, we can use <b>auth1=</b>,
+<b>auth2=</b> and so on, for the corresponding <b>server1=</b>, 
+<b>server2=</b> etc. See the 
+<a href="trouble.html"> discussion under errors 5 and 1747 </a>.  </p>
+
+<p>This <b>auth=</b> setting is only used with DCERPC systems. TCP systems
+ignore it.</p>
+
+<a name="speedtest"></a>
+<h3>speedtest_interval_ms=</h3>
+<p>How frequent are speed-tests to be made, in milliseconds.
+Default 0, this means there are no speed tests being run.  </p>
+
+<h3>speedtest_latest=</h3>
+<p>Small file to put the latest speed-test result into.
+This will be overwritten continually.  Default is no file.</p>
+
+<h3>speedtest_logfile=</h3>
+<p>Log-file to put all the speed-test result into.  Default is no file.</p>
+
+<a name="iolog"></a>
+<h3>iolog=</h3>
+<p>Specifies a log-file, where the information between the client and server
+is shown. Useful for optimisations, but this file will grow.</p>
+
+<a name="interval"/>
+<h3>interval=</h3>
+<p>This entry indicates the interval of checking the server presence and 
+any messages it may have. The value given is in milliseconds. A typical
+value is 300000 milliseconds, or 300 seconds, that is, 5 minutes. </p>
+
+<a name="periodfiles"/>
+<h3>periodfiles=</h3>
+<p>This lists the files to find the
+<a href="#periodcall">periodcall</a> 
+function in. If this is missing or blank, the function will be expected to be
+in one of the files listed in the
+<a href="#library">library</a> 
+entry instead. </p>
+
+<a name="periodcall"/>
+<h3>periodcall=</h3>
+<p>This is the name of a periodically called function, called at every 
+<a href="#interval">INTERVAL</a> 
+milliseconds. Its main purpose is to look for any messages for the user. 
+If this entry is missing or refers to a blank function, nothing will be done.  </p>
+
+<a name="rightmenu"/>
+<h3>rightmenu=</h3>
+<p>This indicates where the main source of the right-click menu entries in the
+hierarchies are. When set to <b>rightmenu=DDMATRIX</b>, 
+the values in the field MENU_TXT in the DDMATRIX table are
+used, not the ones defined on the Strip. </p>
+
+<a name="lockout"/>
+<h3>lockout=</h3>
+<p>This can be used to temporarily stop users from logging in, 
+or allow them to log in but after having been shown a message.  </p>
+<p><tt><b>lockout=0</b></tt><br/> means the system is open and no message is 
+to be shown. This is the default.</p>
+<p><tt><b>lockout=1</b> <em>message</em></tt><br/> means the system is closed, 
+and the message should explain why. </p>
+<p><tt><b>lockout=5</b> <em>message</em></tt><br/> means the system is open, 
+but there is some important message that should be shown.</p>
+
+<a name="editor"/>
+<h3>editor=</h3>
+<p>Selects the text editor program that WinPCS invokes for editing INI 
+and other text files.  A typical value here would be <b>editor=notepad.exe</b>
+but other editors such as vim, ultraedit or textpad might be preferred. </p>
+
+<a name="ddesvc"/>
+<h3>ddesvc=</h3>
+<p>List the names of recognizeable DDE servers that WinPCS may recognize. 
+There are also a need for a section for each of these programs.
+See the <a href="#section.20DDEservers"> DDE-servers sections </a> info below.</p>
+
+<a name="library"/>
+<h3>library=</h3>
+<p>Some globally loaded macrofunctions can be specified here in files. </p>
+
+<a name="appearance"/>
+<h3>appearance=</h3>
+<p>This entry allows changing the appearance of View, 
+Entry, and Inspect screens, and the Report windows. </p>
+<p>Set to <b>exp1</b> for a moderately changed color scheme and <b>new</b> for
+a more radically different color scheme. Other values will give the old 
+traditional look.</p>
+
+<a name="transferblock"/>
+<h3>transferblock=</h3>
+<p>This entry defines the size of each data block used when transferring
+files to or from the server. Default value is 16384. Larger values make
+for better overall transfer speeds at the expense of less interactivity.
+On long-haul networks, where the latency is long, larger values such as
+1048576 is preferrable. Powers of 2 are recommended but not mandatory.  
+</p>
+
+<a name="onstart"/>
+<a name="startfiles"/>
+<h3>onstart= and startfiles=</h3>
+<p>The onstart= defines an LCX function that is to be run when WinPCS 
+is started. It is expected to be in one of the files listed in 
+startfiles=. In addition to functions there, the functions in the
+<a href="#library ">library files</a> will also be available.</p>
+
+
+<hr/>
+<a name="debug"/>
+<h3>debug=</h3>
+<p>This indicates whether serial-port or other debug-tracing is turned on 
+or off. Values specify somewhere to go for the debugging output as well as 
+<a href="lcxh.html#trace">trace( )</a> function calls from LCX code. These 
+can be:</p>
+<pre>
+<b>Debug=OFF</b>
+<b>Debug=COM</b><em>n</em>
+<b>Debug=net</b><em> ipaddress</em>
+<b>Debug=net</b><em> ipaddress</em><b>:</b><em>port</em>
+<b>Debug=udp</b><em> ipaddress</em>
+<b>Debug=udp</b><em> ipaddress</em><b>:</b><em>port</em>
+<b>Debug=file</b><em> filename</em>
+</pre>
+
+<p>See also the discussions on the 
+<a href="lcxh.html#CWULIB">CWULIB( ) function</a>  and 
+<a href="lcxh.html#AimDebugOutput">AimDebugOutput( ) function</a>. </p>
+
+<p> The <b>net</b> and <b>udp</b> options allow <a href="netdebug.html"> 
+sending messages through a network </a>. The default when no 
+port is specified is 16385.</p>
+
+<p>The COM<em>n</em> options select the numbered serial port.</p>
+
+<p>The <b>file</b> puts the output into the named file, which 
+will end up in the system32 or server directory.</p>
+
+<a name="cdatdebug"/>
+<h3>cdatdebug=</h3>
+<p>When running the Transfer phase of CDAT, some functions in WinPCS are
+invoked, and if desired, the debugging-output can be turned on for this.
+as well, running in a separate channel from the <a href="#debug">main 
+client debugging output described above.</a></p>
+
+<p>The default is off, meaning no trace messages occur, and the various
+possible settings are the same as listed above for the
+<a href="#debug">debug= </a> entry.</p>
+
+<p>Note that any calls to the LCX function 
+<a href="lcxh.html#trace">trace( )</a> 
+from the CDAT-set callback
+functions will appear in this channel, not in any main client 
+channel. </p>
+
+<a name="pdfcertclientdebug"/>
+<h3>pdfcert_client_debug=</h3>
+<p>This controls debug-output for the PDFCert client interface (CPDCLI.DLL).
+The possible settings are the same as listed above for the
+<a href="#debug">debug= </a> entry. The default is <b>off</b> for no output.
+</p>
+
+<hr/>
+<a name="section.20Menu"/>
+<h2>[MENU]</h2>
+<p>The entries in this section indicate the presence or absence of certain
+menu items.  Each of the entries may have the PRESENT or ABSENT value.</p>
+
+<p>The entries are:
+<b>STDREP=</b><br/>
+<b>STDIMP=</b><br/>
+<b>EDITMENU=</b><br/>
+<b>RUNMENU=</b><br/></p>
+
+<hr/>
+<a name="section.20Strip"/>
+<h2>[STRIP]</h2>
+<p>The entries here identify the items in the Strip, the row of icons at the
+bottom of the screen.  The entries here have one of the forms:</p>
+<pre><em>name</em><b>=L </b><em>posn</em> <b>(</b><em>menutext</em><b>)</b> <b>(</b><em>explanation</em><b>)</b> </pre>
+<pre><em>name</em><b>=R </b><em>posn</em> <b>(</b><em>menutext</em><b>)</b> <b>(</b><em>explanation</em><b>)</b> </pre>
+<p>The <em>name</em> is the name of the symbol, defined in REFBMP31.INI and referenced
+as a drop-target fieldname in DDMATRIX.  </p>
+
+<p><b>L</b> and <b>R</b> indicates if the icon is 
+to be placed to the left or the right, and <em>posn</em> is the positioning from 
+this side, where 0 is at the end.</p>
+
+<p><em>menutext</em> is the text that is to appear in the menu entries in the right-click
+menus in the hierarchies. If this is blank, this will not be included in these menus.</p>
+
+<p><em>explanation</em> is the text that will be shown as tool-tips
+on the main WinPCS screen, when the pointer is moved over one of the icons in the Strip.
+If this is blank, just with the empty pair of parentheses or entirely absent, there will 
+be no tool-tips shown.  </p>
+
+<hr/>
+<a name="section.20Paths"/>
+<h2>[PATHS]</h2>
+<p>Entries here are references to paths in various DLL and LCX files. 
+Left side is some key value, right side is the path, which may be using
+the numbered drives. </p>
+
+<p>Note that the numbered drives themselves are defined in the 
+<a href="clientini.html"> CLIENT.INI</a>
+file, not in WinPCS.INI. </p>
+
+<h3>See Also:</h3>
+<p>
+<a href="serverini.html#section.20paths">Server-side [paths] in server.ini</a><br/>
+<a href="lcxh.html#ExpandPath">ExpandPath( )</a> ,
+<a href="lcxh.html#ReducePath">ReducePath( )</a> ,
+<a href="clientini.html">CLIENT.INI reference</a>
+</p>
+
+<hr/>
+<a name="section.20Synfare"/>
+<h2>[SYNFARE]</h2>
+<p>There are 2 entries here, QUOTE= and SEPARATOR= and they refer to the
+characters to be used for quote and field separators in SYNFARE CSV files.
+Record separators are always new-lines.
+</p>
+
+<hr/>
+<a name="section.20Ppview"/>
+<h2>[PPVIEW]</h2>
+<p>The entries here are WRAPWIDTH and STARTWIDTH </p>
+
+<p>WRAPWIDTH indicates how wide a column in a report
+may be before it defaults to a multiline layout.  Applies to default report
+formatting. Typical value is WRAPWIDTH=60
+</p>
+
+<p>STARTWIDTH determines how large the window should be when it opens. The 
+value is the width of the window in percent of the screen horizontal 
+area; about 80 looks good. This also changes the behavior of the landscape
+mode previews to extende fully horizontal instead of vertical. </p>
+<p>A typical value thus is STARTWIDTH=80.</p>
+
+<hr/>
+<a name="section.20Hier"/>
+<h2>[HIER]</h2>
+<p>There can be three entries here, HIERWIDTH, SPACEMODE, and CASCADE</p>
+<p>The entry HIERWIDTH indicates how wide 
+the Hierarchy views are when they open. The value is in percentage
+of screen width. A typical value is 60 for 60% of the screen.  
+</p>
+<p>SPACEMODE can be 0, 1, or 2:</p>
+<table border="1">
+<tr><td>SPACEMODE</td><td>Description</td> </tr>
+<tr><td>0</td><td>Strings in the hierarchies are shown with a single 
+space character between the tag number and description. 
+This is the default.</td> </tr>
+<tr><td>1</td><td>Strings in the hierarchies are shown with a
+bit of space between the tag number and description. The amount of space
+varies slightly.</td> </tr>
+<tr><td>2</td><td>Strings in the hierarches have the description part
+moved to the right, and all objects on the same level are indented the
+same amount, depending on the widest tag-number string. Subsequent levels
+are always indented further, even though the tag numbers here might not
+be that long.</td> </tr>
+</table>
+<p>CASCADE indicates if the hierarchies cascade down the same as Views
+and Reports do. Set to 1 to enable this, set to 0 to retain the old
+full-height at top behavior. </p>
+
+<hr/>
+<a name="section.20View"/>
+<h2>[VIEW]</h2>
+<p>There can be two entries here, WIDTH and ASPECT</p>
+
+<p>The entry WIDTH, similar to HIERWIDTH for Hierarchies, indicates 
+how wide the View windows are when they open. The value is in percentage
+of screen width. A typical value is 40 for 40% of the screen.  
+</p>
+
+<p>ASPECT indicates how tall the window is compared to the width. 
+The number is a percentage, 100 makes a regular rectangular window, 
+160 makes it approximately square, 200 makes it tall.</p>
+
+<p>These apply to View, Entry, and Inspect windows.</p>
+
+<hr/>
+<a name="section.20Report"/>
+
+<h2>[REPORT]</h2>
+
+<h3>FRAMEFILE= FRAMEFUNCTION= ORIENT=</h3>
+
+<p>The entries FRAMEFILE= and FRAMEFUNCTION= identifies the default report 
+formatting function and the file where this function can be found.  
+Orientation is set via ORIENT=, this is 0 for Portrait, 1 for Landscape,
+and 9 for asking the user for the one or the other. </p>
+
+<h3>STDTITLE= PRINTTITLE= SHORTTITLE= </h3>
+
+<p>STDTITLE= PRINTTITLE= SHORTTITLE= are titles to be shown 
+on various reports.</p>
+
+<h3>SIERRMSG=</h3>
+
+<p>Entry SIERRMSG= controls if error-messages from bad tree-lines and other
+reasons for failure to run SI reports should appear as messages. </p>
+
+<p>SIERRMSG=0 turns the message-box off.</p>
+<p>SIERRMSG=1 turns the message-box on.</p>
+
+<h3>SICOUNT=</h3>
+
+<p>SICOUNT= defines the number of fields to pass for each iteration of
+status index reports. The default (whis is used by the
+<a href="siclient.html">siclient</a> 
+utility) is 2000. Lower values cause more frequent
+updates of the Odometer Window, but more passes on the network. Higher
+values cause less frequent, larger, amounts of data and a less frequent
+update rate. </p>
+
+<h3>PRLIST_INFO= PRLIST_FUNCTION=</h3>
+
+<p>PRLIST_INFO= sets the information text for the Print Certificates
+pushbutton in the Standard or Quick Reports.</p>
+
+<p>PRLIST_FUNCTION= sets the name of the LCX function that is
+to perform this certificate printing. 
+<a href="call3217.html"> This function </a> is similar to
+but not identical to the <a href="call0013.html"> FORALL2</a>
+functions available in STAREP.INI. 
+The files where this function is to be located should be listed in the
+<a href="clientini.html#PRLIST">entry PRLIST= under section [LCX] in 
+client.ini</a>. </p>
+
+<h3>TEMPFILES=</h3>
+
+<p>TEMPFILES= sets the location where the temporary file which is used for
+transferring to Excel is to be written. The argument is some path, either a
+complete system path, or a "numbered-drives" path. If this entry is missing
+or blank, the default temporary file location that is set in the operating
+system will be used. </p>
+
+<h3>ADDBLANK=</h3>
+
+<p>ADDBLANK=yes will make the empty reports show with a record and the text
+"No records found" in the first column.</p>
+
+<p>ADDBLANK=no will cause empty reports to not be shown at all. </p>
+
+<a name="reportpdfoutput"/>
+<h3>PDFOUTPUT=</h3>
+
+<p>PDFOUTPUT= sets where the saved PDF files from immediate printing of reports
+are to go. Default is <b>9:\reportpdfs</b> 
+Numerical paths are used here, as there is an internal call 
+to the equivalent of <a href="lcxh.html#ExpandPath">ExpandPath( )</a>.  </p>
+
+<p>See also: <a href="call3217.html">Quick Report Print List Functions</a></p>
+
+<hr/>
+<a name="section.20Rconn"/>
+<h2>[RCONN]</h2>
+<p>files= is for the client-side make and break activities functions.</p>
+
+<p>stadlg= are files with status-dialog functions in them. These are also
+referenced for 
+<a href="serverini.html#section.20cdat.barcodediscovery"> CDAT's barcodediscovery= function </a> </p>
+
+<hr/>
+<a name="section.20Hiertop"/>
+<h2>[HIERTOP]</h2>
+<p>Entries here give parameters for various hierarchies. They are on one of the the forms:</p>
+
+<pre>
+<em>table</em><b>=(</b><em>Title</em><b>)</b> <em>tail-arguments</em>
+<em>phase table</em><b>=(</b><em>Title</em><b>)</b> <em>tail-arguments</em>
+</pre>
+
+<p>The optional <em>phase</em> can allow hierarchies off the same level to display
+and act differently on subordinate items, by adjusting the tail-arguments accordingly. </p>
+
+<p>The tail-arguments are a sequence of space-separated arguments, each one can be one of these:</p>
+
+<table border="1" cellspacing="5" cellpadding="2"> <tbody>
+
+<!-- (Z) S Y E L C X -->
+
+<tr valign="top">
+<td>E:<em>table</em></td>
+<td>Stop opening more levels of connections when double-clicking on some object in this table. 
+Open this table, but do not open further levels.</td>
+</tr>
+
+<tr valign="top">
+<td>L:<em>table1+field1==table2+field2</em></td>
+<td>On double-clicking to open any object from either table1 or table2, make sure the 
+field1 in table1 and field2 in table2 have the same value when one of them is a parent 
+item of the other. Only display those items where these fields are the same.</td>
+</tr>
+
+<tr valign="top">
+<td>S:<em>table</em></td> 
+<td>Issue a status-dialog when double-clicking on some object in this table, 
+instead of opening more connections.</td>
+</tr>
+
+<tr valign="top">
+<td>X:<em>table</em></td>
+<td>Do not open or display objects from this table whenever encountered.</td>
+</tr>
+
+<tr valign="top">
+<td>Y:<em>table1</em><b>&gt;</b><em>table2</em></td>
+<td>When double-clicking on objects of table1, do not open up or show the attached objects from 
+table2, but do display others.
+</td>
+</tr>
+
+<tr valign="top">
+<td>C:<em>fieldname+value+value+...</em></td>
+<td>Suppress connections where the fieldname in the connection table has one
+of the values shown in the list.  </td>
+</tr>
+
+</tbody>
+</table>
+
+
+<hr/>
+<a name="section.20DDEservers"/>
+<h2>[<em>dde server name</em>]</h2>
+<p>REGEDIT=</p>
+<p>EXTENSION=</p>
+
+<p>There is one of these for each of the servers listed in the
+
+<a href="#ddesvc">ddesvc entry</a>. In addition, for EXCEL, the following
+extra options exist:</p>
+
+<pre>
+[EXCEL]
+ROWLETTER=R
+COLLETTER=C
+</pre>
+
+<p>Here standard Excel idenfies cells as <b>R</b><em>rowno</em><b>C</b><em>colno</em>, but other language versions are known
+to have different letters. German uses Z and S, Portuguese has F and C, and Polish apparently use W and K. To allow use with
+different languages, the various alternate sets can be listed here, as for example:</p> 
+
+<pre>
+ROWLETTER=RZFW
+COLLETTER=CSCK
+</pre>
+
+<p>Now these can be R and C, Z and S, F and C, or W and K. </p>
+
+
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+
+</body>
+</html>
+
+

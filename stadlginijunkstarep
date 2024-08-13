@@ -1,0 +1,66 @@
+
+<html lang="en">
+<head>
+<title>Stadlg.INI file reference</title>
+
+</head><body>
+
+<h1>Stadlg.ini file reference</h1>
+<p>File Date: 2020-12-10</p>
+
+<p>File has a number of sections, each section defines a report-layout.
+The name of the section identifies the report, as referenced from starep.ini and from the refrep table
+through calls to the statusindex-functions.  </p>
+
+There are a number of entries, for fields, pushbuttons, parameters, and other control info.  
+
+$param name=string
+Special case: $param deltacol=
+
+$postprocess=
+
+Table Field Funcion=width (legend) (alias) 
+
+Special fields:
+$leaf=width (legend) (alias)
+$Trunk
+$Branches
+
+Other specialties:
+$omit=
+$title=
+$head=
+$foot=
+$levelfields=
+$before=
+$after=
+$leaf=
+
+
+Select and FORALL in call0013.html
+$select lilprint Print!=4 (Print Y/N) I:3 Y N #carrier RECEIVED PrintOut
+Print!=FORALL2 0 (Printe Selected Records) CL_Print
+
+LCXCALL Buttons in call3206 Section 4
+$button FIELDACT=LCXCALL 1 (Assign field activity) SIFieldAct conserialcol+treelinecol
+
+QREPORT buttons info in call0010.html and qreportini.html
+$button CALCX=QREPORT1 1 (Q status) QASHREP S:3,4 L:16 G:21 T:31
+
+
+
+
+
+
+<a name="section.20name"></a>
+<h2>section name</h2>
+
+<p>Reference to other files go like 
+<a href="lcxh.html#ExpandPath">ExpandPath( )</a>
+</p>
+
+</body>
+</html>
+
+
+

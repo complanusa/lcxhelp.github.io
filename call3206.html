@@ -1,0 +1,442 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>View, Entry, and Report Pushbuttons Operations -- Category 6 (32-bit WinPCS)</title>
+<meta http-equiv="Content-Type" content="text/html"/>
+<meta name="description" content="View, Entry, and Report Pushbuttons Operations -- Category 6 (32-bit WinPCS)"/>
+</head><body>
+<a name="Top"></a>
+
+<h1>View, Entry, and Report Pushbuttons Operations -- Category 6 (32-bit WinPCS)</h1>
+
+<h3>Function calls in this category are made:</h3>
+
+<p>
+1.  <a href="#Cat6132">In response to</a>
+<a href="evini.html#PushCommand">pushing a button in a View</a> defined to do the 
+<a href="evini.html#PushCommand"> LCXCALL</a> or 
+<a href="evini.html#PushCommand"> LCXCALLA</a> operation.<br/>
+
+2.  <a href="#Cat6232">In response</a> to a 
+<a href="evini.html#LCXMACRO"> $LCXMACRO</a> command 
+on a field in an Entry Form or View Form. <br/>
+
+3. <a href="#Cat6332">In response to the use of the System/Run Macro command</a>.<br/>
+
+4. <a href="#Cat6432">In response to</a> an LCXCALL 
+pushbutton in a Report created with 
+<a href="lcxh.html#RepCreate">RepCreate( )</a> 
+or a status index report as defined in <!-- "starepini.html" --> 
+STAREP.INI.<br/>
+
+5.  <a href="#Cat6532">In response to</a>
+an L or La action code in the menu in PCSD.INI.
+</p>
+
+<hr/>
+<a name="Cat6132"></a>
+<h2>1. LCXCALL and LCXCALLA pushbuttons in View and Entry</h2>
+
+<h3>Enabling control in WinPCS: </h3>
+<p> The <a href="evini.html#PushCommand">LCXCALL</a>
+definition for a pushbutton in 
+The <a href="evini.html"> View .INI, Entry .INI files </a>
+and the common pushbuttons in the <b>0:\VIEW.INI</b> file. </p>
+
+<p>There is one call per push.</p>
+
+<p>The LCXCALL and LCXCALLA  definitions in all of these .INI files is on
+one of the following forms:</p>
+<pre>
+<em>Legend</em><b>=LCXCALL 1 (</b><em>explanation</em><b>)</b><em> filename function tailarg ... </em>
+<em>Legend</em><b>=LCXCALLA 1 (</b><em>explanation</em><b>)</b><em> filename function tailarg ... </em>
+<em>Text</em><b>=LCXCALL 0 (</b><em>explanation</em><b>)</b><em> filename function tailarg ... </em>
+<em>Text</em><b>=LCXCALLA 0 (</b><em>explanation</em><b>)</b><em> filename function tailarg ... </em>
+</pre>
+
+<h3>LCX files and Callback function for View .INI files:</h3>
+<p>The filename and function name is referred to in the 
+button definition in the View .INI file.</p>
+
+<h3>Calling sequence:</h3>
+<p>(source reference eview/evpush.c)</p>
+<p>The function is called as :</p>
+<pre>
+<em>function</em><b>(</b><em>view</em><b>, </b><em>base</em><b>, </b><em>item</em><b>, </b><em>tailarg ... </em><b>)</b>
+</pre>
+
+<p>where <em>view</em> indicates where the call originated, 
+the <em>base</em> is the name of the table of that View or Entry panel, and
+the <em>item</em> is the name of the object being shown in the View or 
+Entry, as per the CXDICT ITEMFLD value. 
+The <em>tailarg</em> arguments correspond to the words on the rest of 
+the line in the definition. This is often used for additional fieldnames. </p>
+
+<h3>Return value:</h3>
+<p>The function should return a 3-part set, where the first 
+element is 0 for status OK resulting in a green 
+status button and non-0 for status error, resulting in a red status button.
+The second element is an explanatory text to go into the action status list, 
+and the last element indicates whether the view itself should be 
+updated or not.  </p>
+
+<p>For example, if the macro-function does something that changes the values in the displayed record in the table,
+it is likely that an update of the visuals will be desired. The typical return statement would then be something
+along the lines of:</p>
+
+<pre><b>return(makeset(0, "OK", 1));</b></pre>
+
+
+<h3>Note:</h3>
+<p>Although the name and the general definition is nearly the same as 
+<a href="#Cat6432"> LCXCALL buttons in Reports</a>, their calling
+contexts and argument lists are different. Views and Entries have a welldefined, single table and
+record, while a Report is a list of records with a lot more possible variations.</p>
+
+<!-- -->
+<hr/>
+<a name="Cat6232"></a>
+<h2>2. $LCXMACRO() on View or Entry fields </h2>
+
+<p>See also the reference to the <a href="evini.html#LCXMACRO">$LCXMACRO</a> command.</p>
+
+<h3>The Entry or View INI file entry:</h3>
+
+<pre> fieldname=order size 0 case (description) $LCXMACRO(function, param, reserved, legend) </pre>
+
+<p>for example</p>
+<pre>    SITE=25 2 0 L (Sitecode) $LCXMACRO(ValSite, F101, 0, Site OK)</pre>
+
+<h3>Function </h3>
+<p>The function is then called as</p>
+
+<pre>function(table, field, screenvalue, param, opcode, univalue);</pre>
+
+<p>and should return a 3-part set as:</p>
+
+<pre> makeset(rcode, primary, secondary)</pre>
+
+<h3>Function arguments and return value</h3>
+<p>(source reference eview/macval.c)</p>
+
+<p>The function parameters are:<br/>
+<em>table</em> is the table being looked at in Entry; <br/>
+<em>field</em> is the field where the $LCXMACRO operation is placed;<br/>
+<em>screenvalue</em> is the value of this field on-screen before coming 
+into the function;<br/>
+<em>param</em> is the parameter copied verbatim from the second 
+parameter of the $LCXMACRO<br/> 
+<em>opcode</em> is either INFO or VALIDATION according to the 
+reason for the function being called. More on this below.<br/>
+<em>univalue</em> is the value of the field name specified as ITEMUNIFLD 
+in CXDICT for this table. It is normally the record number. Its main 
+purpose is to allow the macro user to position on the current record 
+of the table being edited, if necessary. More on this below.<br/>
+</p>
+
+<h3>Return value</h3>
+<p>For the returned value, the three parts of the set are:<br/>
+<em>rcode</em>. To be given one of the values <b>-1</b>, <b>0</b>, or <b>1</b> 
+as per the following, dependent on the value of <em>opcode</em><br/>
+<em>primary</em>: Value of the primary field on-screen<br/>
+<em>secondary</em>: Value of the secondary field on-screen.</p>
+
+<h4>For both <em>opcode</em> == INFO and <em>opcode</em> == VALIDATE:</h4>
+
+<p>Set rcode to <b>-1</b> when: The macro function could not decide whether 
+the value of the <em>screenvalue</em> was good or bad.  This is also the value 
+to use if the value is bad and the macro function decides it can't 
+be fixed, or some secondary error occurred.</p>
+
+<h4>For opcode == INFO:</h4>
+<p> Set <em>rcode</em> to <b>0</b> in order to cause a subsequent 
+validation to be done. </p>
+<p>Set <em>rcode</em> to <b>1</b> means: Do not cause a subsequent 
+validation call; the <em>screenvalue</em> is deemed to be OK as is. Pass the 
+<em>screenvalue</em> back as the primary field parameter, possibly with 
+simple changes (spaces removed, upper-case conversion, that sort of thing).</p>
+
+<h4>For opcode == VALIDATE</h4>
+<p>Set <em>rcode</em> to <b>0</b> in order to reject the value.</p>
+<p>Set <em>rcode</em> to <b>1</b> in order to accept the value, 
+similar to INFO.</p>
+
+<h3>Files</h3>
+<p>The function is expected to be in the file specified in <b>WinPCS.INI</b>, 
+the <b>[ENTRY]</b> section, <b>LCXFILES=</b> entry; or if this is absent, the file 
+<b>0:\ENTRY.LCX</b> (in the client system directory where <b>ANCHORC.DLL</b> 
+and <b>WinPCS.INI</b> are). Even when used in Views in 32-bit 
+systems, the default file is still <b>0:\ENTRY.LCX</b>, and these files are
+still referenced in the <b>[ENTRY]</b> section. </p>
+
+<h3>Availability:</h3>
+<p>When this field is part of a Quick Report, the LCX code is copied from the client 
+for the occasion and then run on the server: this is one of the few places where 
+the same LCX code regularly is run on both the client and on the server.</p>
+
+<p>Therefore, some caution is advised in calling only those system functions that
+exist on both server and client. </p>
+
+<h3>Order of calls:</h3>
+<p>The function is used for both info and validation. The purpose of the 
+info call <b>("INFO"==opcode)</b> is twofold: (1) place values onto the screen 
+and (2) indicate whether subsequent validation is needed. 
+The validation call <b>("VALIDATE"==opcode)</b> is expected to perform 
+the validation itself.  The outcome of this is accept or reject accordingly. 
+If desired, the info or validation calls may place a value in 
+the  secondary field on the screen.</p>
+
+<p>Info calls are made when:</p>
+<p>- Entry or view is started, in order to place any initial values on 
+the screen, different from the ones in the table.</p>
+<p>- Return is hit on a field with a $LCXMACRO setting.</p>
+<p>- When a report containing this field is run, the function is run
+as an INFO call on the server. </p>
+
+<p>The Validate calls are made when:</p>
+<p>- Return is hit on a field with a <b>$LCXMACRO</b> setting, and the 
+corresponding info call has returned 0. </p>
+<p>- the Validate button is clicked and the current field has the <b>$LCXMACRO</b> 
+defined. There is no prior info call for this, as the pushing of the 
+Validate button is equivalent to an info function
+returning the value 0 for Validation required.  </p>
+
+<h3>More Notes:</h3>
+<p>Although designed for validation, this may be used for other purposes 
+as well. For example, when a specific value is entered into a field, a 
+subsequent operation is to be done (create a record, make a connection, 
+verify the presence or absence of something, etc.)  Of course, this 
+may be called validation in a wider sense. The way to do this is to let 
+the info function return <b>0</b> and the original primary value (and any 
+desired secondary value; but note that secondary values don't get stored 
+anywhere) The validation function then does whatever it wants and 
+returns the desired values and <b>1</b> to accept. If the external function 
+failed, the validation function may return <b>0</b> to forestall 
+any updating or insertion of the main table.</p>
+
+<h3>Example:</h3>
+<p>If a field has the value <b>"Y"</b> upon validation, perform an unspecified 
+task. If the field does not have value <b>"Y"</b>, do nothing.</p>
+
+<p>In the Entry INI file: </p>
+
+    <pre>REQUIRED=25 2 0 L (Required action) $LCXMACRO(ReqVal, Y)</pre>
+
+<p>The Macro function will then look like:</p>
+
+<pre>
+ReqVal(string table, string field, string screenvalue, 
+    string param, string opcode, string univalue)
+{
+    string sfield;
+
+    if("INFO" == opcode)
+    {
+        /* Cause all subsequent validation actions to be performed. */
+        return(makeset(0, screenvalue, "" ));
+    }
+
+    if("Y" == screenvalue)
+    {
+        /* This shows how to position the table so get() will work properly. */
+        sfield = StdField(table, "ITEMUNIFLD");
+        findexact(table, sfield, univalue);
+
+        /* Do the desired actions. */
+
+        /* ... */
+    }
+    return(makeset(1, screenvalue, "" ));
+}
+</pre>
+
+<h3>See Also:</h3>
+<p> <a href="evini.html#LCXCALL"> $LCXCALL( ) </a> </p>
+
+<!-- -->
+<hr/>
+<a name="Cat6332"></a>
+<h2>3. Menu choice System/Run Macro</h2>
+
+<h3>Enabling control in WinPCS: </h3>
+<p><em>System/Run Macro</em> menu command</p>
+
+<p>The user selects the macro file and function in the following 
+dialogs. There are no arguments, and the return value is ignored.</p>
+
+<hr/>
+<a name="Cat6432"></a>
+<h2>4. LCXCALL in Reports </h2>
+
+<h3>Enabling control in WinPCS:</h3>
+<p>The <b>LCXCALL</b> definition in <b>STAREP.INI</b> Report sections. <br/>
+The <b>LCXCALL</b> pushbutton definition in a report created with 
+<a href="lcxh.html#RepCreate">RepCreate( )</a> 
+</p>
+
+<p>The definitions in STAREP.INI or the 
+<a href="lcxh.html#RepCreate">RepCreate( )</a> argument list is one of </p>
+<pre>
+<b>$button </b><em>icon</em><b>=LCXCALL 1 (</b><em>Explanation</em><b>)</b><em> function optional tail-args</em>
+<b>$button </b><em>legend</em><b>=LCXCALL 0 (</b><em>Explanation</em><b>)</b><em> function optional tail-args</em>
+<b>makeset("PB", </b><em>icon</em><b>, "LCXCALL 1 (</b><em>Explanation</em><b>)</b><em> file function optional tail-args</em><b>")</b>
+<b>makeset("PB", </b><em>legend</em><b>, "LCXCALL 0 (</b><em>Explanation</em><b>)</b><em> file function optional tail-args</em><b>")</b>
+</pre>
+<p>and when the button is pushed, the call takes place as</p>
+<pre>
+<em> function</em><b>(</b><em>optional tail-args</em><b>,</b><em>Report</em><b>)</b>
+</pre>
+
+<p>
+<em>icon</em> is the name of a bitmap to appear on the pushbutton instead of a legend<br/>
+<em>legend</em> is the text to appear on the pushbutton instead of a bitmap<br/>
+<em>Explanation</em> is the text to appear explaining the purpose of the pushbutton.<br/>
+<em>optional tail-args</em> is any trailing text following the functin name.
+It is frequently useful to formulate this as a set or a separatable list, since the entire
+rest of the line is passed in as one argument.  <br/>
+<em>Report</em> is the reference to the report where this pushbutton is defined. This parameter
+is used with functions such as <a href="lcxh.html#RepInfo">RepInfo( )</a> and 
+<a href="lcxh.html#RepGet">RepGet( )</a> functions to read the contents of the report. 
+</p>
+
+<h3>Example:</h3>
+<pre>
+$button LCX=LCXCALL 0 (Do something) RunLoop 5,4,2
+</pre>
+<p>where the function RunLoop( ), which presumably wants three column-indexes as the argument, 
+and does something interesting but unspecified with the data in the report, looks something like:</p>
+<pre>
+RunLoop(string tail, string Report)
+{
+	string rcount, row, cset; 
+	string tagcol, descrcol, statuscol;
+	string tag, descr, status;
+
+	/* Convert the comma-separated list into a regular set, then extract the column numbers. */ 
+	cset = tabtoset(tail, ordinal(",") ); 
+	tagcol = setiem(cset, 0); 
+	descrcol = setiem(cset, 1); 
+	statuscol = setiem(cset, 2); 
+
+	rcount = RepInfo("rows", Report); 
+	/* Note that row numbering starts at -(row count) and goes up to -1.  */ 
+	for(row = -rcount; row &lt; 0; row += 1)
+	{
+		tag = RepGet(row, tagcol, Report); 
+		descr = RepGet(row, descrcol, Report); 
+		status = RepGet(row, statuscol, Report); 
+
+		if("OK" == status)
+		{
+			/* Do whatever is desired with the tags that are OK 
+				... 
+			*/ 
+		}
+	}
+    return(0);
+}
+</pre>
+
+<h3>Special replacements:</h3>
+<p>None. If the function is non-existent either an error message will appear in its place, 
+	or nothing at all will happen. 
+Use <a href="lcxh.html#message">message( )</a> for debugging and finding out why nothing appears.</p>
+
+<h3>Note:</h3>
+<p>Although the name and the general definition is nearly the same as 
+<a href="#Cat6132"> LCXCALL buttons in Views</a>, their calling
+contexts and argument lists are different. Reports allow for a lot more variations
+than the Views and Entries with their welldefined, single table and
+record.</p>
+
+<h3>Execution context:</h3>
+<p>Not shared and not re-entered.</p>
+
+<!-- -->
+<hr/>
+<a name="Cat6532"></a>
+<h2>5. Menu entry with L or La action code</h2>
+
+<h3>Enabling control in WinPCS: </h3>
+<p>Entry in PCSD.INI with the <b>L</b> (synchronous LCX) or <b>La</b> 
+(asynchronous LCX) operation code, indicating a macrofunction to be run in 
+response to selecting the menu entry. 
+The <b>La</b> code starts the macrofunction in a new thread, this 
+can be useful for reports that call the server and end up sitting 
+and waiting for data from it.  Such reports are very user-unfriendly 
+when run in synchronous mode. </p>
+
+<p>These entries are on one of the forms:<br/>
+<em>Menu text</em><b>=</b><em>lcxfile</em><b> L </b><em>function</em><br/>
+<em>Menu text</em><b>=</b><em>lcxfile</em><b> La </b><em>function</em><br/>
+<em>Menu text</em><b>=</b><em>lcxfile</em><b> L(</b><em>symbol</em><b>) </b><em>function</em><br/>
+<em>Menu text</em><b>=</b><em>lcxfile</em><b> La(</b><em>symbol</em><b>) </b><em>function</em><br/>
+where the <em>Menu text</em> is the string appearing in the menu, 
+<em>lcxfile</em> is the file where the <em>function</em> is expected
+to be found. The optional <em>symbol</em> is a bitmap or icon defined in
+REFBMP31.INI that can accompany the text in the menu entry. </p>
+
+<p>In addition to the file shown, functions defined in the files
+listed in WinPCS.INI, section [WINPCS] entry LIBRARY= are available.</p>
+
+<p>There must be a R or A permission setting on an entry 
+<b>L</b><em>lcxfile</em> defined in USYM and WUSER. If there is
+no such entry, or the permission-setting is H, the menu item 
+will appear grayed and be unavailable.</p>
+
+<h3>Calling sequence:</h3>
+<p>(source reference winpcs31/dispatch.c)</p>
+<p>The function is called with 4 arguments, as :</p>
+<pre>
+<em>function</em><b>(</b><em>""</em><b>, </b><em>""</em><b>, </b><em>permission</em><b>, </b><em>tailarg</em><b>)</b>
+</pre>
+<p>Its return value is ignored. </p>
+<p>The first two arguments are blank, this is from compatibility with
+old 16-bit systems. The tail arguments all come in one string, no effort is
+spent on chopping this into words. 
+Use <a href="lcxh.html#strword">strword( )</a> 
+to do that as and when necessary. </p>
+
+<h3>Example</h3>
+
+<p>These are some typical references from various sections in PCSD.INI:</p>
+<pre>
+Report A=0:\krl.lcx L TestFastReport CERTSYS A123V
+Report B=0:\krl.lcx L TestFastReport CERTSYS B123V
+Published Reports=0:\pubrep.lcx L(BMREPORT) PubReportlist
+Standard &amp;Reports selection=0:\PCSD.LCX L(STDREP) StartStdrep
+&amp;Punch-List Graph =0:\PLGRAF.LCX L(GrafPL) DoListPLTotal AUTOPL
+Main Site (A1) Sheets Graph=0:\PLGRAF.LCX L(GrafITR1) DoListChkTotal CONITR1
+Second Site (A2) Sheets Graph=0:\PLGRAF.LCX L(GrafITR2) DoListChkTotal CONITR2
+Vendor Sites (A3) Sheets Graph=0:\PLGRAF.LCX L(GrafITR3) DoListChkTotal CONITR3
+Preservation Schedule=0:\pmrgen.lcx L(PresvSchedule) PresvSchedule
+Find Preservation Items=0:\pmrgen.lcx L(GSEARCH) FindTagPM
+Hierarchy Systems=0:\PCSD.LCX L(CERTSYS) StartHier CERTSYS
+Hierarchy Sub-Systems=0:\PCSD.LCX L(CERTAC1) StartHier CERTAC1
+</pre>
+
+<h3>See Also:</h3>
+<a href="evini.html#Introduction"> View and Entry INI files</a><br/>
+
+STAREP.INI documentation <br/>
+
+<a href="lcxh.html#Functions.20available.20with.20the.2032.2dbit.20Server">
+    Functions available with the 32-bit server </a> <br/>
+<a href="lcxh.html#Functions.20available.20with.20the.2032.2dbit.20client">
+    Functions available with the 32-bit client </a> <br/>
+
+<!-- -->
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> </p>
+
+
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+</body>
+</html>

@@ -1,0 +1,208 @@
+
+<html lang="en">
+<head>
+<title>WinPCS Super-Server 1.6</title>
+</head><body>
+
+<h1>WinPCS Super-Server 1.6</h1>
+<a name="Intro"> </a> 
+
+<p>The WinPCS Super-server is designed to allow starting and stopping
+of the main WinPCS server program and the Tablet-handling client, 
+remotely, without having to have access to the main server machine. </p>
+
+<p>Version 1.6 is designed to allow up to 4 different projects on the same
+machine.</p>
+
+<p>This is useful when doing updates of the server code where
+the WinPCS server needs to be stopped, having its files replaced,
+and then restarted. </p>
+
+<h2>Components and files</h2>
+<p>The whole thing consists of the following three
+executable files:
+
+WINPCSSV.EXE<br>
+SSPROD.EXE<br>
+WINPCSCL.DLL<br>
+</p>
+
+<p>The server itself is WINPCSSV.EXE and this is a complete EXE file
+that require no non-system DLLs to run. It may be run as a console 
+program or as a service, and it contains the means to install, start, 
+and remove itself.  When invoked without arguments, it gives the 
+following messages about how to use it:</p>
+
+<pre>
+WinPCSSV -install        to install the service
+WinPCSSV -start          to start the installed service
+WinPCSSV -instart        to install and start the service
+WinPCSSV -remove         to remove the service
+WinPCSSV -cmdline        to run as a console app on the commandline
+</pre>
+
+<p>This is normally installed as a service, by issuing 
+<b>WINPCSSV -install</b> or <b>WINPCSSV -instart</b> and left
+to run until the server shuts down. Once installed it will appear in the
+list of services and may be given "Automatic startup" status there.</p>
+
+<p>Upon start, it reads settings from a file WINPCSSV.TXT if that 
+file exists. It writes this file whenever one of the parameters are 
+changed, and remembers them that way. The file is really only to be
+written and read by the super-server, and it is painful to try and change
+things in it manually. Don't bother, use ssprod instead.  </p>
+
+<p>The super-server must be running on the same machine as 
+the WinPCS server. It does not have the capability of starting a program
+such as W31SVR.EXE on a different machine from the one it runs on itself. 
+The super-server also only knows how to deal with the WinPCS Server and
+the Tablet-handling Client. It does not know how to deal with any other
+local programs and is non-configurable in this respect. This also means that
+all paths referenced are local to the server machine and do not require any
+drive mapping in the network or any such. </p>
+
+<h2>Operation</h2>
+<a name="Operation"> </a> 
+To access the server, the SSPROD.EXE (super-server prodding) 
+program is run. This also operates on the command-line, and may tell
+the super-server to start or stop one of the 4 WinPCS server or the 
+tablet-handling clients. ssprod can be run from any client machine
+with network access to the server program, and is the normal way of interfacing 
+to it. The SSPROD.EXE and the WINPCSCL.DLL may be copied onto some client 
+machine and run from there, obviating the need for mapping drives to the server 
+also under these circumstances. The only communications link the two need
+is the collection of RPC calls done via WINPCSCL.DLL to the server program. </p>
+
+<p>ssprod has the following command-line arguments:
+<pre>
+ssprod servername -vlgh -p name -d path -s path -c path -m name -a path
+   servername      name of the server to connect to
+   -v              tell about versions
+   -l              lists the known programs' names
+   -p w31svr1      handle the winpcs server program for Project 1
+   -p tabhcli1     handle the tablet-handling program for Project 1
+   -g              Start the program
+   -h              stop the program
+   -d path         Set server executable file's directory
+   -q path         Set path for the stop command
+   -s path         Set server's working directory
+   -c path         Set client's working directory
+   -m name         Set machine name or IP-address
+   -a path         Set additional optional path-info
+</pre></p>
+
+<p>For the other three projects, number 2, 3, or 4, the suffix digit on the
+to the -p arguments can be changed to w31svr2, w31svr3, tabhcli2, etc. The idea 
+is that there can be up to 4 different projects running on one server, with 
+independent server processes
+and we will want to start and stop them independently of each other.</p>
+
+<p>Generally, as examples, to start the WinPCS server for Project 1 
+on a machine named krld610 the command is
+<pre>ssprod krld610 -p w31svr1 -g</pre>
+and to stop it it is: 
+<pre>ssprod krld610 -p w31svr1 -h</pre></p>
+
+<h2>Paths</h2>
+
+<p>There are 4 paths and the machine-name that need to be 
+set for it to handle the WinPCS server:</p>
+
+<p>1. The server executable file's directory. This is where the
+W31SVR.EXE file is or will be. For example, if it is for the Project 1
+in the directory I:\server31 on the machine named krld610:</p>
+
+<pre>ssprod krld610 -p w31svr1 -d i:\server31</pre>
+
+<p>Note how the arguments to SSPROD invocations identify the machine, 
+the program and some setting to apply to it. </p>
+
+<p>2. The stop-server program requires the name or IP-address of
+the machine. This is similar to the argument to ssprod, but there
+may be instances where the naming resolution does not work, and we
+must use the IP-address.  To set this name, use the -m argument: </p>
+
+<pre>ssprod krld610 -p w31svr1 -m krld610</pre>
+
+<p>3. The stop-server program's executable file's directory. 
+This is where the W31STOP.EXE file is or will be. This is usually
+the same as the the directory for the server program.  Example
+for the same machine as above:</p>
+
+<pre>ssprod krld610 -p w31svr1 -q i:\server</pre>
+
+<p>4. The WinPCS server also needs to find its ANCHORS.DLL file, this
+directory is the server's system directory. This is typically called
+SERVER and is a sibling of the ordinary project-specific DATA, INI, 
+SYSTEM32, and the rest of the lot. For the example machine KRLD610 where 
+this is located in J:\united\server, the command-line is: </p>
+
+<pre>ssprod krld610 -p w31svr1 -s j:\united\server</pre>
+
+<p>5. On versions of the WinPCS servers, earlier than 
+W31svr.exe Build 728, 28 June 2004, the 
+the "stop WinPCS server program" uses the client-side ANCHORC.DLL. 
+This requires the version 1.5 or earlier of the Super-Server, for it
+to stop it correctly. Of course, the manual way of stopping by calling
+w31stop.exe from a client is still possible independent of the super-server,
+except that it may think the winpcs server is still running and may have to
+have a stop command issued before allowing the server to restart.</p>
+
+<p>Later versions, from Build 728, 28 June 2004 and onwards, use the server-side
+ANCHORS.DLL instead. These do not need to know about the client directory
+at all. </p>
+
+<pre>ssprod krld610 -p w31svr1 -c j:\united\system32</pre>
+
+<p>6. On some systems, the path to the Pervasive or Btrieve engine might
+not have been set, and there is an additional way of specifying an 
+additional path element in this case: </p>
+
+<pre>ssprod krld610 -p w31svr1 -a c:\pvsw\bin</pre>
+
+<p>To clear any of these paths, use the argument <b>(none)</b> for them; the system will
+then wipe it out: </p>
+
+<pre>ssprod krld610 -p w31svr1 -a c:\pvsw\bin</pre>
+
+<p>To check what the current settings for the winpcs server, W31SVR, 
+are, use the <b>-l</b> command:
+
+<pre>ssprod krld610 -p w31svr1 -l</pre>
+
+<p>and it will tell about the various paths and commands.  
+If necessary, these may be changed at any time.  Whenever changes are 
+being made, these will be stored in the WINPCSSV.TXT file where they can
+be re-read on a later start.  This file is not read at other times. Do not
+depend on being able to edit this file -- newer versions of ssprod and winpcssv.exe will
+want to rewrite the file in new ways, and no guarantee of cross-version
+compatibility will be given. The file is used by the super-server to remember 
+the path settings.</p>
+
+<h2>Start and Stop</h2>
+
+<p>The WinPCS server may now be started by issuing</p>
+
+<pre>ssprod krld610 -p w31svr1 -g</pre>
+
+<p>If this comes up with some error messages about a path not found, 
+the missing path may be added. If this is successful, the list of 
+running programs in Task Manager should display the entry named 
+"w31svr.exe" and the WinPCS client should be able to locate the 
+running server and access it.</p>
+
+<p>To stop the WinPCS server, the command </p>
+
+<pre>ssprod krld610 -p w31svr1 -g</pre>
+
+<p>will cause it to halt. This can be checked by noting the absence of the
+entry in the Task Manager List.  Once stopped, DLL files for the server
+can be removed and replaced as desired, before the server is started again.</p>
+
+<p>Should the WinPCS server crash, the stop-command must still be given,
+so as to clear the memory of the server, before it is attempted restarted. </p>
+
+</body>
+</html>
+
+

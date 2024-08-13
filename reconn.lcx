@@ -1,0 +1,132 @@
+
+/* Reconn.lcx:
+	Input from an Excel sheet, 
+	tag number in column A, the check-sheet (from REFITR1) 
+	to be disconnected in column B and the 
+	check-sheet from REFITR2 to be connected to go into column C. 
+	Status will be reported into column D. 
+*/ 
+
+ReconnSheet()
+{
+	string maydo, tagtable, field;
+	string topic, hdde, erow, tag;
+	string bs, ds, rtable;
+	string fromsheet, tosheet;
+	string A, B, C, D, E; 
+	string sheet, bsc, bsd, cbs, bs; 
+
+	/* Some parameterized stuff to make code easier to read */ 
+	
+	fromsheet = "REFITR1";
+	tosheet = "REFITR2";
+	A = 1; B = 2; C = 3; D = 4; E = 5; 
+
+	message("Reconnecting checksheets", 
+		"This utility is used for reconnecting checksheets to tags. ",
+		"\x0a Column A is expected to be the tag number.",
+		"\x0a Column B is the ", fromsheet, " check-sheet to be disconnected, and ",
+		"\x0a column C is the ", tosheet, " check-sheet to be connected. ",
+		"\x0a Status info will be written to columns D and E in the process");
+
+	topic = SelectExcelTopic1("Reconnect Checksheets");
+	if(topic == "" ) { return(0); }
+
+	hdde = DDEconnect("EXCEL", topic);
+	erow = 2;
+	CounterHere("Reconnecting Tags", 1);
+	
+	while(1)
+	{
+		tag = ReqXY1(hdde, erow, A, 1);
+		if(notext(tag)) { break; }
+
+		cbs = findexact("CORE", "ITEMID", tag);
+		if(setitem(cbs, 0) != 0)
+		{
+			PutXY1(hdde, erow, D, concat("Search for tag: ", cbs));
+		}
+		else
+		{
+
+		tagtable = get("CORE", "HOMETABLE");
+		field = StdField(tagtable, "ITEMFLD");
+		bs = findexact(tagtable, field, tag);
+		if(setitem(bs, 0) != 0)
+		{
+			PutXY1(hdde, erow, D, concat("Find tag ", tag, " in table ", tagtable, " = ", cbs));
+		}
+		else
+		{ 		
+			sheet = ReqXY1(hdde, erow, C, 1);
+			bsc = connect(tosheet, tagtable, tag, sheet); 
+			PutXY1(hdde, erow, E,  setitem(bsc, 1)); 
+
+			sheet = ReqXY1(hdde, erow, B, 1);
+			bsd = disconnect(tosheet, tagtable, tag, sheet); 
+			PutXY1(hdde, erow, D,  setitem(bsd, 1)); 
+
+		} /* Table find success */ 
+		} /* Core find success */ 
+		erow+=1;
+		CounterStep();
+		if(CounterCheck() == 1)
+		{	
+			break;
+		}
+	}
+	CounterAway();
+	DDEdisconnect(hdde);
+	
+	return(0);	
+}
+
+/* Ask Excel what it has available. */
+SelectExcelTopic1(string whatdo)
+{
+	string svclist, hdde, tset, topic;
+
+	/* Open Excel if it is not running */
+	svclist = capital(DDEsvclist());
+	if(inset(svclist, "EXCEL") < 0)
+	{
+		message(whatdo, 
+			"(", svclist, ")\x0a ", 
+			"Excel is not running. You need to ",
+			"start Excel on the data to be imported..." ); 
+		return("");
+	}
+
+	hdde = DDEconnect("EXCEL", "System");
+	// message(__HERE__, "Connected Excel = ", hdde); 
+
+	/* List the topics, use the one called [...]tail */
+	tset = DDErequest(hdde, "Topics", 1);
+	// message(__HERE__, "tset = ", tset); 
+
+	DDEdisconnect(hdde);
+
+	topic = selectfromset("Excel Input", "Select the source sheet", tset);
+	if(notext(topic)) { return(""); }
+	
+	return(topic);
+}
+
+ReqXY1(string hdde, int row, int col, int makecaps)
+{
+	string z, zl, zr, addr;
+	addr = concat("R",row,"C", col);
+	z = DDErequest(hdde, addr, 1);
+	zl = strlen(z);
+	zr = substr(z, 1, zl-2);
+	if(makecaps) { zr = capital(zr); }
+	return(zr);
+}
+
+PutXY1(string hdde, int row, int col, string info)
+{
+	string addr;
+	addr = concat("R",row,"C", col);
+	DDEpoke(hdde, addr, info);
+	return(info);
+}

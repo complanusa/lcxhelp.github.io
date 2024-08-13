@@ -1,0 +1,52 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>LC97.EXE and lc64</title>
+<meta http-equiv="Content-Type" content="text/html"/>
+<meta name="description" content="LC97.EXE and lc64"/>
+</head><body>
+<a name="Top"></a>
+
+<h1>LC97.EXE and lc64</h1>
+
+<h3>Description:</h3>
+<p>Command-line utilities. LC97.EXE is for Windows, 
+and lc64 is for Linux. They are used from the command-line
+and can test or run LCX functions. </p>
+
+<p>The most useful option is the "dry-running" of 
+LCX files, where each of the functions are checked for certain
+errors, such as undefined variables, mismatched brackets etc.</p>
+
+<h2>LC97.EXE</h2>
+<h3>Configuration</h3>
+<p>Since this uses the client-side functions in DLLs for the most part, 
+the easiest way to set it up is to place a batch-file somewhere there
+is a PATH, such as C:\windows or C:\utils:  </p>
+<pre>
+@echo off
+C:\winpcs\prog_client\lc97 %1 %2 %3 %4 %5 %6 %7 %8 %9
+</pre>
+<p>This batch-file will run the actual LC97.EXE with whatever arguments are
+supplied. </p>
+
+<h2>lc64</h2>
+<h3>Configuration</h3>
+<p>Place the lc64 executable in some local ~/bin directory or similar. 
+The same LD_LIBRARY_PATH= that locates the various .so files for 
+WinPCS will also make these available for the lc64 program. </p>
+
+<hr/>
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+</body>
+</html>
+
+

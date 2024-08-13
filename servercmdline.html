@@ -1,0 +1,104 @@
+
+<html lang="en">
+<head>
+<title>WinPCS Server Command-Line (Windows)</title>
+
+</head><body>
+<a name="commandline"></a>
+
+<h1>WinPCS Server Command-Line (Windows)</h1>
+
+<p>File Date: 2015-05-13</p>
+
+<p>The WinPCS server program, w31tcp.exe, can be started as a standalone command on
+the command-line, from a shortcut, or installed and started as a service.</p>
+
+<p>During testing of a new installation, running it in the command-line will help
+with diagnosing any problems that may be with the WinPCS or database server, such as
+permission errors, files or tables that are not found for whatever reason, errors in
+LCX files, and other startup items that should be and remain OK for the life of the project.</p>
+
+<p>When run as a shortcut or from the command line, it will run with the capabilities and
+rights of whatever the user that started it has. When run as a service, the default
+is to run as Local System, but this may not be desireable. LocalSystem has too many 
+unnecessary permissions and rights within the local machine, that is, the server, and it
+has too few if any at all, for accessing data on other servers that it may be connected to.
+The relevant macro-function that can be used for moving data to the server is
+<a href="lcxh.html#FilePut">FilePut( )</a> 
+and it requires that the WinPCS Server has write access to wherever it is indicated that it is
+to put data files.
+</p>
+
+<p>It is therefore recommended to create a standard, limited-rights user,  or use an existing
+one with the correct limited permissions, 
+and let the WinPCS server run as this user.  The benefits are that there is more control
+over where the WinPCS server may write transferred files to, and it can easily be
+prevented from writing or reading, and thus make accessible, any files beyond its own.</p>
+
+<p>Generally, a separate file-server for documents may be useful, and the WinPCS server 
+should be able to access this; this is not possible or desirable with the Local System account.</p>
+
+<p>Starting the WinPCS server on the command-line or as a shortcut is similar to the invocations for
+the client: the working directory should be the SERVER directory, and the executable
+W31tcp.EXE can be located in a separate PROG_SERVER directory or similar.  No command-line
+parameters per se are used in these cases. </p>
+
+<p>Starting the WinPCS server as a service requires all the server-side DLL files, including
+ANCHORS.DLL to be located in the project's SERVER directory, and that the service is installed from a command-line. 
+Once installed, it can be started and stopped from the Control Panel/Administrative Tools/Services applet
+of the Windows system, and the effective user can also be changed there if necessary.  Note that
+"command-line" means Cmd.EXE, it does <b>not</b> mean Start/Run, since the latter window vanishes as soon
+as the command is performed, causing the information about how it went to be lost.  Completely useless...</p>
+
+<p>The command-line parameters are strings separated with spaces. The first parameter should begin with 
+a - (minus or hyphen). -? and -help makes it produce the information about its command-line parameters. </p>
+
+<p>The basic commands are: <br>
+-install<br>
+-start<br>
+-instart<br>
+-remove<br>
+</p>
+
+<p>Instart simply is -install followed by -start.  -install may be optionally followed by the username and password
+of the user as which the WinPCS server is to run, or these can be changed in the Services control panel later on. 
+The default will be LocalSystem, which as noted, might not be the best choice, since it has access to everything 
+in the local machine and nothing elsewhere. </p>
+
+<p>The -install and -instart commands take an optional username and password when the service is to be run
+as other than Local System. Alternate service-names can be specified as the original service name with a suffix,
+in order to run several services on the same project on the same server, for report-generator purposes.
+This suffix must be specified for -install, -instart, -start, and -remove in order to correctly identify the service.
+</p>
+
+<p>The following commands with options are defined: </p>
+<table><tbody>
+<tr><td>-install</td><td>Installs the service, set to be running as Local System</td></tr>
+<tr><td>-start</td><td>Starts the service</td></tr>
+<tr><td>-instart</td><td>Installs, then starts the service in one go</td></tr>
+<tr><td>-remove</td><td>Removes the service</td></tr>
+
+<tr><td>-install accountname password</td><td>Installs the service with standard name with specified account-name or username, and password.</td></tr>
+<tr><td>-instart accountname password</td><td>Installs the service with standard name with specified account-name or username, and password, then starts it.</td></tr>
+
+<tr><td>-install -S suffix</td><td>Installs the service with name with the suffix added, as Local System</td></tr>
+<tr><td>-instart -S suffix</td><td>Installs the service with name with the suffix added, as Local System, then starts it</td></tr>
+<tr><td>-start -S suffix</td><td>Installs the service with name with the suffix added, as Local System</td></tr>
+<tr><td>-remove -S suffix</td><td>Removes the service installed as the service with name with the suffix added</td></tr>
+
+<tr><td>-install accountname password -S suffix</td><td>Installs the service with standard name with specified account-name or username, and password</td></tr>
+<tr><td>-instart accountname password -S suffix</td><td>Installs the service with standard name with specified account-name or username, and password</td></tr>
+
+<tr><td>-a inifile</td><td>Command-line mode: use an alternate server.ini file. Used for tablet invocations mostly.</td></tr>
+
+</tbody></table>
+<p>For the Linux server</p>
+<table><tbody>
+<tr><td>-u uid</td><td>Run the server as the effective uid, as it would otherwise be root when started automatically.</td></tr>
+
+</tbody></table>
+
+</body>
+</html>
+
+

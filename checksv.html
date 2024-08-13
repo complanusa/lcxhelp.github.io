@@ -1,0 +1,268 @@
+
+<html lang="en">
+<head>
+<title>CHECKSV.EXE: WinPCS Client Installation and Update utility</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name=description content "CHECKSV.EXE: WinPCS Client Installation and Update utility">
+</head><body>
+
+<h1>WinPCS Client Installation and Update program.</h1>
+
+<p><b>CHECKSV.EXE</b> is a stand-alone executable file, which contains a subset of
+WinPCS client elements, enough to allow it to pull the entire regular set 
+of client side files from a master copy located on the server. </p>
+
+<p><b>CHECKSV.EXE</b> is to be run on any remote client in a WAN, and allows 
+the users there to get an updated WinPCS installation, or verify that 
+the one he has is up to date, at any time this may be desired.  
+The program requires only the <b>CHECKSV.EXE</b> and the <b>ZLIB1.DLL</b> files to 
+run.  <b>ZLIB1.DLL</b> is the compression-library, which hardly ever has to be 
+changed, and is used for transferring data between the WinPCS server and
+clients. </p>
+
+<p><b>CHECKSV.EXE</b> communicates with a running WinPCS server, and allows a comparison
+of the master files on the server to be done against any operating files on 
+the client. Any such files that are found to be different from the ones in 
+the master set on the server, even if more recent; are deemed to have 
+been changed and thus require an update.  All files in a number of folders are
+handled through this mechanism. Subfolders are not handled automatically; if 
+there are any, these will have to be considered folders in their own right 
+and must be listed on the server, following their parent folders. </p>
+
+<p>This allows the <b>CHECKSV.EXE</b> also to be used for the client installation 
+process, as will be detailed in the following. </p>
+
+<p>The <b>CHECKSV.EXE</b> also looks at an existing <b>ANCHORC.DLL</b> 
+and makes sure this belongs to the same project as the server whose master 
+files are to be read.
+If this were not done, it would be possible to update a set of files for the
+wrong project, with subsequent problems.  For this, the <b>CHECKSV.EXE</b> also needs
+some version of <b>CWULIB.DLL</b> as the <b>ANCHORC.DLL</b> requires that to work. 
+Unlike the <b>ZLIB1.DLL</b>, this <b>CWULIB.DLL</b> will be checked and if necessary, 
+updated later. It is only needed for the <b>ANCHORC.DLL</b> not for <b>CHECKSV.EXE</b> 
+itself.</p>
+
+<h1>Server-side preparations</h1>
+<p>For <b>CHECKSV.EXE</b> to work properly, the master folders and files must be
+located on the server.  These should be in a format and location
+that allows a client to be run on that machine, for testing and debugging. </p>
+
+<h2>Master folders on the server</h2>
+
+<p>The folders to be copied to the client-side machine includes as a 
+minimum, the <b>SYSTEM32</b>, <b>INI</b>, and <b>PROG_CLIENT</b> 
+folders and the contents 
+of these. More folders may be included in this set. 
+A master copy of the contents of these folders should be located
+on the server. Generally, this also allows us to run a client on this
+machine, and in mixed LAN/WAN environments, we should be able to use this
+set as both the working data for the LAN and the master copy for the WAN. </p>
+
+<h2>Server-side settings, server.ini</h2>
+
+<p>The 
+<a href="serverini.html#section.20client">section [client] in server.ini</a>
+specifies which these folders are. The
+entry folders= here lists the various folders in numbered-drive format,
+for example:</p>
+
+<pre>
+[client]
+; Client-master files for updates
+folders=9:\ini 9:\system32 9:\prog_client
+</pre>
+
+<p>Both the server and the client will have to know about their locations. 
+Using the customary definition of the 9: drive as the parent of the 
+0: directories for both the server and client will make this work. </p>
+
+<h1>First-time installation</h1>
+<p>The steps for initial client installation are, presuming the
+important client directories are <b>SYSTEM32</b> and <b>PROG_CLIENT</b>. Other 
+names will have to be substituted, but the logic and the files
+are the same:</p>
+<li>Create the <b>SYSTEM32</b> folder </li>
+<li>copy the <b>ANCHORC.DLL</b> for the project into <b>SYSTEM32</b></li>
+<li>Create the <b>PROG_CLIENT</b> folder </li>
+<li>copy the <b>CHECKSV.EXE</b>, <b>ZLIB1.DLL</b>, and <b>CWULIB.DLL</b> 
+	files into <b>PROG_CLIENT</b></li>
+<li>Create shortcut for <b>CHECKSV.EXE</b>
+<li>Run <b>CHECKSV.EXE</b>
+<li>Tell it about the client directory and server name and port</li>
+<li>Have it perform the installation of the rest of the system</li>
+<li>Create shortcut for <b>WinPCS.EXE</b></li>
+<li>Create or edit the shortcut for <b>CHECKSV.EXE</b> so that it 
+later can be used for updating. Make sure that <b>CHECKSV.EXE</b> refers to
+to the same server address as WinPCS.EXE does.</li>
+
+<p>For an initial installation of the client, the directory which will 
+eventually hold the executable files for the client should be created, 
+and the two files <b>CHECKSV.EXE</b> and <b>ZLIB1.DLL</b> should be 
+located in this directory. Then <b>CHECKSV.EXE</b> should be run without 
+any arguments.  A shortcut for it may be created at this time, and 
+this will later become edited into the shortcut for the Update Client process. </p>
+
+<p>For the verification of the <b>ANCHORC.DLL</b> to be made for the 
+project, this file must also exist in the ultimate client system 
+directory, <b>SYSTEM32</b>. No other files need exist here 
+initially; they will be copied from the server later. </p>
+
+<p>All other folders that may be referenced will be created as 
+necessary and then populated. To summarize, the following four files 
+should exist at the beginning: </p>
+
+<li>PROG_CLIENT/CHECKSV.EXE</li>
+<li>PROG_CLIENT/ZLIB1.DLL</li>
+<li>PROG_CLIENT/CWULIB.DLL</li>
+<li>SYSTEM32/ANCHORC.DLL</li>
+
+<p><b>CHECKSV.EXE</b> will present its main window, and the user 
+will have to define the
+settings manually. Later, these will be obtained from the files in the
+<b>SYSTEM32</b> directory, but as these aren't here yet, we will have to enter
+them manually, through the dialog from the menu System/Set Settings Manually. </p>
+
+<p>This dialogbox has a number of edit-controls for these settings. </p>
+
+<p>The <b>Client Directory</b> should be set to the directory where 
+the <b>SYSTEM32</b>, <b>INI</b>, and <b>PROG_CLIENT</b> folders 
+are located.  This indicates where to the folders are
+to be created and filled. </p>
+
+<p>The <b>Client User</b> may be left blank, as a suitable 
+default name will be used. </p>
+
+<p>The <b>Server Name or IP address</b> should be set to refer to the machine
+where the WinPCS server program is running.  This can be the machine's
+IP address or machine name as appropriate.</p>
+
+<p>The <b>Server Endpoint</b> is the TCP port number that this WinPCS server is
+using. This is usually set in the ANCHORS.DLL, or it may be redefined
+by the endpoint= setting in SERVER.INI and WINPCS.INI. 
+This will be the same port number as will later be used by the regular
+WinPCS client.  Notice that this ANCHORS.DLL must refer to the same project
+as the <b>ANCHORC.DLL</b> </p>
+
+<p>The <b>Authentication</b> Checkbox indicates whether the RPC authentication
+is used, corresponding to the auth= entries in SERVER.INI and WINPCS.INI. 
+This must be in agreement with the setting on the WinPCS server. Systems 
+using Windows XP SP2 must have this turned on, others may have it on or
+off. Servers and clients must be in agreement of this setting. </p>
+
+<p>Once these settings are given, the dialog may be dismissed with OK.
+The current settings will now be shown in the main <b>CHECKSV.EXE</b> window. If
+they don't look right, the settings dialog may be used again for 
+changing them.  </p>
+
+<p>Once the settings are done, the Perform Check command under the System 
+menu can be issued. This will make <b>CHECKSV.EXE</b> go to the WinPCS server
+identified in the Settings, and have it transmit all the files in all the 
+folders that are indicated. Any files or folders not existing will be 
+created in the process. There will be a flashing odometer indicating progress
+of all the files, and a summary by folder will be shown on the main 
+<b>CHECKSV.EXE</b> window.  <b>CHECKSV.EXE</b> may now be closed. </p>
+
+<p>When all the files are pulled across, the shortcut for the WinPCS client
+can be created. The executable file should be <b>WINPCS.EXE</b> 
+under <b>PROG_CLIENT</b>, 
+and the Working Directory should refer to the <b>SYSTEM32</b> folder. 
+Also, make sure that the correct server address for WinPCS is used,
+this is indicated by a parameter <b>-S 1</b>, <b>-S 2</b>, or similar,
+referring to the server<i>n</i> entry in WinPCS.INI.
+</p>
+
+<p>The shortcut for <b>CHECKSV.EXE</b> should now be changed to 
+use the <b>SYSTEM32</b> as the working directory.</p>
+
+<p><b>CHECKSV.EXE</b> should now be able to figure out the client settings
+by itself. To test this, start it and run the menu entry 
+System/Detect settings, and then review the settings displayed. 
+When correctly configured, <b>CHECKSV.EXE</b> will display the same 
+system directory, server name, and TCP port as WinPCS itself uses.</p>
+
+<p>Attempting the System/Perform Check will make it check the files
+and find that they are all the same, and do no updates. This is fine. </p>
+
+<p>Once the manual actions are tested and found to work OK, the 
+update process can be automated by editing the <b>CHECKSV.EXE</b> shortcut 
+and have it include the <b>-A</b> argument after the executable file name. </p>
+
+<!-- Possible improvements: 
+	-Let <b>CHECKSV.EXE</b> use its parent directory as initially suggested
+		setting for the Client Dir. 
+	-Allow <b>CHECKSV.EXE</b> to create shortcuts 
+		for itself and WINPCS.EXE with proper paths and parameters. 
+	-Allow <b>CHECKSV.EXE</b> to search for and
+		find any ..\SYSTEM32\ANCHORC.DLL file and use that 
+--> 
+
+<h1>Subsequent updates</h1>
+<p>To perform a subsequent update with minimal user interaction, the shortcut
+for <b>CHECKSV.EXE</b> should be set up to use the <b>-A</b> argument 
+(ie. <b>X:\winpcs\prog_client\CHECKSV.EXE -A</b>)
+and have its working directory be <b>SYSTEM32</b>, very similar to 
+the requirements for the WinPCS client itself. It must use the <b>-S</b> 
+argument to refer to the correct server address. This is the same as the 
+WinPCS client will use.  </p>
+
+<p>Running this shortcut now will cause it to look
+at the server and update any necessary files, without further interaction. 
+It stops at the end, with a message-box indicating the completion, and 
+the main window will show the summaries by folder.  Closing the message box
+will cause <b>CHECKSV.EXE</b> to stop, and now the WinPCS client is ready to run. </p>
+
+<p>Note that the WinPCS Client should not be running on the machine 
+while <b>CHECKSV.EXE</b> is running there, or <b>CHECKSV.EXE</b> may fail to 
+update any executable files that have changed.  Should this happen, just 
+stopping the WinPCS Client and re-running <b>CHECKSV.EXE</b> will be 
+sufficient to make sure all the program files will be properly updated.</p>
+
+<p>Otherwise, <b>CHECKSV.EXE</b> can be run at any time. </p>
+
+<h1>Command-line and menu reference</h1>
+
+<p><b>CHECKSV.EXE</b> runs as a GUI Windows application. It can take three command-line
+arguments: <b>-A</b>, <b>-D </b><i>ipaddress</i><b>:</b><i>port</i>, and
+<b>-S </b><i>index</i>.</p> 
+
+<p><b>-A</b> means it should run an update pass automatially.  This is most useful on
+an existing installed client, where there is a known <b>ANCHORC.DLL</b> from where
+all the necessary parameters can be found. </p>
+
+<p><b>-D </b><i>ipaddress</i><b>:</b><i>port</i> is used for debugging. 
+in a matter analogous to the Debug=net entries in WinPCS.INI or SERVER.INI.
+It allows trace-printing across the network to some machine running a netrx
+listener on a port. The <i>ipaddress</i> is the IP-address of this machine, and 
+the <i>port</i> is the TCP port on which a netrx process is listening there. </p>
+
+<p><b>-S </b><i>index</i> indicates to CHECKSV.EXE that the server address of 
+that number, as specified in WinPCS.INI, is to be used. On projects where some
+clients are on a LAN and others are on a WAN, this is how the different
+addresses can be handled without maintaining different files. Both WinPCS and
+CHECKSV.EXE use this mechanism to address the server.  </p>
+
+<p>The menu has two dropdowns, <i>System</i> and <i>Help. </i>
+Most actions appear under <i>System</i>. <i>System/Exit</i> and <i>Help/About</i> ought to
+be self-explanatory. </p>
+
+<p><i>System/Detect Settings</i> will cause <b>CHECKSV.EXE</b> to attempt finding the settings
+from the information in the client's <b>ANCHORC.DLL</b> and WINPCS.INI. If it cannot
+find anything it will complain about <b>ANCHORC.DLL</b> or <b>CWULIB.DLL</b> or some such
+file missing.</p>
+
+<p><i>System/Set Settings Manually</i> allows us to edit the settings of <b>CHECKSV.EXE</b></p>
+
+<p><i>System/Test Server access</i> allows us to test that <b>CHECKSV.EXE</b> can talk to the server.
+This will cause it to try to connect, then obtain the version string from the server, and if 
+this is OK, display that string.</p> 
+
+<p><i>System/Test File Update</i> allows us to check how <b>CHECKSV.EXE</b> would go about updating files. 
+The program would go through the motions of checking and updating files, but not actually copy them across. </p>
+
+<p><i>System/Perform Check</i> causes <b>CHECKSV.EXE</b> to actually go ask the server for
+changes and update any files that have been found to have changed. </p>
+
+</body>
+</html>
+
+

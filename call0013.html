@@ -1,0 +1,194 @@
+
+<html lang="en">
+<head>
+<title>View SI Report Forall-Functions -- Category 13</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name=description content="View SI Report Forall-Functions -- Category 13">
+</head><body>
+<a name="Top"></a>
+
+<h1>View SI Report Forall-Functions -- Category 13</h1> <p> 
+
+<p>Functions called in this category are: </p>
+
+<b>1.</b> Function called in response to the FORALL2 pushbutton defined in STATREES.INI or 
+STAREP.INI SI report sections.<br/>
+<b>2.</b> Function called in response to a FORALL2 pushbutton defined in an argument to
+the <a href="lcxh.html#RepCreate">RepCreate( )</a> function.  <br/>
+<b>3.</b> Function called in response to the FORALL or FORALL1 pushbuttons defined in 
+STATREES.INI or STAREP.INI SI report sections. (16 bit only)<br/>
+
+<h3>Description:</h3>
+<p>These functions are called once per selected item in a Report View when the Forall 
+button is hit.</p>
+
+<h3>Enabling control in WinPCS:</h3>
+<ul>
+<li>Status Index Reports: FORALL2 buttons in STAREP.INI</li>
+<li>Programmed reports: FORALL2 buttons defined in the 
+<a href="lcxh.html#RepCreate ">RepCreate ( )</a> 
+argument list, in tandem with a CS field definition. </li>
+</ul>
+
+<h3>FORALL series pushbuttons in SI and programmed reports.</h3>
+<p>$select entries in STAREP.INI or CS fields in a Report, enable the 
+selection column in the Report View. Execution is done on all records in the Report View where 
+the value is the Yes-value defined. The $select= controls in STATREES.INI appear in the 
+sections dealing with SI report layout is defined as one of the following:</p>
+
+<p>
+$select icon legend = width (field-legend) I:1 yes no <br/>
+$select icon legend = width (field-legend) I:2 yes no <br/>
+$select icon legend = width (field-legend) I:3 yes no table field function<br/>
+</p>
+<p>See the documentation for
+<a href="lcxh.html#RepCreate">RepCreate( )</a> 
+for the equivalent CS field definition in the Programmed (non-status-index) Reports</p>
+
+<p>The I:1 makes the initial setting to the no-value, I:2 defaults similarly to the yes value, 
+and I:3 allows a defined macro function to return the yes or no value as appropriate. 
+This macro function works like all the 
+<a href="call3209.html"> other field-data functions in category 9</a>. 
+</p>
+
+<p>The associated buttons are then defined as:<br/>
+$button legend = FORALL odraw (Explanation) function<br/>
+$button legend = FORALL1 odraw (Explanation) function<br/>
+$button legend = FORALL2 odraw (Explanation) function<br/>
+$button legend = FORALL2 odraw (Explanation) file function<br/>
+</p>
+
+<p>Note that only FORALL2 is still implemented in the 32-bit and 64-bit systems. 
+FORALL was too hard to maintain, and FORALL1 is redundant.</p>
+
+<p>The legend parameter is the legend on the button if odraw is 0 or the name of the bitmap 
+on the button if odraw is 1. This is expected to match the legend name in the $select 
+entries.</p>
+
+<p>For example, the following entries will generate a field filled with N for not selected and Y 
+for selected, and the field will be 10 wide, with the icon defined in REFBMP as lilprint 
+and titled Print Y/N. The function LCX_Certs_Print(&nbsp;) will be invoked for all the records 
+selected (the ones with the Y) in this field. </p>
+
+<pre>
+$select lilprint PCert=5 (Print Y/N) I:2 Y N
+$button PCert=FORALL2 0 (Print Selected Records) LCX_Certs_Print
+</pre>
+
+<h3>Disallowed functions:</h3>
+<p>DDE callback and document-drawing functions are only available inside the DDE 
+callback and Printing callback environments.  There is however no restrictions on 
+initiating printing or DDE-operations. This is actually one of the major uses of these
+functions: to cause printing of all check-sheets or punchitems in a report.</p>
+
+<h3>LCX files (16-bit):</h3>
+<p>All LCX functions referred to in STATREES.INI or STAREP.INI [SI] sections are expected to be found in 
+one of the files referred to via SI= in the [RCONN] section in WinPCS.ini</p>
+
+<h3>LCX files (32-bit):</h3>
+<p>In the case of FORALL2, if the first space-separated word following the end of the explanation
+contains any of the characters :, /, \, and . this will be taken as the name of the file where the
+function is expected to be found. Otherwise, all pushbutton LCX functions referred to in STATREES.INI or 
+STAREP.INI [SI] sections are expected to be found in one of the files referred to via SI= in the [LCX] section 
+in client.ini. Field-functions will be expected to be found on the server, as discussed in
+<a href="call3209.html"> Status Index Callback field functions</a>
+The situation is similar to the optional file-name defined for
+the <a href="call3206.html#Cat6432"> LCXCALL buttons in Reports.  </a>
+</p>
+
+<h3>Callback functions:</h3>
+<p><b>FORALL:</b>
+<em>function</em><b>(</b><em>field1</em><b>, </b><em>field2</em><b>, ...)</b></p>
+
+<p> The 
+<em>field1</em>, <em>field1</em> etc., are the data in the row of the report, as defined 
+in STATREES.INI.  This function's argument set makes it very hard to maintain, since it depends 
+so strongly on the presence and order of the fields in the report. The function has therefore not 
+been ported from the 16-bit monolithic systems to the 32-bit system. 
+</p>
+
+<p><b>FORALL1:</b></p>
+<p><em>function</em><b>(</b><em>reportID</em><b>, </b><em>row</em><b>, </b><em>turn</em><b>, 
+</b><em>yescount</em><b>, </b><em>nocount</em><b>)</b></p>
+
+<p>This <em>function</em> is called once for each record with <b>Yes</b> in the Yes/No field. 
+The arguments are as explained below with FORALL2. It does not have an initial checking pass, 
+and has been deemed redundant, since FORALL2 where this initial pass is ignored is functionally
+exactly the same. </p>
+
+
+<p><b>FORALL2:</b></p>
+
+<p>Initial call: <em>checkvalue</em> = <em>function</em><b>(</b><em>reportID</em><b>, -1, -1, 
+</b><em>yescount</em><b>, </b><em>nocount</em><b>)</b></p>
+
+<p>This is called even if there are no Yes records.
+The argument <em>reportID</em> refers to the report. Functions
+such as <a href="lcxh.html#RepInfo">RepInfo(&nbsp;)</a> can be used to find out more about the report; 
+notably how many records and fields there are, as well as parameters and field aliases set in its layout.</p>
+
+<p>The <em>yescount</em> is the number of records with Yes in the Yes/No field, and 
+<em>nocount</em> is the number of records with No in the Yes/No field. The function is called this
+first exploratory pass even if there are no records with Yes, in which case the value of <em>yescount</em> is zero. </p>
+
+<p>Any global variables set in this initial pass will retain their values during subsequent passes.</p>
+
+<p>If this initial call returns a numeric value greater than or equal to zero, the calls are then
+made for each of the records with the Yes value in their Yes/No field:</p>
+
+<p>Subsequent calls: <em>function</em><b>(</b><em>reportID</em><b>, </b><em>row</em><b>, </b><em>turn</em><b>, 
+</b><em>yescount</em><b>, </b><em>nocount</em><b>)</b></p>
+
+<p><em>reportID</em>, <em>yescount</em>, and <em>nocount</em> are the same as on the first call. <em>turn</em>
+is a counter starting at 0, it is incremented by 1 for each pass; so eventually it will reach the value 
+of <em>yescount</em>-1,  <em>row</em> is the zero-based row number indicating the record in the report
+that is being processed.  In order to be used with 
+<a href="lcxh.html#RepGet">RepGet(&nbsp;)</a> or <a href="lcxh.html#RepPut">RepPut(&nbsp;)</a>
+which use negative numbers based on the end of the report, 
+it has to be adjusted with the number of records in the report, highlighted in the following: </p>
+
+<pre>
+LCX_Certs_Print(string reportID, string row, string turn, string yescount, string nocount)
+{
+	string <b>rmax</b>, tagno, tagcolumn;
+
+	/* the report has a defined alias, tagno, defined for the field containing an equipment tag number */
+
+	<b>rmax</b> = RepInfo("rows", reportID);
+
+	tagcolumn = RepInfo("alias tagno", reportID);
+
+	tagno = RepGet(row<b>-rmax</b>, tagcolumn, reportID);
+
+	/* do something interesting with this ... */
+
+	return(0);
+}
+</pre>
+
+<h3>Return Value: (initial pass)</h3>
+<p>The FORALL2 function should return:<br/>
+Return 0 or a positive value to continue with the first record marked Yes.<br/>
+Return -3 or another negative value for stopping the processing. <br/>
+
+<h3>Return Value: (subsequent pass)</h3>
+<p>The FORALL2 function should return:<br/>
+Return 1 for turning the status back to No<br/>
+Return 0 for leaving the status at Yes<br/>
+Return -1 to ask the user if he wants to retry the most recent one, or cancel the sequence.<br/>
+Return -2 to ask the user if he wants to try the next one, or cancel the sequence.<br/>
+Return -3 to break off the loop prematurely.</p>
+
+<h3>Execution context:</h3>
+<p>Not shared.  Re-entered: The function is called once per selected record in the Report.</p>
+
+<h3>See Also:</h3>
+<p>For the for-all record functions in TRANS see <a href="call0007.html"> category 7</a>.
+<p>For the for-all record functions in Quick Reports see <a href="call0015.html"> category 15</a>.
+<p>For the for-all record functions in INSPECT and SYNFARE see <a href="call0016.html"> category 16</a>.
+<p>For the print all records functions in Quick Reports see <a href="call3217.html">category 17</a>.
+
+<p>Back to <a href="wherecal.html#categories"> WinPCS Macro Calls Invocations and Origins </a> </p>
+</body>
+</html>
+

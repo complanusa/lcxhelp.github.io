@@ -1,0 +1,990 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>Plotting functions</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#0000FF"
+vlink="#000080" alink="#FF0000">
+
+<hr/>
+
+<h1>Plotting functions.</h1>
+
+<p>It has become of interest to have a native plotting
+subsystem.  Some earlier implementation of plots have been 
+done via LCX certificates, but these have been found to be 
+difficult to maitain. </p>
+
+<p>However, this has suggested the place to locate the plotting
+mechanism, since the Print Preview subsystem already supports drawing
+of lines and texts, and it has now been extended to
+allow plots, as a third kind of document, different from Reports and
+LCX programmed Certificates. </p>
+
+<p>To run a plot, there needs to be data coming from somewhere; this
+far, the plots are available from a pushbutton command in a Report
+View, and is expected to read the values to be plotted from 
+this. </p>
+
+<h2>Pushbutton definitions</h2>
+<p>The definition of the pushbutton that starts the plot from
+a Report uses the PLOT command. Any string beginning with PLOT will
+do; the reason for allowing this is so that several different plotting
+commands can be set up from one and the same Report. </p>
+
+<p>In <a href="#STAREP.INI">STAREP.INI</a>, there is a 
+$button definition: </p>
+<pre>
+	$button Sky=PLOT 0 (SMCC skyline plot) S:plotspec.ini K:ss_skyline
+</pre>
+
+<p>The relevant pushbutton element in a programmed report 
+created with <a href="lcxh.html#RepCreate">RepCreate( )</a> is:</p>
+<pre>
+	makeset("PB", "Rundown", "PLOT1 0 (Rundown Curves Plot 1) S:plotspec.ini K:Rundown F:3"),
+</pre>
+
+<p>The overall shape of these definitions follow the standard pattern,
+as seen in for example <a href="call3206.html#Cat6432">LCXCALL in Reports</a>, 
+or <a href="call0013.html">FORALL functions in SI Reports</a>.
+
+<p>In either of these variants (STAREP.INI or Report View), 
+the tail arguments are:<p>
+
+<table border="1">
+<tbody>
+<tr>
+<td><b>S:</b></td><td> - Specification file, an INI file, where the information about
+	how the report-view is to be used for drawing curves or skyline plots, 
+	and how it is to be formatted. More on this file below.
+</td>
+</tr>
+<tr>
+<td><b>K:</b></td><td> - Keyword, the name of a section in the file given as 
+	argument to <b>S:</b>
+	The <b>S:</b> and <b>K:</b> are mandatory, if not referring to 
+	a file with an .INI style layout and a section within this file, 
+	the resulting "plot" will consist of an error message about this.</td>
+</tr>
+<tr>
+<td><b>F:</b></td><td> - formatting information, orientation and page size. 
+	These are the same as the numerical arguments to 
+	<a href="lcxh.html#RepCreate">RepCreate( )</a> or 
+	<a href="lcxh.html#statusindex">statusindex( )</a> 
+	If not specified, it will be whatever the parent Report was set up 
+	to use.</td>
+</tr>
+</tbody>
+</table>
+
+<p>Other, similar, letter-codes may be added as desired later on. Don't 
+expect any of them to remain no-ops forever. </p>
+
+<h3>Arguments to the <b>F:</b> option</h3>
+
+<table>
+<tbody>
+<tr> <td><b>F:0</b></td><td> for A4 or A (8.5 by 11 inches) Portrait</td> </tr>
+<tr> <td><b>F:1</b></td><td> for A4 or A (8.5 by 11 inches) Landscape</td> </tr>
+<tr> <td><b>F:2</b></td><td> for A3 or B (11 by 17 inches) Portrait</td> </tr>
+<tr> <td><b>F:3</b></td><td> for A3 or B (11 by 17 inches) Landscape</td> </tr>
+<tr> <td><b>F:8</b></td><td> for Force Printer selection dialog</td> </tr>
+<tr> <td><b>F:9</b></td><td> for Ask the user what size and orientation is desired</td> </tr>
+</tbody>
+</table>
+
+<h2>The plotspec.ini file</h2>
+
+
+<p>The early version of this file is called plotspec.ini.
+There are one section per plot of interest; we could have any number
+of these files and there can be many sections defining a plot in 
+each of them.</p>
+
+<p>One of the sections in this file is [lcx], which is expected to contain
+functions for various purposes. Other functions in the files identified
+as the LIBRARY= in winpcs.ini, as well as the functions in the files
+listed as the ones for the formatting of the report (usually repform.lcx
+and one of the mcform.lcx -series files). This can be exploited for
+the formatting: projects generally have some function like DrawMCHeader()
+in repform.lcx which provides a uniform frame and title box on the reports
+and this can be re-used for the plots.</p>
+
+<a name="colors"/>
+<h3>Color coding</h3>
+<p>The references to colors of lines and boxes uses the following
+code scheme for colors:</p>
+
+<table>
+<tbody>
+<tr> <td>Code</td><td>Color</td> </tr>
+<tr> <td>0</td><td>Black</td> </tr>
+<tr> <td>1</td><td>Brown</td> </tr>
+<tr> <td>2</td><td>Red</td> </tr>
+<tr> <td>3</td><td>Orange</td> </tr>
+<tr> <td>4</td><td>Yellow</td> </tr>
+<tr> <td>5</td><td>Green</td> </tr>
+<tr> <td>6</td><td>Blue</td> </tr>
+<tr> <td>7</td><td>Purple</td> </tr>
+<tr> <td>8</td><td>Gray</td> </tr>
+<tr> <td>9</td><td>White</td> </tr>
+</tbody>
+</table>
+
+<p>All boxes are drawn with a black frame around them, so the light colors such as white and yellow
+are better suited for use there than for plot lines.</p>
+
+<h2>Entries in each section for plots:</h2>
+
+<h3>Summary:</h3>
+
+<table border="1">
+<tbody>
+<tr><td>Plot-type</td><td>Entry</td><td>Description</td></tr>
+<tr><td>All</td><td><a href="#title">title=<em>string</em></a></td><td>Title of window and plot</td></tr>
+<tr><td>All</td><td><a href="#format">format=<em>function</em></a></td><td>Function to draw the frame with project logo and such</td></tr>
+<tr><td>All</td><td><a href="#margin">left=<em>margin</em></a></td><td>Margin to the left of the plot on the page</td></tr>
+<tr><td>All</td><td><a href="#margin">right=<em>margin</em></a></td><td>Margin to the right of the plot on the page</td></tr>
+<tr><td>All</td><td><a href="#margin">top=<em>margin</em></a></td><td>Margin above the plot on the page. 
+								It is usually in this margin area that the formatting function draws the title boxes and logos. </td></tr>
+<tr><td>All</td><td><a href="#margin">bottom=<em>margin</em></a></td><td>Margin below the plot on the page.</td></tr>
+<tr><td>Curve</td><td><a href="#mode">mode=curve</a></td><td>Indicate that this is a Curve plot</td></tr>
+
+<tr><td>Curve</td><td><a href="#Ckeywordcol">keywordcol=<em>columnnumber</em></a></td><td>The column where the keywords identifying other rows are.</td></tr>
+<tr><td>Curve</td><td><a href="#Cfirstx">firstx=<em>columnnumber</em></a></td><td>The column where the first data-point is. Generally,
+								there are one or more columns to the left of this set aside for labels, legends, keywords, etc.</td></tr>
+<tr><td>Curve</td><td><a href="#Cycount">Ycount=<em>number</em></a></td><td>Number of curve traces to draw</td></tr>
+<tr><td>Curve</td><td><a href="#Cxkeyword">Xkeyword=<em>string</em></a></td><td>Identify the row where the X values are, by matching 
+								this entry to the string in the keyword column.</td></tr>
+<tr><td>Curve</td><td><a href="#Cxlegend">Xlegend=<em>string</em></a></td><td>Legend for the X values as text</td></tr>
+<tr><td>Curve</td><td><a href="#Cxlegendn">Xlegend=#<em>columnnumber</em></a></td><td>Legend for the X values, using the text found
+								in the column for the X values row.</td></tr>
+<tr><td>Curve</td><td><a href="#Cxvalueedit">Xvalueedit=<em>function</em></a></td><td>Optional function to change the appearence of the raw
+								X values, such as converting weeks to dates, putting labels on several lines, etc.</td></tr>
+
+<tr><td>Curve</td><td><a href="#Cykeyword">Ykeyword<em>number</em>=<em>string</em></a></td><td>For the curve number <em>number</em> this is
+								the keyword in the keyword column identifying the data row for this curve.</td></tr>
+<tr><td>Curve</td><td><a href="#Cycolor">Ycolor<em>number</em>=<em>color</em></a></td><td>For the curve number <em>number</em> this is
+								the color with which to draw the curve.</td></tr>
+<tr><td>Curve</td><td><a href="#Cylegend">Ylegend<em>number</em>=<em>string</em></a></td><td>For the curve number <em>number</em> this is
+								the legend string explaining the values shown.</td></tr>
+<tr><td>Curve</td><td><a href="#Cylegendn">Ylegend<em>number</em>=#<em>columnnumber</em></a></td><td>For the curve number <em>number</em> this 
+								indicates a column where the text explaining the values shown is.  </td></tr>
+<tr><td>Curve</td><td><a href="#Cystop">Ystop<em>number</em>=<em>function</em></a></td><td>For the curve number <em>number</em> this 
+								is an optional function that can control whether the curve is to be drawn in a given interval.  </td></tr>
+
+<tr><td>Skyline</td><td><a href="#skyline">mode=skyline</a></td><td>Indicate that this is a skyline plot</td></tr>
+<tr><td>Skyline</td><td><a href="#Skeywordcol">keywordcol=<em>columnnumber</em></a></td><td>The column where the keywords identifying other rows are.</td></tr>
+<tr><td>Skyline</td><td><a href="#Sfirstx">firstx=<em>columnnumber</em></a></td><td>The column where the first data-point is. Generally,
+<tr><td>Skyline</td><td><a href="#Sxkeyword">Xkeyword=<em>string</em></a></td><td>Identify the row where the X values are, by matching 
+								this entry to the string in the keyword column.</td></tr>
+<tr><td>Skyline</td><td><a href="#Sxlegend">Xlegend=<em>string</em></a></td><td>Legend for the X values as text</td></tr>
+<tr><td>Skyline</td><td><a href="#Sxlegendn">Xlegend=#<em>columnnumber</em></a></td><td>Legend for the X values, using the text found
+								in the column for the X values row.</td></tr>
+<tr><td>Skyline</td><td><a href="#Sxvalueedit">Xvalueedit=<em>function</em></a></td><td>Optional function to change the appearence of the raw
+								X values, such as converting weeks to dates, putting labels on several lines, etc.</td></tr>
+
+<tr><td>Skyline</td><td><a href="#Sykeyword">Ykeyword=<em>string</em></a></td><td>Identify the row where the Y values are, by matching 
+								this entry to the string in the keyword column. The Y values are the height of the pillars, this row
+								should contain the corresponding numbers.</td></tr>
+<tr><td>Skyline</td><td><a href="#Sylegend">Ylegend=<em>string</em></a></td><td>Legend for the Y values as text</td></tr>
+<tr><td>Skyline</td><td><a href="#Sylegendn">Ylegend=#<em>columnnumber</em></a></td><td>Legend for the Y values, using the text found
+								in the column for the Y values row.</td></tr>
+
+<tr><td>Skyline</td><td><a href="#Stagstatus">tagstatus=<em>keyword</em>%u</a></td><td>These keywords </td></tr>
+<tr><td>Skyline</td><td><a href="#Slinethisweek">linethisweek=<em>colornumber</em></a></td><td>Optional line to mark this week, 
+								to be shown in the specified color.</td></tr>
+<tr><td>Skyline</td><td><a href="#Scolor">color<em>colornumber</em>=<em>text</em></a></td><td>Explanation of what the 
+								boxes drawn in the specified color mean.</td></tr>
+
+</tbody>
+</table>
+
+<a name="title"/>
+<h3>Common to all kinds of plots: Title Entry</h3>
+<p>
+<b>title=</b><em>string giving the title of the window</em>
+See trace 1 on the illustration. The text may find its way into the page itself, via the 
+formatting function, as this gets this value as its third argument.</p>
+
+<a name="format"/>
+<h3>Common to all kinds of plots: Format Entry</h3>
+<p><b>format=</b><em>function</em></p>
+<p> This refers to the formatting function for the plot, this can
+be in any LCX files referenced or in the [LCX] section. All 
+the <a href="lcxh.html#unicert">usual drawing functions</a> (
+<a href="lcxh.html#Hline">Hline( )</a> , 
+<a href="lcxh.html#Vline ">Vline ( )</a> , 
+<a href="lcxh.html#Text">Text( )</a> , etc) are available.  </p>
+<p>This function is called as:</p>
+<pre>
+<em>function</em><b>(</b><em>inifile</em><b>, </b><em>section</em><b>,
+	</b><em>title</em><b>, </b><em>Report</em><b>, 
+	</b><em>Pleft</em><b>, </b><em>Pright</em><b>, </b><em>Ptop</em><b>, </b><em>Pbottom</em><b>)</b>
+</pre>
+
+</p>where inifile and section refer to the plotspec file and relevant section for this plot; 
+title is the title string as given in the title= entry above.  Report is a report reference to the
+data input, it can be used with the <a href="lcxh.html#RepInfo">RepInfo( )</a> 
+ and <a href="lcxh.html#RepGet">RepGet( )</a> functions to obtain other values from the 
+report outside of the ones being plotted.  The values Pleft, Pright, Ptop, Pbottom, indicate the part of the
+page occupied with the plot; this is of interest so that the framing text and lines can be drawn outside it.</p>
+<p> The return value of this function is ignored.  </p>
+
+<p>The function can call other functions that are loaded as part of the formatting functions for
+the Report View. Notably, the <b>DrawMCHeader( )</b> function in the <b>0:\repform.lcx</b> can be useful.
+An example formatting function, corresponding to the illustration, is shown below. </p>
+
+<a name="margin"/>
+<h3>Common to all kinds of plots: Margin Entries</h3>
+<p>Margins:<br/>
+<b>left=</b><em>number</em><br/>
+<b>right=</b><em>number</em><br/>
+<b>top=</b><em>number</em><br/>
+<b>bottom=</b><em>number</em><br/>
+See trace 2 that shows the left, right, and top margins.
+</p>
+
+<p>There is the <em>number</em> amount of space as margin around the rectangular 
+area in which the plot is drawn on the page. Typically these values can be 
+matched with the ones expected by the function <b>DrawMCHeader( )</b>, for this case, 
+the margins are:<br/>
+<b>left=100<br/>
+right=100<br/>
+top=500<br/>
+bottom=10<br/></b>
+This will give a good-looking result. The numbers are 1/10 mm, same units as we
+see with all other print-preview and plotting functions. </p>
+
+
+<a name="mode"/>
+<h3>Common to all kinds of plots: The Mode of Plot</h3>
+<p>The mode entry defines what kind of plot we have. This far there are
+two modes available, more will be added as need arises. These are:<br/>
+<b>mode=curve</b><br/>
+or<br/>
+<b>mode=skyline</b><br/></p>
+
+<div align="center"><img src="aplot.jpg" 
+alt="Example illustration of a curve Plot along with input 
+report and specification section." /></div>
+
+<h2>For the Curve Plot</h2>
+
+<p> The originating Report is expected to contain a number of rows 
+with the values to be plotted. Each column will have a data point
+and there is one row with the X, horizontal, values, and one or more
+rows with the vertical, Y, values, one row for each of the curves.  
+To identify these, one column in the
+report will have to contain distinct values, "keywords", so that even
+if the report is sorted, and the order of the rows change, the plot 
+will work right. </p>
+
+<a name="Ckeywordcol"/>
+<h3>Curve Plot: Keyword column</h3>
+<p>Identify the column with keywords as<br/>
+<b>keywordcol=</b><em>columnnumber</em><br/>
+for example<br/>
+<b>keywordcol=0</b><br/>
+See trace 3.
+</p>
+
+
+<a name="Cfirstx"/>
+<h3>Curve Plot: First X value</h3>
+<p>Identify the first column that has data-values to be plotted is:<br/>
+<b>firstx=</b><em>columnnumber</em><br/>
+for example<br/>
+<b>firstx=3</b><br/>
+</p>
+<p>Generally, one or more columns on the left will be reserved for keywords, legends,
+explanatory text and so forth. See the trace 4 for this.</p>
+
+<a name="Cycount"/>
+<h3>Curve Plot: Number of curves</h3>
+<b>ycount=</b><em>number</em>
+<p>Number of Y values to plot. There can be 1 or more, typical example shown in the illustration is
+3; there are 3 rows to be identified for each of the three curves. See the trace 5 in the illustration.</p>
+
+<a name="Cxkeyword"/>
+<h3>Curve Plot: Keyword for the X values</h3>
+<p>The keyword for the row where the X values are, is identified as</br>
+<b>Xkeyword=</b><em>name</em></br>
+The row where the keyword column has the identified value is the one that will be used. Trace 6 
+indicates this, here the example is <b> Xkeyword=Week</b>.
+</p>
+
+<a name="Cxlegend"/>
+<h3>Curve Plot: Legend for the X values</h3>
+<p><b>Xlegend=</b><em>string</em></p>
+<a name="Cxlegendn"/>
+<p><b>Xlegend=#</b><em>columnnumber</em></p>
+<p>The legend for the x-axis can be pulled from an indicated column in the report or 
+specified as it is right away. Here in the example, <b>Xlegend=#2</b>, thus it is taken
+from the column 2 in the x-values row, as indicated by trace 7. 
+This legend is also printed out at the end of the X-axis</p>
+
+<a name="Cxvalueedit"/>
+<h3>Curve Plot: X value editing function</h3>
+<p>The raw X values may need further changes. The default is to pass the original values through
+as they are, but there is an option for displaying them differently. Raw week values can be broken on
+several lines, and have the date included, as shown here -- this work is done in the function specified
+from <br/>
+<b>Xvalueedit=</b><em>function</em></br>
+</p>
+<p>The function is called as:
+<pre>
+<em>function</em><b>(</b><em>inweek</em><b>, </b><em>Report</em><b>, </b><em>row</em><b>, </b><em>col</em><b>, </b><em>turn, </em></b><em>turncount</em><b>)</b>
+</pre>
+<p>The inweek variable is the original X value to be drawn, and which will be drawn when this function is not defined.
+Report, row, and col refer to the input report and where in the report the value is found, turn is how far the plot has
+progressed, and turncount is the number of data values or times that this function will be called. </p>
+
+<p>The example shown uses the function 
+<b>Xvalueedit=EditWeeks</b>, defined in the [LCX] section.</p>
+
+<h3>Curve Plot: Y specifications</h3>
+<p>For each of the Y values, indexed as <em>ynumber</em> from 1 to the ycount number given above, 
+there are definitions of the keyword identifying the row, the 
+<a href="#colors">Color</a>
+of the line, the legend
+explaining the values the line shows, and an optional drawing-control function, that can be used to stop the line
+short.  </p>
+
+<a name="Cykeyword"/>
+<p>The keyword identifies the row, via the value matched in the keyword column, similar to the way the 
+X column is identified.  <br/>
+<b>Ykeyword</b><em>ynumber</em><b>=</b><em>name</em><br/>
+for example <b>Ykeyword1=A.5</b>, <b>Ykeyword2=A.6</b>, <b>Ykeyword3=A.7</b>. See trace 8 in the illustration.
+
+<a name="Cycolor"/>
+<p>Each line can have an identifying 
+<a href="#colors">Color</a>, indexed as 0-9.
+<br/>
+<b>Ycolor</b><em>ynumber</em><b>=</b><em>color</em></br> 
+See trace 9.</p>
+
+<p>Each line also has a legend, that is either taken from a column in the Report, or a string
+given directly.
+<br/>
+<a name="Cylegendn"/>
+<b>Ylegend</b><em>ynumber</em><b>=#</b><em>columnnumber</em></br>
+<a name="Cylegend"/>
+<b>Ylegend</b><em>ynumber</em><b>=</b><em>string</em></br>
+In the example, these legends come from a specific row, same as was done for the X legend. The legends
+and the associated lines appear at the top of the plot, serving to explain what the curve is showing.
+
+<p>Optionally, we can make the plotting of lines stop by specifying an LCX function that controls whether
+a segment of line is to be drawn or not.  For curves showing both progress and planned values, the past 
+progress curves should stop at the point of time corresponding to today, any values for the future would be
+meaningless, and no reasonable curve values can be shown, see trace 10. 
+<br/>
+<a name="Cystop"/>
+<b>Ystop</b><em>ynumber</em><b>=</b><em>function</em></br>
+This function is called as</p>
+<pre>
+<em>function</em>(<em> x1</em>, <em> x2</em>, <em> y1</em>, <em> y2</em>, <em> Report</em>, <em> row</em>, <em> col</em>, <em> turn</em>, <em> turncount</em>)
+</pre>
+<p>and it should return -1 for not drawing the line-segment from x1,y1 to x2,y2 for some reason
+and 0 if it should draw this line segment. If no <b>Ystop</b> function is specified
+the default action is to continue drawing the line all the way.</p>
+
+<p>This function, as well as the formatting-function, should be defined in the [LCX] section in this file. </p>
+
+
+<div align="center"><img src="skyline.jpg" 
+alt="Example illustration of a Skyline Plot along with input 
+report and specification section." /></div>
+
+<a name="skyline"/>
+<h2>Skyline Plot</h2>
+<p>The entries <a href="#title">title=</a>, <a href="#format">format=</a>, 
+<a href="#margin">left=</a>, <a href="#margin">right=</a>, <a href="#margin">top=</a>,  and 
+<a href="#margin">bottom=</a>
+are the same as for all plots, discussed above. The <b>mode=skyline</b> is what identifies this
+as a skyline plot. See traces 1 and 2 on the skyline figure for the linkage.</p>
+
+<a name="Skeywordcol"/>
+<h3>Skyline Plot: Keyword column</h3>
+<p>Identify the column with keywords as<br/>
+<b>keywordcol=</b><em>columnnumber</em><br/>
+for example<br/>
+<b>keywordcol=0</b><br/>
+See trace 4 on the skyline figure.
+</p>
+
+
+<a name="Sfirstx"/>
+<h3>Skyline Plot: First X value</h3>
+<p>Identify the first column that has data-values to be plotted is:<br/>
+<b>firstx=</b><em>columnnumber</em><br/>
+for example<br/>
+<b>firstx=3</b><br/>
+See trace 3 on the skyline figure.  </p>
+<p>Generally, one or more columns on the left will be reserved for keywords, legends,
+explanatory text and so forth.</p>
+
+<a name="Sxkeyword"/>
+<h3>Skyline Plot: Keyword for the X values</h3>
+<p>The keyword for the row where the X values are, is identified as</br>
+<b>Xkeyword=</b><em>name</em></br>
+See trace 5 on the skyline plot figure.</p>
+<p>The row where the keyword column has the identified value is the one that will be used. 
+</p>
+
+<a name="Sxlegend"/>
+<h3>Skyline Plot: Legend for the X values</h3>
+<p><b>Xlegend=</b><em>string</em></p>
+<a name="Sxlegendn"/>
+<p><b>Xlegend=#</b><em>columnnumber</em>
+See trace 5 on the skyline plot figure.  </p>
+<p>The legend for the x-axis can be pulled from an indicated column in the report or 
+specified as it is right away.  This legend is also printed out at the end of the X-axis</p>
+
+<a name="Sxvalueedit"/>
+<h3>Skyline Plot: X value editing function</h3>
+<p>The raw X values may need further changes. The default is to pass the original values through
+as they are, but there is an option for displaying them differently. Raw week values can be broken on
+several lines, and have the date included, as shown here -- this work is done in the function specified
+from <br/>
+<b>Xvalueedit=</b><em>function</em></br>
+</p>
+<p>The function is called as:
+<pre>
+<em>function</em><b>(</b><em>inweek</em><b>, </b><em>Report</em><b>, </b><em>row</em><b>, </b><em>col</em><b>, </b><em>turn</em><b>, </b><em>turncount</em><b>)</b>
+</pre>
+<p>The inweek variable is the original X value to be drawn, and which will be drawn when this function is not defined.
+Report, row, and col refer to the input report and where in the report the value is found, turn is how far the plot has
+progressed, and turncount is the number of data values or times that this function will be called. </p>
+
+
+<a name="Sykeyword"/>
+<h3>Skyline Plot: Y keyword</h3>
+<p><b>Ykeyword=<em>string</em></b><br/>
+See trace 6.</p>
+<p>Skyline plots have only one Y axis value: the number of tagged objects (subsystems, SMCCs, or whatever) that is 
+allocated to each bin identified by the X value. Each pillar height is expected to be in a row identified by this
+keyword. </p>
+
+<a name="Sylegend"/>
+<h3>Skyline Plot: Y legend column</h3>
+<p><b>Ylegend=</b><em>string</em></p>
+<a name="Sylegendn"/>
+<p><b>Ylegend=#</b><em>columnnumber</em></p>
+<p>Like the other legends, this either refers to a column where a legend is, or it specifies 
+the legend as a string directly. </p>
+
+<a name="Stagstatus"/>
+<h3>Skyline Plot: Tag and Status rows for drawing the boxes.</h3>
+<p><b>tagstatus=<em>keyword</em>%u</b></p>
+<p>This is the most essential part of the skyline plot, that makes it different from the curves. 
+The rows to read data from are identified by this set of keywords, where the %u part is converted 
+into the numbers 1, 2, etc. for each "storey" in the pillars. Thus <b>tagstatus=CERT%u</b> will match
+a sequence of <b>CERT1</b>, <b>CERT2</b>, <b>CERT3</b>, and so on, up to the maximum height for the pillar for
+this week.  See trace 7 on the skyline plot figure. 
+Each column entry in these rows is expected to contain a 2-part 
+<a href="lcxh.html#Variables">LCX set</a>, where the first part is a
+label, typically a system number, to be displayed on the boxes if there is room, and the second part is the
+color-number for the <a href="#colors">color</a> that this box is to be drawn. An entry 
+such as <b>61-1019+9+</b> will be shown as a
+white box with the string <b>61-1019</b> inside it. </p>
+
+<a name="Slinethisweek"/>
+<h3>Skyline Plot: Optional vertical line to indicate this week.</h3>
+<p><b>linethisweek=</b><em>color</em></p>
+<p>For week-based plots, where the X axis has values calibrated in weeks, the present week 
+can be highlighted by drawing a vertical line on the plot corresponding to today.  The 
+<a href="#colors">color</a> of this line can be specified here. If the statement is not present or
+the color number is set to -1, there will be no such line drawn. See trace 8 on the skyline plot figure.</p>
+
+<a name="Scolor"/>
+<h3>Skyline Plot: Box color explanations.</h3>
+<p><b>color</b>[0-9]<b>=</b><em>string</em></p>
+<p>These entries serve to generate an explanation of what the various box colors are meant to indicate.
+See trace 9 on the skyline plot figure.  Typical <a href="#colors">colors</a> that are useful here 
+are red (2), yellow (4), green (5), and white (9).  </p>
+
+
+<!--
+
+	/* Decide if we do not want to paint the curve in the 
+		interval x1,y1 - x2,y2 for some reason. */ 
+
+
+
+
+
+; Plotspec.ini - specify details and things for plots. 
+
+; Command-tail reference, S:plotspec.ini refers to this file,
+; K:std1 refers to this section.
+; We then expect various entries here, to be determined as needed.
+[std1]
+title=Test Curves
+format=PlotGenFormat
+
+; Margins for the drawing box on the page. The margins can be filled-in
+; with text and legends, need an LCX function compatible with the 
+; report-formatting ones for that.
+
+; The plotting takes place in the box that remains. 
+left=100
+right=100
+top=500
+bottom=10
+
+; We test this doing curves of some Y-values over some X values. 
+mode=curve
+
+; read by column: 
+firstx=3
+keywordcol=0
+ycount=4
+
+; Where do we pick out x,y from the report?
+; Legends, labels on the data from the report somewhere?
+; Row indexes are way too brittle - sort and the plot is dead
+; We designate one column to have distinct recognizable values, 
+; and use these to identify the important rows, for X and the 
+; set of Ys.  Suffixes numbered from 1 to ycount 
+
+Xkeyword=Week
+; Allow for a legend or refer to some column indexed with # 
+Xlegend=#2
+
+; Allow re-writing values, for example, weeks can/should be 
+; numbered 200811, 12, 13 ... 52, 200901, 02, 03 ... 
+; or even go on two or more lines. Have the function be called as
+; lcxfunction(proposedxvalue, vpx, row, column )  
+; add turn and turn-count to help with formatting 
+
+; and return a value or set, where a multipart set means the output
+; is text to go onto several lines. Return blank to omit the label
+
+Xvalueedit=EditWeeks
+
+Ykeyword1=A.1
+Ycolor1=2
+; Legends, (#n means from some specified column n in the same row) or 
+; from a fixed input string (or maybe from LCX or whatever...)
+Ylegend1=#2
+
+Ykeyword2=A.4
+Ycolor2=5
+Ylegend2=#2
+
+Ykeyword3=A.5
+Ycolor3=6
+Ylegend3=#2
+
+Ykeyword4=A.3
+Ycolor4=0
+Ylegend4=#2
+
+; Read the report, dataform=
+; xcolumns: X from the set of columns, its value to be found in some row
+; Xlisted:  X from values in some column, Y from values in other columns
+;  dataform=xcolumns
+
+; 
+; makeset("PB", "Test",    "PLOT0 0 (Rundown Curves Plot 1) S:plotspec.ini K:std1"),
+; makeset("PB", "Rundown", "PLOT1 0 (Rundown Curves Plot 1) S:plotspec.ini K:Rundown"),
+[Rundown]
+title=Rundown Curves
+format=PlotGenFormat
+left=100
+right=100
+top=400
+bottom=10
+mode=curve
+; read by column: 
+firstx=3
+keywordcol=0
+ycount=7
+Xkeyword=Week
+Xlegend=#2
+Xvalueedit=EditWeeks
+
+; A check rundown (Linear)
+Ykeyword1=A.3
+Ycolor1=0
+Ylegend1=#2
+
+; A checks remaining
+Ykeyword2=A.6
+Ycolor2=2
+Ylegend2=#2
+Ystop2=NotPastNow
+
+; B check rundown (Linear)
+Ykeyword3=B.3
+Ycolor3=8
+Ylegend3=#2
+
+; B checks remaining 
+Ykeyword4=B.6
+Ycolor4=1
+Ylegend4=#2
+Ystop4=NotPastNow
+
+; Plan Loop rundown (Linear)
+Ykeyword5=BL.3
+Ycolor5=7
+Ylegend5=#2
+
+; Loop sheets remaining
+Ykeyword6=BL.6
+Ycolor6=3
+Ylegend6=#2
+Ystop6=NotPastNow
+
+; Punchlist remaining
+Ykeyword7=PL.6
+Ycolor7=6
+Ylegend7=#2
+Ystop7=NotPastNow
+
+; 
+
+; makeset("PB", "A",       "PLOT2 0 (A-sheet curves Plot 2) S:plotspec.ini K:Acurve"),
+[Acurve]
+title=A Check Records
+format=PlotGenFormat
+left=100
+right=100
+top=500
+bottom=10
+mode=curve
+; read by column: 
+firstx=3
+keywordcol=0
+ycount=3
+Xkeyword=Week
+Xlegend=#2
+Xvalueedit=EditWeeks
+
+; A check complete
+Ykeyword1=A.5
+Ycolor1=5
+Ylegend1=#2
+
+; A checks remaining
+Ykeyword2=A.6
+Ycolor2=2
+Ylegend2=#2
+
+; A checks total
+Ykeyword3=A.7
+Ycolor3=6
+Ylegend3=#2
+; 
+
+; makeset("PB", "B",       "PLOT3 0 (B-sheet curves) S:plotspec.ini K:Bcurve"), 
+[Bcurve]
+title=B Check Records
+format=PlotGenFormat
+left=100
+right=100
+top=500
+bottom=10
+mode=curve
+; read by column: 
+firstx=3
+keywordcol=0
+ycount=3
+Xkeyword=Week
+Xlegend=#2
+Xvalueedit=EditWeeks
+
+; B check complete
+Ykeyword1=B.5
+Ycolor1=5
+Ylegend1=#2
+
+; B checks remaining
+Ykeyword2=B.6
+Ycolor2=2
+Ylegend2=#2
+
+; B checks total
+Ykeyword3=B.7
+Ycolor3=6
+Ylegend3=#2
+; 
+
+; makeset("PB", "LoopB",   "PLOT4 0 (Loop B-sheet curves) S:plotspec.ini K:BLoopcurve"), 
+[BLoopcurve]
+title=Loop Checks
+format=PlotGenFormat
+left=100
+right=100
+top=500
+bottom=10
+mode=curve
+; read by column: 
+firstx=3
+keywordcol=0
+ycount=3
+Xkeyword=Week
+Xlegend=#2
+Xvalueedit=EditWeeks
+
+; B Loop check complete
+Ykeyword1=BL.5
+Ycolor1=5
+Ylegend1=#2
+
+; B Loop checks remaining
+Ykeyword2=BL.6
+Ycolor2=2
+Ylegend2=#2
+
+; B Loop checks total
+Ykeyword3=BL.7
+Ycolor3=6
+Ylegend3=#2
+; 
+
+; makeset("PB", "Punch",   "PLOT5 0 (Punchlist curves) S:plotspec.ini K:PLcurve"), 
+[PLcurve]
+title=Punchitems
+format=PlotGenFormat
+left=100
+right=100
+top=500
+bottom=10
+mode=curve
+; read by column: 
+firstx=3
+keywordcol=0
+ycount=3
+Xkeyword=Week
+Xlegend=#2
+Xvalueedit=EditWeeks
+
+; Punchlists complete
+Ykeyword1=PL.5
+Ycolor1=5
+Ylegend1=#2
+
+; Punchlists remaining
+Ykeyword2=PL.6
+Ycolor2=2
+Ylegend2=#2
+
+; Punchlists total
+Ykeyword3=PL.7
+Ycolor3=6
+Ylegend3=#2
+
+
+; 
+; Subsystems skyline plot. Pull data-sets of subsystemnumber, 
+; subsystem status, and subsystem planned/completed/status/whatever/week
+; to be used to make pillars of boxes.
+
+[ss_skyline]
+title=SMCC skyline plot
+format=PlotGenFormat
+left=100
+right=100
+top=400
+bottom=10
+mode=skyline
+
+; Oke, so where to spec the (comm or sub-) systems to be read? 
+; We have to get a report of SMCCs!  SMCC, OK, outstanding
+; or Not, and when it was done. This is probably better based off
+; of the reports that Andy made.
+; X has weeks, we do same basic one week per column-oriented plot
+; as the curves.
+firstx=3
+keywordcol=0
+Xkeyword=Week
+Xlegend=#0
+Xvalueedit=EditWeeks
+; Ys ... numbers in a keyworded row also. Indicates pillar heights
+; Only one Y, keyword and legend
+Ykeyword=Required
+Ylegend=#2
+; Then the names and statuses of the things will be in a number 
+; of subsequent rows, with a chained keyword 
+tagstatus=CERT%u
+; These are 2-part sets in the date, with number followed by box color 
+
+; Another option: Paint a vertical line corresponding to this week.
+linethisweek=2
+
+; TBD:  Color-legends: explain what the various colored boxes are supposed to mean.
+color2=
+color4=
+color5=
+; the color 9 (white) needs a little special TLC, as it must have a black frame drawn around it. 
+color9=
+
+; 
+; makeset("PB", "Rundown", "PLOT2 0 (SMCC Rundown) S:plotspec.ini K:smcc_rundown F:1"),
+[smcc_rundown]
+title=SMCC Rundown
+format=PlotGenFormat
+left=100
+right=100
+top=400
+bottom=10
+mode=curve
+; read by column: 
+firstx=3
+keywordcol=0
+ycount=2
+Xkeyword=Week
+Xlegend=#0
+Xvalueedit=EditWeeks
+
+Ykeyword1=SMCC.R
+Ycolor1=5
+Ylegend1=#2
+Ystop1=NotPastNow
+
+Ykeyword2=SMCC.P
+Ycolor2=2
+Ylegend2=#2
+; Ystop2=NotPastNow
+
+
+; 
+--> 
+
+<h2>Example [LCX] section </h2>
+
+<p>This is the [LCX] section as it was used for the plots shown in the figures. It is likely that something
+similar will be useful for other kinds of plots, thus here the functions are as examples.</p>
+
+<p>Note the implementations of the Editweeks() function and the NoPastNow() functions; these
+expect the X values to be week numbers, and use the regular LCX functions for handling these.</p>
+
+<p>The formatting function pulls some texts from the report, amongst these, the values of the row 
+where the column 0 value is "Info", and uses them to display the title in the plot window and the 
+header text. The function DrawMCHeader() is in repform.lcx on most systems; it is made available from being
+one of the files listed as the formatting code files for the parent Report window (the one we see here that is titled
+"Status Summary"). </p>
+
+<pre>
+
+; We put any interesting LCX functions into this section 
+[LCX]
+
+EditWeeks(string inweek, string Report, int row, int col, int turn, int turncount)
+{
+	string theyear, weekno, zo, theday;
+
+	theday = <a href="lcxh.html#DateFromWeek">DateFromWeek</a>(inweek, 0);  
+	theyear = <a href="lcxh.html#substr">substr</a>(inweek, 1, 4);
+	weekno = <a href="lcxh.html#substr">substr</a>(inweek, 5, 2); 
+	zo = <a href="lcxh.html#makeset">makeset</a>(theyear, weekno, theday); 
+	return(zo); 
+}
+
+/* Control curve stopping short at each interval: return &gt;= 0 for showing 
+	and -1 for not showing */ 
+NotPastNow(string x1, string x2, string y1, string y2, 
+	string Report, int row, int col, int turn, int turncount)
+{
+	string now, howlate; 
+	/* Decide if we do not want to paint the curve in the 
+		interval x1,y1 - x2,y2 for some reason. */ 
+
+	now = <a href="lcxh.html#week">week</a>();
+	howlate = <a href="lcxh.html#WeekDelta">WeekDelta( )</a>(x1, now); 
+
+	if(howlate &gt; 0) { return(-1); } 
+	return(0); 
+}
+
+/* Formatting function, able to call other functions 
+	in mcform.lcx, repform.lcx and such, as specified upon
+	starting the parent Report. */ 
+PlotGenFormat(string inifile, string section,
+	string title, string Report, 
+	string Pleft, string Pright, string Ptop, string Pbottom)
+{
+    string delta, top, left, right, center;
+	string row, itemtable; 
+	string itemz; 
+	string item1, descr1, itemtype1; 
+	string h4, header2; 
+	string svpx, srow; 
+
+	delta = 780; 
+	top = <a href="lcxh.html#Height">Height( )</a>() - delta; 
+	left = Pleft;
+	right = Pright; 
+    center = (left + right) / 2;
+	
+	/* The system or subsystem or other object that we ran the 
+		report off from. Where to get this? Look for a row keyed Info. */ 
+	row = <a href="lcxh.html#RepInfo">RepInfo( )</a>("rows", Report); 
+
+	row = <a href="lcxh.html#RepSearch">RepSearch( )</a>("Info", 0, Report, 1); 
+	itemtable = <a href="lcxh.html#RepGet">RepGet( )</a>(row, 1, Report); 
+
+	itemz = <a href="lcxh.html#RepGet">RepGet( )</a>(row, 2, Report); 
+	itemtype1 = <a href="lcxh.html#StdField">StdField( )</a>(itemtable, "BASEDESCR"); 
+	header2 = <a href="lcxh.html#concat">concat( )</a>("by ", itemtype1); 
+
+	/* check the number of items. */ 
+	if( <a href="lcxh.html#setlen">setlen( )</a>(itemz) == 1)
+	{
+		item1 = <a href="lcxh.html#setitem">setitem( )</a>(itemz, 0); 
+		svpx = GTableInfo(itemtable); // This is usually in global.lcx 
+		srow = <a href="lcxh.html#RepSearch">RepSearch( )</a>(item1, 1, svpx, 1); 
+		descr1 = <a href="lcxh.html#RepGet">RepGet( )</a>(srow, 2, svpx); 
+		h4 = ""; 
+	}
+	else
+	{
+		item1 = "several";
+		descr1 = ""; 
+		h4 = <a href="lcxh.html#replace">replace( )</a>(itemz, "+", ","); 
+	}
+
+	/* The DrawMCHeader is in repform.lcx, it is the same function used for 
+		Reports in general. Makes the plot titles look uniform. */ 
+
+    DrawMCHeader(right, top+delta, left, center,
+        "&lt;item2&gt;", item1, descr1,
+        1, 1,                         // "&lt;pagelitra&gt;", "&lt;pagecount&gt;",
+        h4,           // "&lt;xheader4&gt;", 
+		itemtype1, "&lt;pos2txt&gt;",
+        title,   						// "&lt;xheader1&gt;"  
+		header2, 
+        "&lt;descr2&gt;", 
+		"",     // "&lt;xheader3&gt;", 
+		1, 0,
+        "55", "35", "35", "35", "Arial");
+
+    return(0);
+}
+
+[end]
+</pre>
+
+
+<hr/>
+
+<!--
+<div align="center"><img src="icons/apache_pb.gif" alt="Powered by Apache" /></div>
+-->
+
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0!" height="31" width="88" /></a>
+</p>
+
+</body>
+</html>
+

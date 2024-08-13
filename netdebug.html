@@ -1,0 +1,177 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<title>Debugging through a network link</title>
+
+</head><body>
+
+<h1>Debugging through a network link</h1>
+
+<p>File Date: 2022-02-22</p>
+
+<p>During development and testing of WinPCS, an important mechanism 
+for performing trace-printing has been through a serial line. The machines
+running the server and client programs both may have had a serial link
+with information running in it, for seeing what is happening. </p>
+
+<p>On deployment, ideally, the trace-printing facility is not needed, 
+and to this end, the output from the client or the server may be controlled
+with Debug= entries in their INI files.  This works fine as long as 
+everything is operating properly, but when crashes and problems are apparent,
+there needs to be a way of inspecting these messages even in a production 
+system on the customers' site. </p>
+
+<p>The physical server machine in most installations may not be readily 
+accessible,  so the usual serial-line trick cannot be done. The remote 
+access to start and stop the server is handled through the 
+<a href="winpcsmc.html">WinPCS Super-Server</a>, and this program 
+can also restart a crashed server.  </p>
+
+<p>But the issue then will be to find out what has made the server crash. 
+To this end, recompilation, testing, and trace-printing is important. </p>
+
+<p>Another problem sometimes encountered is the fact that a number of
+portables now no longer have an available serial port. Here, some alternative
+is needed in these cases as well.  </p>
+
+<h2>TCP or UDP replaces serial</h2>
+<p>Recognizing that all these servers and clients operate in a network,
+even if this is just one machine with a loopback connection on it, the
+the solution was found to be to allow the server and the client to emit 
+messages on a network connection. </p>
+
+<p>So instead of emitting to com1 it could emit on
+some TCP or UDP port to a listening process on the same or a different machine.</p>
+
+<p>TCP will guarantee everything making it through, but with a performance penalty.
+Since TCP works with a connection, WinPCS will want to connect to a <b>netrx</b> listener
+at the other end, and if this can't be found, the connection attempt will time out
+after some some rather noticeable delay. </p>
+
+<p>For UDP, there is no such guarantee of everything making it through, though on a LAN 
+we might expect to see everything. There is, on the other hand, no overhead in setting up
+a connection, with UDP, WinPCS just blasts out the message and if there is any <b>udprx</b>
+program listening at the other end, it will hear them and display them.  If no <b>udprx</b>
+is there, the messages will be ignored. WinPCS will not sit around and wait, so the
+speed penalty is a lot less. However, the messages will clutter up the network, so in all
+cases, if debugging info is not of interest, they should be turned off. </p>
+
+<!-- <a href="serverini.html#options.debuglevel"> </a> -->
+<!-- <a href="serverini.html#options.debug"> </a> -->
+
+<p>To turn TCP or UDP output on, the entry Debug= in the <a href="serverini.html#options.debug">SERVER.INI</a> 
+and <a href="winpcsini.html#debug">WINPCS.INI</a> files can be set to one of</p>
+<pre>
+<b>Debug=net </b><em>ipaddress</em>
+<b>Debug=net </b><em>ipaddress</em><b>:</b><em>port</em>
+<b>Debug=tcp </b><em>ipaddress</em>
+<b>Debug=tcp </b><em>ipaddress</em><b>:</b><em>port</em>
+<b>Debug=udp </b><em>ipaddress</em>
+<b>Debug=udp </b><em>ipaddress</em><b>:</b><em>port</em>
+</pre>
+<p>The keywords <b>net</b> and <b>tcp</b> are synonyms, and will make WinPCS emit 
+messages using the TCP protocol, 
+and the keyword <b>udp</b> will make WinPCS use the UDP protocol. </p>
+
+<p>Alternately, the command-line argument for the client can include the
+-N debug-command, with a similar syntax, for example:</p>
+<pre>-N "net 192.168.2.107:16381"</pre>
+<p>This will override the setting in the WinPCS.INI for this client. </p>
+
+<p>In the above, the <em>ipaddress</em> refers to the ip-address of the machine running one of 
+the listener programs <b>netrx</b> or <b>udprx</b> as appropriate. The port is default 
+16385, corresponding to the default of port 16385 for the commands. Any other available
+port may be specified. </p>
+
+<p>Normally, these messages are not of much interest to the running project, 
+but when some trace-printing is needed, from the server in particular,
+(on the client, the <a href="lcxh.html#message">message(&nbsp;)</a>
+function goes a long way), this is very useful. Custom messages from LCX
+code can be emitted using the 
+<a href="lcxh.html#trace">trace(&nbsp;)</a>
+function of LCX.</p>
+
+<p>On the server, the debug-output can be restricted to only put out 
+info from calls to <a href="lcxh.html#trace">trace(&nbsp;)</a>
+and not from everything else that is going on in the server.  To control this,
+the entry debuglevel= in <a href="serverini.html#options.debuglevel"> server.ini</a> 
+can be set to debuglevel=LCX for only LCX-origin output, 
+or the default debuglevel=DLL for everything. </p>
+
+<p> It is also possible to turn debugging on or off while the WinPCS 
+server or client program is running, by using one of the functions
+<a href="lcxh.html#AimDebugOutput">AimDebugOutput(&nbsp;)</a> or
+<a href="lcxh.html#CWULIB">CWULIB(&nbsp;)</a>. Once debugging is turned on, and
+until it is turned off, all messages from the system will appear, whether these come from the 
+compiled code in one or another of the DLL or SO files, or from 
+<a href="lcxh.html#trace">trace(&nbsp;)</a> 
+calls in LCX code. </p>
+
+<a name="netrx"/>
+<h2>netrx</h2>
+<p>
+This console program listens for messages on the port that some WinPCS server
+or client may be emitting messages into using the TCP protocol.  When it 
+has received a message, it puts it out on the screen.  <b>netrx</b> is a 
+receive-only server, that never transmits anything back.  </p>
+
+<p>To run this, open a command-line window, and run the command</p>
+<pre><b>netrx -p </b><em>port</em></pre>
+<p>to establish <b>netrx</b> listening on the numbered TCP port.
+This has to be the same port as is specified in the 
+debug= setting. Several instances listening on different 
+ports, for example one for the server, and another for the client,  may be 
+running at the same time.</p>
+
+<p>There are versions of <b>netrx</b> available for Windows, Linux, BSD and hp-ux.
+</p>
+
+<a name="udprx"/>
+<h2>udprx</h2>
+<p>
+This is the UDP equivalent of <b>netrx</b>. This is also a console program 
+that sits listens for messages on the port that some WinPCS server
+or client may be emitting messages into, using the UDP protocol.  
+When it has received a message, it puts it out on the screen.  
+<b>udprx</b>, like <b>netrx</b>, is receive-only. </p>
+
+<p>To run this, open a command-line window, and run the command</p>
+<pre><b>udprx -p </b><em>port</em></pre>
+<p>to establish <b>udprx</b> listening on the numbered port.
+This would generally be the same port as is specified in one of the 
+debug= settings. Several instances listening on different 
+ports may be running at the same time.</p>
+<p>There are versions of <b>udprx</b> available for Windows, Linux, and BSD.
+</p>
+
+<h2>Capturing output to a file</h2>
+<p>Both netrx and udprx can save the received text into a file. One of the command-line arguments</p>
+
+<pre>-o <em>filename</em> </pre>
+
+<p>or </p>
+
+<pre>-d <em>prefix</em> </pre>
+
+<p>will allow this to happen. This argument comes in addition to any <tt>-p <em>port</em></tt> 
+arguments used to define the port number.  </p>
+
+<p> the <tt>-d <em>prefix</em></tt> makes the output go into a file with the name <em>prefix<b>MMDDNN</b></em>,
+where <em>MM</em> and <em>DD</em> are the month and day of the file's creation, and <em>NN</em> will be 
+a sequence number starting at <b>01</b> for each of of several files created on the same day. </p>
+
+<hr/>
+
+<p>
+      <a href="http://validator.w3.org/check?uri=referer">
+		<img src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+</p>
+
+</body>
+</html>
+
+
